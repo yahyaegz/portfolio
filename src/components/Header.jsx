@@ -203,7 +203,7 @@ export default function Header() {
                             <motion.a
                                 key={item.href}
                                 href={item.href}
-                                className={`relative whitespace-nowrap rounded-md px-2.5 pb-2 pt-1.5 text-sm font-medium transition-colors ${
+                                className={`relative whitespace-nowrap rounded-md px-2.5 pb-3 pt-1.5 text-sm font-medium transition-colors ${
                                     activeSection === item.id
                                         ? 'text-accent'
                                         : 'text-secondary hover:text-accent hover:bg-accent/10'
@@ -213,15 +213,19 @@ export default function Header() {
                                 whileTap={{ scale: 0.95 }}
                             >
                                 {item.label}
-                                <motion.span
-                                    className="absolute bottom-0 left-[10%] right-[10%] rounded-full bg-accent"
-                                    style={{ height: '2px' }}
-                                    initial={false}
-                                    animate={{
-                                        scaleX: activeSection === item.id ? 1 : 0,
+                                <span
+                                    style={{
+                                        position: 'absolute',
+                                        bottom: 0,
+                                        left: '10%',
+                                        width: '80%',
+                                        height: '2px',
+                                        borderRadius: '9999px',
+                                        backgroundColor: 'var(--accent, #10b981)',
+                                        transform: activeSection === item.id ? 'scaleX(1)' : 'scaleX(0)',
                                         opacity: activeSection === item.id ? 1 : 0,
+                                        transition: 'transform 0.3s ease, opacity 0.3s ease',
                                     }}
-                                    transition={{ duration: 0.3, ease: 'easeInOut' }}
                                 />
                             </motion.a>
                         ))}
