@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../theme/ThemeProvider';
 import { useLanguage, LANGUAGES } from '../context/LanguageContext';
 import useActiveSection from '../hooks/useActiveSection';
@@ -199,12 +199,11 @@ export default function Header() {
 
                 <nav className="hidden lg:block" role="navigation" aria-label="Main navigation">
                     <div className="flex items-center gap-1 xl:gap-2">
-                        <LayoutGroup>
                         {navItems.map(item => (
                             <motion.a
                                 key={item.href}
                                 href={item.href}
-                                className={`relative whitespace-nowrap rounded-md px-2.5 py-1.5 text-sm font-medium transition-colors ${
+                                className={`relative whitespace-nowrap rounded-md px-2.5 pb-2 pt-1.5 text-sm font-medium transition-colors ${
                                     activeSection === item.id
                                         ? 'text-accent'
                                         : 'text-secondary hover:text-accent hover:bg-accent/10'
@@ -214,16 +213,18 @@ export default function Header() {
                                 whileTap={{ scale: 0.95 }}
                             >
                                 {item.label}
-                                {activeSection === item.id && (
-                                    <motion.span
-                                        layoutId="activeNavIndicator"
-                                        className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full bg-accent"
-                                        transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                                    />
-                                )}
+                                <motion.span
+                                    className="absolute bottom-0 left-[10%] right-[10%] rounded-full bg-accent"
+                                    style={{ height: '2px' }}
+                                    initial={false}
+                                    animate={{
+                                        scaleX: activeSection === item.id ? 1 : 0,
+                                        opacity: activeSection === item.id ? 1 : 0,
+                                    }}
+                                    transition={{ duration: 0.3, ease: 'easeInOut' }}
+                                />
                             </motion.a>
                         ))}
-                        </LayoutGroup>
                         <div className={isRTL ? 'flex items-center gap-2 mr-3 pr-3 border-r' : 'flex items-center gap-2 ml-3 pl-3 border-l'} style={{ borderColor: 'var(--border-color)' }}>
                             <motion.a
                                 href="/resume.pdf"
