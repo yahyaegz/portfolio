@@ -17,7 +17,7 @@ export default function Contact() {
         const payload = Object.fromEntries(form.entries());
 
         // Add Web3Forms access key
-        payload.access_key = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY || 'YOUR_ACCESS_KEY_HERE';
+        payload.access_key = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY;
         // Optional: add subject to payload for Web3Forms to use as email subject
         payload.from_name = payload.name;
         payload.subject = payload.subject || `New message from ${payload.name}`;
