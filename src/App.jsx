@@ -1,15 +1,15 @@
 import React, { Suspense, lazy, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
-import Header from './components/Header';
-import ScrollProgress from './components/ScrollProgress';
-import Hero from './components/Hero';
 import SkeletonLoader from './components/SkeletonLoader';
-import ParticleField from './components/ParticleField';
-import BackToTop from './components/BackToTop';
-import Chatbot from './components/Chatbot';
-import IntroSequence from './components/IntroSequence';
-import ScrollWarpDivider from './components/ScrollWarpDivider';
 
+const Header = lazy(() => import('./components/Header'));
+const ScrollProgress = lazy(() => import('./components/ScrollProgress'));
+const Hero = lazy(() => import('./components/Hero'));
+const ParticleField = lazy(() => import('./components/ParticleField'));
+const BackToTop = lazy(() => import('./components/BackToTop'));
+const Chatbot = lazy(() => import('./components/Chatbot'));
+const IntroSequence = lazy(() => import('./components/IntroSequence'));
+const ScrollWarpDivider = lazy(() => import('./components/ScrollWarpDivider'));
 const Services = lazy(() => import('./components/Services'));
 const Skills = lazy(() => import('./components/Skills'));
 const Projects = lazy(() => import('./components/Projects'));
@@ -27,9 +27,13 @@ export default function App() {
 
     return (
         <div className="section-dark min-h-screen flex flex-col overflow-x-hidden w-full relative">
-            <IntroSequence onComplete={() => setIntroDone(true)} />
+            <Suspense fallback={null}>
+                <IntroSequence onComplete={() => setIntroDone(true)} />
+            </Suspense>
 
-            <ParticleField />
+            <Suspense fallback={null}>
+                <ParticleField />
+            </Suspense>
 
             <a
                 href="#home"
@@ -52,12 +56,18 @@ export default function App() {
                 }}
             />
 
-            <ScrollProgress />
-            <BackToTop />
-            <Chatbot />
-            <Header />
+            <Suspense fallback={null}>
+                <ScrollProgress />
+                <BackToTop />
+                <Chatbot />
+            </Suspense>
+            <Suspense fallback={<SkeletonLoader />}>
+                <Header />
+            </Suspense>
             <main className="flex-grow relative z-10">
-                <Hero />
+                <Suspense fallback={<SkeletonLoader />}>
+                    <Hero />
+                </Suspense>
                 <Suspense fallback={<SkeletonLoader />}>
                     <ScrollWarpDivider />
                     <Services />

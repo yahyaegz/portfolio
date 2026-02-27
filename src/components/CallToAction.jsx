@@ -63,7 +63,7 @@ export default function CallToAction() {
                 </motion.div>
 
                 <motion.div
-                    className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16 pt-12 border-t"
+                    className="grid grid-cols-3 gap-6 mt-16 pt-12 border-t"
                     style={{ borderColor: 'var(--border-color)' }}
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
@@ -73,10 +73,6 @@ export default function CallToAction() {
                     <div className="text-center">
                         <p className="text-3xl font-bold text-accent"><AnimatedCounter value={3} suffix="+" /></p>
                         <p className="text-muted text-sm">{t('cta.projectsDelivered')}</p>
-                    </div>
-                    <div className="text-center">
-                        <p className="text-3xl font-bold text-accent"><AnimatedCounter value={2} /></p>
-                        <p className="text-muted text-sm">{t('cta.internships')}</p>
                     </div>
                     <div className="text-center">
                         <p className="text-3xl font-bold text-accent"><AnimatedCounter value={30} suffix="+" /></p>

@@ -1,7 +1,7 @@
 import React, { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Points, PointMaterial } from '@react-three/drei';
-import * as THREE from 'three';
+import { AdditiveBlending } from 'three';
 
 function seededRandom(seed) {
     let s = seed;
@@ -49,7 +49,7 @@ function ParticleSphere() {
                 size={0.025}
                 sizeAttenuation
                 depthWrite={false}
-                blending={THREE.AdditiveBlending}
+                blending={AdditiveBlending}
                 opacity={0.7}
             />
         </Points>
@@ -87,7 +87,7 @@ function InnerRing() {
                 size={0.018}
                 sizeAttenuation
                 depthWrite={false}
-                blending={THREE.AdditiveBlending}
+                blending={AdditiveBlending}
                 opacity={0.5}
             />
         </Points>
