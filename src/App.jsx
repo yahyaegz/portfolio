@@ -26,7 +26,7 @@ export default function App() {
     );
 
     return (
-        <div className="section-dark min-h-screen flex flex-col">
+        <div className="section-dark min-h-screen flex flex-col overflow-x-hidden w-full relative">
             <IntroSequence onComplete={() => setIntroDone(true)} />
 
             <ParticleField />

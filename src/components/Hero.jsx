@@ -35,12 +35,12 @@ export default function Hero() {
             </Suspense>
 
             <motion.div
-                className="absolute -left-40 -top-40 w-80 h-80 bg-accent/5 rounded-full blur-3xl pointer-events-none z-0"
+                className="absolute -left-10 -top-40 w-80 h-80 bg-accent/5 rounded-full blur-3xl pointer-events-none z-0"
                 animate={{ x: [0, 30, 0], y: [0, 30, 0] }}
                 transition={{ duration: 8, repeat: Infinity }}
             />
             <motion.div
-                className="absolute -right-40 -bottom-40 w-80 h-80 bg-cyan-400/5 rounded-full blur-3xl pointer-events-none z-0"
+                className="absolute -right-10 -bottom-40 w-80 h-80 bg-cyan-400/5 rounded-full blur-3xl pointer-events-none z-0"
                 animate={{ x: [0, -30, 0], y: [0, -30, 0] }}
                 transition={{ duration: 8, repeat: Infinity, delay: 1 }}
             />
