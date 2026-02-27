@@ -16,19 +16,29 @@ export default function Contact() {
         const form = new FormData(e.target);
         const payload = Object.fromEntries(form.entries());
 
-        // Add Web3Forms access key
-        payload.access_key = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY;
-        // Optional: add subject to payload for Web3Forms to use as email subject
-        payload.from_name = payload.name;
-        payload.subject = payload.subject || `New message from ${payload.name}`;
-
         setLoading(true);
         const toastId = toast.loading(t('contact.sending'));
+
+        // Add Web3Forms access key
+        const accessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY;
+        
+        if (!accessKey) {
+            toast.error('Web3Forms Access Key is missing. Please check your .env file.', { id: toastId });
+            setLoading(false);
+            return;
+        }
+
+        payload.access_key = accessKey;
+        payload.from_name = payload.name;
+        payload.subject = payload.subject || `New message from ${payload.name}`;
 
         try {
             const response = await axios.post('https://api.web3forms.com/submit', payload, {
                 timeout: 10000,
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
             });
 
             if (response?.data?.success) {
