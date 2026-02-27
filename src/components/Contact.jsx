@@ -21,9 +21,10 @@ export default function Contact() {
 
         // Add Web3Forms access key
         const accessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY;
+        console.log("Web3Forms Access Key present:", !!accessKey);
         
         if (!accessKey) {
-            toast.error('Web3Forms Access Key is missing. Please check your .env file.', { id: toastId });
+            toast.error('Web3Forms Access Key is missing. Please RESTART your Vite server (npm run dev).', { id: toastId });
             setLoading(false);
             return;
         }
