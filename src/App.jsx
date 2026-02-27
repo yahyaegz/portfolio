@@ -1,5 +1,6 @@
 import React, { Suspense, lazy, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
+import { Analytics } from '@vercel/analytics/react';
 import SkeletonLoader from './components/SkeletonLoader';
 
 const Header = lazy(() => import('./components/Header'));
@@ -90,6 +91,7 @@ export default function App() {
             <Suspense fallback={null}>
                 <Footer />
             </Suspense>
+            <Analytics />
         </div>
     );
 }
