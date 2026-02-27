@@ -9,7 +9,7 @@ export const profile = {
         linkedin: 'https://www.linkedin.com/in/yahya-el-gzouli-99536b331',
         github: 'https://github.com/yahyaegz',
         twitter: 'https://x.com/YahyaEgz?t=1w_Suv18laykjv_2GtumTQ&s=09',
-        instagram: 'https://www.instagram.com/arty7ya_?igshid=anB3cDR5am9tNjlx',
+        instagram: 'https://www.instagram.com/shadowy7ya',
     },
     summary: `Results-driven Full-Stack Software Engineer with expertise in developing scalable and high-performance web applications using React, Node.js, ASP.NET Core, and SQL-based databases. Skilled in RESTful API design, cloud deployment, and database optimization. Committed to clean architecture, secure authentication systems, and agile team collaboration. Passionate about building innovative solutions and pushing boundaries in technology.`,
 };
