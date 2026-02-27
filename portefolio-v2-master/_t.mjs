@@ -1,0 +1,1 @@
+import{translations as t}from"./src/locales/translations.js";console.log("en edu",t.en.education.items[0].text);console.log("ar edu",t.ar.education.items[0].text);console.log("fr edu",t.fr.education.items[0].text);console.log("es edu",t.es.education.items[0].text);
