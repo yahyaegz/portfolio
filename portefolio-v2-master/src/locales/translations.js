@@ -95,8 +95,7 @@ export const translations = {
             techStack: 'TECH STACK',
             items: [
                 { title: 'AIR BABOUCHE E-Commerce Platform', description: 'Full-stack e-commerce platform with secure authentication, product management, and payment integration. Built with React, Node.js, and MySQL.' },
-                { title: 'My Rock Attitude Platform', description: 'Responsive web application with React frontend and Express.js backend, supporting 1,000+ monthly user interactions with optimized performance.' },
-                { title: 'Portfolio Website', description: 'Modern single-page portfolio website built with React and Tailwind CSS showcasing projects, skills, and professional experience.' },
+                { title: 'Portfolio Website', description: 'Modern portfolio website showcasing projects, skills, and professional experience. Built with React and Tailwind CSS, deployed on Vercel.', link: 'https://y7ya.vercel.app/' },
             ],
         },
         topSkills: ['Full-Stack Development', 'RESTful API Design', 'Database Optimization'],
@@ -331,8 +330,7 @@ export const translations = {
             techStack: 'التقنيات المستخدمة',
             items: [
                 { title: 'منصة AIR BABOUCHE للتجارة الإلكترونية', description: 'منصة تجارة إلكترونية Full-Stack مع مصادقة آمنة وإدارة المنتجات وتكامل الدفع. مبنية بـ React و Node.js و MySQL.' },
-                { title: 'منصة My Rock Attitude', description: 'تطبيق ويب متجاوب بواجهة React و Backend بـ Express.js، يدعم أكثر من 1,000 تفاعل شهري مع أداء محسّن.' },
-                { title: 'موقع Portfolio', description: 'موقع Portfolio حديث من صفحة واحدة مبني بـ React و Tailwind CSS لعرض المشاريع والمهارات والخبرة المهنية.' },
+                { title: 'موقع Portfolio', description: 'موقع Portfolio حديث يعرض المشاريع والمهارات والخبرة المهنية. مبني بـ React و Tailwind CSS، منشور على Vercel.', link: 'https://y7ya.vercel.app/' },
             ],
         },
         topSkills: ['تطوير Full-Stack', 'تصميم RESTful API', 'تحسين قواعد البيانات'],
@@ -567,8 +565,7 @@ export const translations = {
             techStack: 'TECHNOLOGIES',
             items: [
                 { title: 'Plateforme E-Commerce AIR BABOUCHE', description: 'Plateforme e-commerce Full-Stack avec authentification sécurisée, gestion des produits et intégration de paiement. Construite avec React, Node.js et MySQL.' },
-                { title: 'Plateforme My Rock Attitude', description: 'Application web réactive avec frontend React et backend Express.js, supportant plus de 1 000 interactions mensuelles avec des performances optimisées.' },
-                { title: 'Site Portfolio', description: 'Site portfolio moderne en une seule page construit avec React et Tailwind CSS présentant projets, compétences et expérience professionnelle.' },
+                { title: 'Site Portfolio', description: 'Site portfolio moderne présentant projets, compétences et expérience professionnelle. Construit avec React et Tailwind CSS, déployé sur Vercel.', link: 'https://y7ya.vercel.app/' },
             ],
         },
         topSkills: ['Développement Full-Stack', 'Conception de RESTful API', 'Optimisation de Bases de Données'],
@@ -803,8 +800,7 @@ export const translations = {
             techStack: 'TECNOLOGÍAS',
             items: [
                 { title: 'Plataforma E-Commerce AIR BABOUCHE', description: 'Plataforma e-commerce Full-Stack con autenticación segura, gestión de productos e integración de pagos. Construida con React, Node.js y MySQL.' },
-                { title: 'Plataforma My Rock Attitude', description: 'Aplicación web responsiva con frontend React y backend Express.js, soportando más de 1.000 interacciones mensuales con rendimiento optimizado.' },
-                { title: 'Sitio Web Portfolio', description: 'Sitio portfolio moderno de una sola página construido con React y Tailwind CSS mostrando proyectos, habilidades y experiencia profesional.' },
+                { title: 'Sitio Web Portfolio', description: 'Sitio portfolio moderno que muestra proyectos, habilidades y experiencia profesional. Construido con React y Tailwind CSS, desplegado en Vercel.', link: 'https://y7ya.vercel.app/' },
             ],
         },
         topSkills: ['Desarrollo Full-Stack', 'Diseño de RESTful API', 'Optimización de Bases de Datos'],
