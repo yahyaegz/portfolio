@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { profile, skills, experience, projects, education, contactInfo, services, certifications, coreCompetencies, testimonials, languages as langData } from '../data';
 import { useLanguage } from '../context/LanguageContext';
@@ -18,261 +18,81 @@ function YLogo({ size = 36 }) {
     );
 }
 
-function buildKnowledge() {
-    const kb = [];
 
-    kb.push({ keys: ['name', 'who', 'yahya', 'about', 'introduce', 'yourself', 'tell me about', 'gzouli', 'portfolio owner', 'developer', 'engineer', 'من', 'يحيى', 'acerca', 'qui'], category: 'about', data: profile });
+function buildSystemPrompt(language) {
+    const langNames = { en: 'English', ar: 'Arabic', fr: 'French', es: 'Spanish' };
+    const currentLang = langNames[language] || 'English';
 
-    kb.push({ keys: ['summary', 'bio', 'background', 'describe', 'overview', 'profile', 'ملخص', 'résumé', 'biografía'], category: 'summary', data: profile.summary });
+    const skillsSummary = skills.map(c => `${c.category}: ${c.items.map(i => i.title).join(', ')}`).join('\n');
+    const projectsSummary = projects.map(p => `• ${p.title} — ${p.description} | Tech: ${p.tech.join(', ')}${p.link && p.link !== '#' ? ` | Link: ${p.link}` : ''}`).join('\n');
+    const experienceSummary = experience.map(e => `• ${e.company} — ${e.role} (${e.period}, ${e.location})\n  ${e.summary}`).join('\n');
+    const educationSummary = education.map(e => `• ${e.text} (${e.period})`).join('\n');
+    const certsSummary = certifications.flatMap(cat => cat.items.map(c => `• ${c.name} (${cat.category}) — Issued: ${c.issued}`)).join('\n');
+    const servicesSummary = services.map(s => `• ${s.title}: ${s.text}`).join('\n');
+    const testimonialsSummary = testimonials.map(t => `• "${t.quote}" — ${t.author} (${t.stars}★)`).join('\n');
+    const languagesSummary = langData.map(l => `${l.language}: ${l.level}`).join(', ');
 
-    skills.forEach(cat => {
-        const items = cat.items.map(i => i.title).join(', ');
-        kb.push({ keys: [cat.category.toLowerCase(), ...cat.items.map(i => i.title.toLowerCase())], category: 'skills', data: { category: cat.category, items } });
-    });
-    kb.push({ keys: ['skill', 'tech', 'stack', 'technology', 'tool', 'framework', 'programming', 'competenc', 'مهار', 'habilidad', 'compétence', 'what can', 'what do you know', 'capable'], category: 'allSkills', data: skills });
+    return `You are Yahya El Gzouli's personal portfolio assistant. Your role is to answer visitors' questions about Yahya based ONLY on the data below. Be friendly, professional, concise, and helpful. Use emojis sparingly to keep things warm.
 
-    kb.push({ keys: ['competenc', 'core', 'strength', 'strong', 'best at', 'speciali', 'expert', 'كفاء', 'compétence clé', 'competencia'], category: 'competencies', data: coreCompetencies });
+IMPORTANT: Always respond in ${currentLang}. If the user writes in a different language, still respond in ${currentLang}.
 
-    projects.forEach(p => {
-        kb.push({ keys: [p.title.toLowerCase(), ...p.tech.map(t => t.toLowerCase())], category: 'project', data: p });
-    });
-    kb.push({ keys: ['project', 'work', 'built', 'build', 'create', 'made', 'develop', 'مشر', 'proyecto', 'projet', 'portfolio', 'app', 'application', 'website', 'platform'], category: 'allProjects', data: projects });
+If someone asks something not covered by the data below, politely say you can only answer questions about Yahya and suggest what topics you can help with.
 
-    experience.forEach(e => {
-        kb.push({ keys: [e.company.toLowerCase(), e.role.toLowerCase(), e.period.toLowerCase()], category: 'experience', data: e });
-    });
-    kb.push({ keys: ['experience', 'job', 'work', 'intern', 'stage', 'employ', 'company', 'career', 'خبر', 'experiencia', 'expérience', 'worked', 'where did', 'professional'], category: 'allExperience', data: experience });
+Never make up information that isn't in the data below. If you don't know, say so.
 
-    kb.push({ keys: ['education', 'study', 'school', 'university', 'degree', 'college', 'learn', 'academic', 'ehei', 'bac', 'preparatory', 'تعليم', 'formación', 'formation', 'studied', 'graduated', 'diploma'], category: 'education', data: education });
+═══ PROFILE ═══
+Name: ${profile.name}
+Title: ${profile.title}
+Location: Oujda, Morocco 🇲🇦
+Age: 23
+Phone: +212 654495827
+Summary: ${profile.summary}
 
-    kb.push({ keys: ['contact', 'email', 'phone', 'reach', 'message', 'call', 'connect', 'touch', 'تواصل', 'contacto', 'how to reach', 'get in touch', 'write', 'send'], category: 'contact', data: contactInfo });
+═══ SOCIAL LINKS ═══
+LinkedIn: ${profile.social.linkedin}
+GitHub: ${profile.social.github}
+Twitter: ${profile.social.twitter}
+Instagram: ${profile.social.instagram}
 
-    kb.push({ keys: ['service', 'offer', 'provide', 'what do you do', 'can you', 'help', 'خدم', 'servicio', 'propose'], category: 'services', data: services });
+═══ CONTACT ═══
+Email: ${contactInfo.email}
+Phone: ${contactInfo.phone}
+LinkedIn: ${contactInfo.linkedin}
 
-    kb.push({ keys: ['where', 'location', 'city', 'country', 'live', 'based', 'from', 'أين', 'dónde', 'où', 'morocco', 'oujda', 'maroc', 'marruecos', 'المغرب', 'وجدة'], category: 'location', data: null });
+═══ SKILLS ═══
+${skillsSummary}
 
-    kb.push({ keys: ['hire', 'available', 'freelance', 'open to', 'job', 'opportunity', 'recruit', 'توظيف', 'disponible', 'contract', 'remote', 'looking for', 'need developer'], category: 'hire', data: null });
+═══ CORE COMPETENCIES ═══
+${coreCompetencies.join(', ')}
 
-    kb.push({ keys: ['language', 'speak', 'tongue', 'لغ', 'idioma', 'langue', 'arabic', 'french', 'english', 'spanish', 'عربي', 'فرنسي', 'انجليزي'], category: 'languages', data: langData });
+═══ PROJECTS ═══
+${projectsSummary}
 
-    kb.push({ keys: ['cv', 'resume', 'download', 'pdf', 'سيرة', 'currículum', 'télécharger', 'descargar'], category: 'cv', data: null });
+═══ EXPERIENCE ═══
+${experienceSummary}
 
-    kb.push({ keys: ['certif', 'badge', 'credential', 'hackerrank', 'scrimba', 'codédex', 'شهاد', 'certificación', 'achievement', 'award', 'earned'], category: 'certifications', data: certifications });
+═══ EDUCATION ═══
+${educationSummary}
 
-    kb.push({ keys: ['testimonial', 'review', 'feedback', 'client', 'what people say', 'recommend', 'آراء', 'testimonio', 'témoignage', 'opinion', 'say about'], category: 'testimonials', data: testimonials });
+═══ CERTIFICATIONS ═══
+${certsSummary}
 
-    kb.push({ keys: ['age', 'old', 'born', 'birthday', 'عمر', 'edad', 'âge', 'year born'], category: 'age', data: null });
+═══ SERVICES OFFERED ═══
+${servicesSummary}
 
-    kb.push({ keys: ['github', 'linkedin', 'twitter', 'instagram', 'social', 'link', 'مواقع', 'redes sociales', 'réseaux'], category: 'social', data: profile.social });
+═══ LANGUAGES SPOKEN ═══
+${languagesSummary}
 
-    kb.push({ keys: ['hi', 'hello', 'hey', 'salam', 'bonjour', 'hola', 'مرحبا', 'السلام', 'good morning', 'good evening', 'sup', 'yo', 'wassup', 'what\'s up', 'howdy'], category: 'greeting', data: null });
+═══ TESTIMONIALS ═══
+${testimonialsSummary}
 
-    kb.push({ keys: ['thank', 'thanks', 'merci', 'gracias', 'شكر', 'appreciate', 'helpful', 'great', 'awesome', 'cool', 'nice'], category: 'thanks', data: null });
-
-    kb.push({ keys: ['bye', 'goodbye', 'see you', 'later', 'وداع', 'adiós', 'au revoir', 'ciao', 'take care'], category: 'goodbye', data: null });
-
-    kb.push({ keys: ['joke', 'funny', 'fun', 'humor', 'laugh', 'نكت', 'chiste', 'blague'], category: 'fun', data: null });
-
-    kb.push({ keys: ['how are you', 'how\'s it going', 'how do you do', 'what\'s up', 'كيف حالك', 'comment ça va', 'cómo estás', 'ça va'], category: 'howareyou', data: null });
-
-    kb.push({ keys: ['what can you', 'what do you', 'help me', 'your purpose', 'your job', 'why are you here', 'capabilities', 'features', 'ماذا تفعل'], category: 'capabilities', data: null });
-
-    kb.push({ keys: ['price', 'cost', 'rate', 'charge', 'how much', 'budget', 'سعر', 'precio', 'tarif', 'combien', 'cuánto'], category: 'pricing', data: null });
-
-    kb.push({ keys: ['when', 'timeline', 'how long', 'deadline', 'start', 'متى', 'cuándo', 'quand', 'available when'], category: 'timeline', data: null });
-
-    kb.push({ keys: ['favorite', 'prefer', 'best', 'love', 'like most', 'مفضل', 'favorito', 'préféré', 'enjoy'], category: 'favorites', data: null });
-
-    kb.push({ keys: ['how did you learn', 'self-taught', 'course', 'bootcamp', 'training', 'كيف تعلمت', 'cómo aprendiste', 'comment as-tu appris'], category: 'learning', data: null });
-
-    kb.push({ keys: ['asp.net', '.net', 'c#', 'csharp'], category: 'skills', data: { category: 'Backend', items: 'C# / .NET / ASP.NET Core — Full-stack backend development with secure APIs' } });
-    kb.push({ keys: ['react', 'frontend', 'front-end', 'next.js', 'nextjs'], category: 'skills', data: { category: 'Frontend', items: 'React.js, Next.js, HTML5, CSS3, Tailwind CSS, Bootstrap' } });
-    kb.push({ keys: ['python', 'machine learning', 'ml', 'ai', 'artificial intelligence', 'tensorflow', 'deep learning', 'neural'], category: 'skills', data: { category: 'ML & AI', items: 'Python, TensorFlow, Keras, Deep Learning, Neural Networks, NLP, Data Analysis' } });
-    kb.push({ keys: ['database', 'sql', 'mysql', 'postgres', 'mongodb', 'nosql', 'قاعدة بيانات'], category: 'skills', data: { category: 'Databases', items: 'PostgreSQL, MySQL, MongoDB' } });
-    kb.push({ keys: ['docker', 'devops', 'deploy', 'cloud', 'aws', 'azure', 'vercel', 'netlify', 'ci/cd'], category: 'skills', data: { category: 'Tools & Cloud', items: 'Docker, Git & GitHub, Linux, AWS, Microsoft Azure, Vercel & Netlify' } });
-
-    return kb;
-}
-
-const knowledgeBase = buildKnowledge();
-
-function findBestMatch(input) {
-    const q = input.toLowerCase().trim();
-    const words = q.split(/\s+/);
-
-    let bestMatch = null;
-    let bestScore = 0;
-
-    for (const entry of knowledgeBase) {
-        let score = 0;
-        for (const key of entry.keys) {
-            if (q.includes(key)) {
-                score += key.length * 3;
-            }
-            for (const word of words) {
-                if (word.length < 2) continue;
-                if (key.includes(word)) {
-                    score += word.length * 2;
-                }
-                if (word.includes(key) && key.length >= 3) {
-                    score += key.length;
-                }
-            }
-        }
-        if (score > bestScore) {
-            bestScore = score;
-            bestMatch = entry;
-        }
-    }
-
-    return { match: bestMatch, score: bestScore };
-}
-
-function getResponse(input, t, _language) {
-    const q = input.toLowerCase().trim();
-    const { match, score } = findBestMatch(q);
-
-    if (!match || score < 3) {
-        return generateSmartFallback(q, t);
-    }
-
-    switch (match.category) {
-        case 'greeting':
-            return t('chatbot.greeting');
-
-        case 'thanks':
-            return t('chatbot.thanks');
-
-        case 'goodbye':
-            return t('chatbot.goodbye');
-
-        case 'howareyou':
-            return t('chatbot.howareyou');
-
-        case 'fun':
-            return t('chatbot.fun');
-
-        case 'capabilities':
-            return t('chatbot.capabilities');
-
-        case 'about':
-            return `${t('chatbot.aboutIntro')} ${profile.name} — ${profile.title}. ${profile.subtitle}`;
-
-        case 'summary':
-            return profile.summary;
-
-        case 'skills':
-            if (match.data?.category) {
-                return `**${match.data.category}:** ${match.data.items}`;
-            }
-            return t('chatbot.skillsIntro') + ' ' + skills.map(c => c.category).join(', ') + '.';
-
-        case 'allSkills': {
-            const cats = skills.map(c => `• ${c.category}: ${c.items.map(i => i.title).join(', ')}`).join('\n');
-            return `${t('chatbot.skillsIntro')}\n${cats}`;
-        }
-
-        case 'competencies':
-            return `${t('chatbot.competenciesIntro')} ${coreCompetencies.join(', ')}.`;
-
-        case 'project':
-            if (match.data?.title) {
-                return `📦 **${match.data.title}**: ${match.data.description}\n🛠️ Tech: ${match.data.tech.join(', ')}${match.data.link && match.data.link !== '#' ? `\n🔗 ${match.data.link}` : ''}`;
-            }
-            break;
-
-        case 'allProjects': {
-            const real = projects.filter(p => p.type === 'project');
-            return `${t('chatbot.projectsIntro')} ${real.map(p => `• ${p.title}`).join(', ')}.`;
-        }
-
-        case 'experience':
-            if (match.data?.company) {
-                return `💼 **${match.data.company}** — ${match.data.role} (${match.data.period})\n📍 ${match.data.location}\n${match.data.summary}`;
-            }
-            break;
-
-        case 'allExperience': {
-            const exp = experience.map(e => `• ${e.company} — ${e.role} (${e.period})`).join('\n');
-            return `${t('chatbot.experienceIntro')}\n${exp}`;
-        }
-
-        case 'education': {
-            const edu = education.map(e => `• ${e.text} (${e.period})`).join('\n');
-            return `${t('chatbot.educationIntro')}\n${edu}`;
-        }
-
-        case 'contact':
-            return `${t('chatbot.contactIntro')} ✉️ ${contactInfo.email} | 📞 ${contactInfo.phone} | 💼 LinkedIn: ${contactInfo.linkedin}`;
-
-        case 'services': {
-            const svc = services.map(s => `• ${s.title}: ${s.text}`).join('\n');
-            return `${t('chatbot.servicesIntro')}\n${svc}`;
-        }
-
-        case 'location':
-            return t('chatbot.location');
-
-        case 'hire':
-            return t('chatbot.hire');
-
-        case 'languages':
-            return t('chatbot.languages');
-
-        case 'cv':
-            return t('chatbot.cv');
-
-        case 'certifications': {
-            const certs = certifications.flatMap(cat =>
-                cat.items.map(c => `• ${c.name} (${cat.category}) — ${c.issued}`)
-            ).join('\n');
-            return `${t('chatbot.certificationsIntro')}\n${certs}`;
-        }
-
-        case 'testimonials': {
-            const test = testimonials.map(t => `⭐ "${t.quote}" — ${t.author}`).join('\n\n');
-            return `${t('chatbot.testimonialsIntro')}\n\n${test}`;
-        }
-
-        case 'age':
-            return t('chatbot.age');
-
-        case 'social':
-            return `${t('chatbot.socialIntro')}\n🔗 GitHub: ${profile.social.github}\n💼 LinkedIn: ${profile.social.linkedin}\n🐦 Twitter: ${profile.social.twitter}\n📸 Instagram: ${profile.social.instagram}`;
-
-        case 'pricing':
-            return t('chatbot.pricing');
-
-        case 'timeline':
-            return t('chatbot.timeline');
-
-        case 'favorites':
-            return t('chatbot.favorites');
-
-        case 'learning':
-            return t('chatbot.learning');
-
-        default:
-            return generateSmartFallback(q, t);
-    }
-
-    return generateSmartFallback(q, t);
-}
-
-function generateSmartFallback(q, t) {
-    const isQuestion = /\?|^(what|who|how|where|when|why|can|do|does|is|are|will|would|should|could|tell|show|list|explain|describe|ما|من|كيف|أين|هل|لماذا|qué|quién|cómo|dónde|est-ce|quel|pourquoi|comment)/.test(q);
-
-    const isConversational = /^(i |my |we |our |please|can you|could you|i'm|i am|i need|i want|looking for|help me|yo |أنا|أريد|je |j'|necesito|quiero)/.test(q);
-
-    if (isQuestion) {
-        return t('chatbot.smartQuestion');
-    }
-
-    if (isConversational) {
-        return t('chatbot.smartConversational');
-    }
-
-    return t('chatbot.smartDefault');
+═══ ADDITIONAL INFO ═══
+- Yahya is open to opportunities, freelance work, and collaboration.
+- His CV can be downloaded from the hero section of this portfolio website.
+- He is a 4th-year Computer Engineering student at EHEI Oujda.
+- His favorite technologies are React (frontend), Node.js/ASP.NET Core (backend), and Python (AI/ML).
+- He is self-taught in many areas, complementing his formal education with HackerRank, Scrimba, and Codédex courses.
+- Pricing depends on project scope — visitors should reach out via the contact form or email.`;
 }
 
 function getQuickQuestions(t) {
@@ -282,10 +102,6 @@ function getQuickQuestions(t) {
         t('chatbot.quickContact'),
         t('chatbot.quickAbout'),
     ];
-}
-
-function getRandomDelay() {
-    return 400 + Math.floor(Math.random() * 600);
 }
 
 export default function Chatbot() {
@@ -298,12 +114,16 @@ export default function Chatbot() {
     const messagesEnd = useRef(null);
     const inputRef = useRef(null);
     const welcomeSent = useRef(false);
+    const conversationRef = useRef([]); // stores {role, content} for puter.ai.chat
 
-    // Initialize welcome message when chat first opens
     const ensureWelcome = () => {
         if (!welcomeSent.current) {
             welcomeSent.current = true;
-            setMessages([{ role: 'bot', text: t('chatbot.welcome') }]);
+            const welcomeText = t('chatbot.welcome');
+            setMessages([{ role: 'bot', text: welcomeText }]);
+            conversationRef.current = [
+                { role: 'assistant', content: welcomeText },
+            ];
         }
     };
 
@@ -315,9 +135,47 @@ export default function Chatbot() {
         if (open) inputRef.current?.focus();
     }, [open]);
 
-    const send = (text) => {
+    const sendToPuter = useCallback(async (userText) => {
+        const systemPrompt = buildSystemPrompt(language);
+
+        // Add user message to conversation history
+        conversationRef.current = [
+            ...conversationRef.current,
+            { role: 'user', content: userText },
+        ];
+
+        // Keep conversation history manageable (last 20 messages)
+        if (conversationRef.current.length > 20) {
+            conversationRef.current = conversationRef.current.slice(-20);
+        }
+
+        try {
+            const response = await window.puter.ai.chat(
+                [
+                    { role: 'system', content: systemPrompt },
+                    ...conversationRef.current,
+                ],
+                { model: 'gpt-4o-mini' }
+            );
+
+            const botText = response?.message?.content || response?.toString?.() || t('chatbot.smartDefault');
+
+            // Add assistant reply to history
+            conversationRef.current = [
+                ...conversationRef.current,
+                { role: 'assistant', content: botText },
+            ];
+
+            return botText;
+        } catch (err) {
+            console.error('Puter AI error:', err);
+            return t('chatbot.smartDefault');
+        }
+    }, [language, t]);
+
+    const send = useCallback(async (text) => {
         const trimmed = (text || input).trim();
-        if (!trimmed) return;
+        if (!trimmed || isTyping) return;
 
         const userMsg = { role: 'user', text: trimmed };
         setMessages(prev => [...prev, userMsg]);
@@ -325,14 +183,11 @@ export default function Chatbot() {
         setShowQuick(false);
         setIsTyping(true);
 
-        const delay = getRandomDelay();
-        setTimeout(() => {
-            const botResponse = getResponse(trimmed, t, language);
-            const botMsg = { role: 'bot', text: botResponse };
-            setMessages(prev => [...prev, botMsg]);
-            setIsTyping(false);
-        }, delay);
-    };
+        const botResponse = await sendToPuter(trimmed);
+        const botMsg = { role: 'bot', text: botResponse };
+        setMessages(prev => [...prev, botMsg]);
+        setIsTyping(false);
+    }, [input, isTyping, sendToPuter]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
