@@ -96,6 +96,7 @@ export const translations = {
             items: [
                 { title: 'AIR BABOUCHE E-Commerce Platform', description: 'Full-stack e-commerce platform with secure authentication, product management, and payment integration. Built with React, Node.js, and MySQL.' },
                 { title: 'Portfolio Website', description: 'Modern portfolio website showcasing projects, skills, and professional experience. Built with React and Tailwind CSS, deployed on Vercel.', link: 'https://y7ya.vercel.app/' },
+                { title: "Women's Day Tribute", description: "An animated React celebration page honoring inspiring women around the world. Built to celebrate International Women's Day – March 8 💜 This project creates a beautiful interactive experience with animations, particles, inspirational quotes, and famous women showcases.", link: 'https://international-womens-day-chi.vercel.app/' },
             ],
         },
         topSkills: ['Full-Stack Development', 'RESTful API Design', 'Database Optimization'],
@@ -330,6 +331,7 @@ export const translations = {
             items: [
                 { title: 'منصة AIR BABOUCHE للتجارة الإلكترونية', description: 'منصة تجارة إلكترونية Full-Stack مع مصادقة آمنة وإدارة المنتجات وتكامل الدفع. مبنية بـ React و Node.js و MySQL.' },
                 { title: 'موقع Portfolio', description: 'موقع Portfolio حديث يعرض المشاريع والمهارات والخبرة المهنية. مبني بـ React و Tailwind CSS، منشور على Vercel.', link: 'https://y7ya.vercel.app/' },
+                { title: 'تحية ليوم المرأة', description: 'صفحة احتفالية متحركة بـ React تكرم النساء الملهمات حول العالم. بنيت للاحتفال بيوم المرأة العالمي – 8 مارس 💜 تجربة تفاعلية جميلة مع الرسوم المتحركة والجزيئات والاقتباسات الملهمة.', link: 'https://international-womens-day-chi.vercel.app/' },
             ],
         },
         topSkills: ['تطوير Full-Stack', 'تصميم RESTful API', 'تحسين قواعد البيانات'],
@@ -564,6 +566,7 @@ export const translations = {
             items: [
                 { title: 'Plateforme E-Commerce AIR BABOUCHE', description: 'Plateforme e-commerce Full-Stack avec authentification sécurisée, gestion des produits et intégration de paiement. Construite avec React, Node.js et MySQL.' },
                 { title: 'Site Portfolio', description: 'Site portfolio moderne présentant projets, compétences et expérience professionnelle. Construit avec React et Tailwind CSS, déployé sur Vercel.', link: 'https://y7ya.vercel.app/' },
+                { title: 'Hommage à la Journée de la Femme', description: 'Une page de célébration animée en React honorant les femmes inspirantes du monde entier. Créée pour célébrer la Journée internationale de la femme – 8 mars 💜 Une expérience interactive avec des animations, des particules et des citations inspirantes.', link: 'https://international-womens-day-chi.vercel.app/' },
             ],
         },
         topSkills: ['Développement Full-Stack', 'Conception de RESTful API', 'Optimisation de Bases de Données'],
@@ -798,6 +801,7 @@ export const translations = {
             items: [
                 { title: 'Plataforma E-Commerce AIR BABOUCHE', description: 'Plataforma e-commerce Full-Stack con autenticación segura, gestión de productos e integración de pagos. Construida con React, Node.js y MySQL.' },
                 { title: 'Sitio Web Portfolio', description: 'Sitio portfolio moderno que muestra proyectos, habilidades y experiencia profesional. Construido con React y Tailwind CSS, desplegado en Vercel.', link: 'https://y7ya.vercel.app/' },
+                { title: 'Tributo al Día de la Mujer', description: 'Una página de celebración animada en React que rinde homenaje a mujeres inspiradoras de todo el mundo. Creada para celebrar el Día Internacional de la Mujer – 8 de marzo 💜 Una experiencia interactiva con animaciones, partículas y citas inspiradoras.', link: 'https://international-womens-day-chi.vercel.app/' },
             ],
         },
         topSkills: ['Desarrollo Full-Stack', 'Diseño de RESTful API', 'Optimización de Bases de Datos'],

@@ -231,7 +231,7 @@ export default function Header() {
                         ))}
                         <div className={isRTL ? 'flex items-center gap-2 mr-3 pr-3 border-r' : 'flex items-center gap-2 ml-3 pl-3 border-l'} style={{ borderColor: 'var(--border-color)' }}>
                             <motion.a
-                                href="/resume.pdf"
+                                href="/yahya_el_gzouli_cv_en.pdf"
                                 download
                                 className="flex items-center gap-1.5 rounded-full border border-accent bg-accent/10 px-3 py-1 text-xs font-semibold text-accent hover:bg-accent hover:text-black transition"
                                 whileHover={{ scale: 1.05 }}
@@ -296,7 +296,7 @@ export default function Header() {
                             </motion.a>
                         ))}
                         <motion.a
-                            href="/resume.pdf"
+                            href="/yahya_el_gzouli_cv_en.pdf"
                             download
                             onClick={() => setOpen(false)}
                             className="rounded-lg px-4 py-3 text-base font-medium text-accent flex items-center gap-2 hover:bg-accent/10 transition-colors"

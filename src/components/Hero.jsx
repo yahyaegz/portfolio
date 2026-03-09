@@ -128,7 +128,7 @@ export default function Hero() {
                             />
                         </motion.a>
                         <motion.a
-                            href="/resume.pdf"
+                            href="/yahya_el_gzouli_cv_en.pdf"
                             download
                             className="inline-flex items-center gap-2 rounded-full border-2 border-accent/50 px-8 py-3 font-semibold text-accent hover:border-accent hover:bg-accent/10 transition duration-300"
                             data-magnetic

@@ -257,6 +257,14 @@ export const projects = [
         icon: 'briefcase',
         type: 'project',
     },
+    {
+        title: "Women's Day Tribute",
+        description: "An animated React celebration page honoring inspiring women around the world. Built to celebrate International Women's Day – March 8 💜 This project creates a beautiful interactive experience with animations, particles, inspirational quotes, and famous women showcases.",
+        tech: ['React', 'Framer Motion', 'Vite', 'Animations'],
+        link: 'https://international-womens-day-chi.vercel.app/',
+        icon: 'heart',
+        type: 'project',
+    },
 ];
 
 export const testimonials = [
