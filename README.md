@@ -97,58 +97,6 @@ dotnet run
 
 ---
 
-# 🔐 Environment Variables
-
-Create `.env`
-
-```id="env1"
-EMAIL_HOST=
-EMAIL_USER=
-EMAIL_PASS=
-```
-
----
-
-# 📊 GitHub Stats
-
-<div align="center">
-
-<img height="170" src="https://github-readme-stats.vercel.app/api?username=YOURUSERNAME&show_icons=true&theme=tokyonight"/>
-
-<img height="170" src="https://github-readme-streak-stats.herokuapp.com/?user=YOURUSERNAME&theme=tokyonight"/>
-
-</div>
-
----
-
-# 📈 Activity Graph
-
-<div align="center">
-
-<img src="https://github-readme-activity-graph.vercel.app/graph?username=YOURUSERNAME&theme=tokyo-night"/>
-
-</div>
-
----
-
-# 🐍 Contribution Snake
-
-<div align="center">
-
-<img src="https://raw.githubusercontent.com/YOURUSERNAME/YOURUSERNAME/output/github-contribution-grid-snake.svg"/>
-
-</div>
-
----
-
-# 📬 Contact
-
-💼 LinkedIn
-🐦 Twitter
-🌐 Portfolio Website
-
----
-
 <div align="center">
 
 ⭐ If you like this project, give it a star!
