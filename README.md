@@ -62,10 +62,9 @@ portfolio
 
 # 📸 Screenshots
 
-| Home                                                         | Projects                                                         | Contact                                                         |
-| ------------------------------------------------------------ | ---------------------------------------------------------------- | --------------------------------------------------------------- |
-| ![](https://dummyimage.com/400x250/0f172a/ffffff\&text=Home) | ![](https://dummyimage.com/400x250/0f172a/ffffff\&text=Projects) | ![](https://dummyimage.com/400x250/0f172a/ffffff\&text=Contact) |
-
+| Home | Projects | Contact |
+|------|----------|---------|
+| ![](/hero.png) | ![](/projects.png) | ![](/contact.png) |
 ---
 
 # 🚀 Installation
