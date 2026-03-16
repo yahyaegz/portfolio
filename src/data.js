@@ -11,7 +11,7 @@ export const profile = {
         twitter: 'https://x.com/YahyaEgz?t=1w_Suv18laykjv_2GtumTQ&s=09',
         instagram: 'https://www.instagram.com/shadowy7ya',
     },
-    summary: `Results-driven Full-Stack Software Engineer with expertise in developing scalable and high-performance web applications using React, Node.js, ASP.NET Core, and SQL-based databases. Skilled in RESTful API design, cloud deployment, and database optimization. Committed to clean architecture, secure authentication systems, and agile team collaboration. Passionate about building innovative solutions and pushing boundaries in technology.`,
+    summary: `Computer Engineering student and Full-Stack developer focused on building modern and scalable web applications. Interested in SaaS platforms, high-performance backend architectures, and applications integrating artificial intelligence.`,
 };
 
 export const topSkills = [
@@ -293,7 +293,8 @@ export const skills = [
             { icon: 'linux', title: 'Linux', brand: true },
             { icon: 'aws', title: 'AWS', brand: true },
             { icon: 'microsoft', title: 'Microsoft Azure', brand: true },
-            { icon: 'rocket', title: 'Vercel & Netlify' },
+            { icon: 'rocket', title: 'Vercel, Render & Netlify' },
+            { icon: 'code', title: 'Postman & Swagger' },
         ]
     },
     {
@@ -334,6 +335,14 @@ export const experience = [
 ];
 
 export const projects = [
+    {
+        title: 'Cliniko - AI Healthcare SaaS Platform',
+        description: 'SaaS platform for clinic management including patient records, appointment scheduling and AI-powered intelligent search. Built with Next.js, PostgreSQL, and AI integration.',
+        tech: ['Next.js', 'React', 'Node.js', 'PostgreSQL', 'Tailwind', 'REST API', 'JWT', 'AI'],
+        link: '#',
+        icon: 'hospital',
+        type: 'project',
+    },
     {
         title: 'AIR BABOUCHE E-Commerce Platform',
         description: 'Full-stack e-commerce platform with secure authentication, product management, and payment integration. Built with React, Node.js, and MySQL.',
