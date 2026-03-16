@@ -29,11 +29,6 @@ portfolio
 │   ├── sections
 │   └── styles
 │
-└── backend
-    ├── Domain
-    ├── Application
-    ├── Infrastructure
-    └── API
 ```
 
 ---
