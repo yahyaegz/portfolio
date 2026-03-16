@@ -37,6 +37,99 @@ export const coreCompetencies = [
 
 export const certifications = [
     {
+        category: 'Meta',
+        items: [
+            {
+                name: 'Meta Full-Stack Developer Professional Certificate',
+                issued: 'Mar 2026',
+                credentialId: 'NQDPG73WKDGP',
+                type: 'Professional Certificate',
+                skills: ['Full-Stack Development', 'React.js', 'Node.js', 'Python', 'Django', 'REST APIs', 'Databases', 'Git'],
+                credentialUrl: '#',
+                icon: 'certificate'
+            },
+            {
+                name: 'Meta APIs Certificate (Django REST Framework)',
+                issued: 'Mar 2026',
+                credentialId: 'EEUHU9MXOVV3',
+                type: 'Course',
+                skills: ['Django REST Framework', 'API REST', 'Web Development'],
+                credentialUrl: '#',
+                icon: 'gears'
+            },
+            {
+                name: 'Version Control — Meta',
+                issued: 'Mar 2026',
+                credentialId: 'K10H9YWFQBBV',
+                type: 'Course',
+                skills: ['Git', 'Version Control', 'GitHub'],
+                credentialUrl: '#',
+                icon: 'github',
+                brand: true
+            },
+            {
+                name: 'Django Web Framework — Meta',
+                issued: 'Mar 2026',
+                credentialId: 'P0LB91TMSLGY',
+                type: 'Course',
+                skills: ['Django', 'Python', 'Back-End Development'],
+                credentialUrl: '#',
+                icon: 'python',
+                brand: true
+            },
+            {
+                name: 'Programming in Python — Meta',
+                issued: 'Mar 2026',
+                credentialId: 'N33V5W2ENBX8',
+                type: 'Course',
+                skills: ['Python', 'Object-Oriented Programming (OOP)'],
+                credentialUrl: '#',
+                icon: 'python',
+                brand: true
+            },
+            {
+                name: 'HTML and CSS in Depth — Meta',
+                issued: 'Mar 2026',
+                credentialId: 'JK76WH80F5SC',
+                type: 'Course',
+                skills: ['HTML', 'CSS', 'Responsive Design'],
+                credentialUrl: '#',
+                icon: 'html5',
+                brand: true
+            },
+            {
+                name: 'Advanced React — Meta',
+                issued: 'Mar 2026',
+                credentialId: 'JS31GVB04B7D',
+                type: 'Course',
+                skills: ['React.js', 'Front-End Development', 'Performance Optimization'],
+                credentialUrl: '#',
+                icon: 'react',
+                brand: true
+            },
+            {
+                name: 'React Basics — Meta',
+                issued: 'Mar 2026',
+                credentialId: 'EBA76J9BFNA5',
+                type: 'Course',
+                skills: ['React.js', 'Front-End Development', 'JSX'],
+                credentialUrl: '#',
+                icon: 'react',
+                brand: true
+            },
+            {
+                name: 'Programming with JavaScript — Meta',
+                issued: 'Mar 2026',
+                credentialId: 'IXA9RNJY9YV1',
+                type: 'Course',
+                skills: ['JavaScript', 'Web Development', 'ES6+'],
+                credentialUrl: '#',
+                icon: 'js',
+                brand: true
+            }
+        ]
+    },
+    {
         category: 'HackerRank',
         items: [
             {
@@ -137,99 +230,6 @@ export const certifications = [
                 credentialUrl: 'https://scrimba.com/certificate-cert24zAwJ77fGzp2NCmrTsNJcbPNi7brsfEXFpbv',
                 icon: 'code'
             },
-        ]
-    },
-    {
-        category: 'Meta',
-        items: [
-            {
-                name: 'Meta Full-Stack Developer Professional Certificate',
-                issued: 'Mar 2026',
-                credentialId: 'NQDPG73WKDGP',
-                type: 'Professional Certificate',
-                skills: ['Full-Stack Development', 'React.js', 'Node.js', 'Python', 'Django', 'REST APIs', 'Databases', 'Git'],
-                credentialUrl: '#',
-                icon: 'certificate'
-            },
-            {
-                name: 'Meta APIs Certificate (Django REST Framework)',
-                issued: 'Mar 2026',
-                credentialId: 'EEUHU9MXOVV3',
-                type: 'Course',
-                skills: ['Django REST Framework', 'API REST', 'Web Development'],
-                credentialUrl: '#',
-                icon: 'gears'
-            },
-            {
-                name: 'Version Control — Meta',
-                issued: 'Mar 2026',
-                credentialId: 'K10H9YWFQBBV',
-                type: 'Course',
-                skills: ['Git', 'Version Control', 'GitHub'],
-                credentialUrl: '#',
-                icon: 'github',
-                brand: true
-            },
-            {
-                name: 'Django Web Framework — Meta',
-                issued: 'Mar 2026',
-                credentialId: 'P0LB91TMSLGY',
-                type: 'Course',
-                skills: ['Django', 'Python', 'Back-End Development'],
-                credentialUrl: '#',
-                icon: 'python',
-                brand: true
-            },
-            {
-                name: 'Programming in Python — Meta',
-                issued: 'Mar 2026',
-                credentialId: 'N33V5W2ENBX8',
-                type: 'Course',
-                skills: ['Python', 'Object-Oriented Programming (OOP)'],
-                credentialUrl: '#',
-                icon: 'python',
-                brand: true
-            },
-            {
-                name: 'HTML and CSS in Depth — Meta',
-                issued: 'Mar 2026',
-                credentialId: 'JK76WH80F5SC',
-                type: 'Course',
-                skills: ['HTML', 'CSS', 'Responsive Design'],
-                credentialUrl: '#',
-                icon: 'html5',
-                brand: true
-            },
-            {
-                name: 'Advanced React — Meta',
-                issued: 'Mar 2026',
-                credentialId: 'JS31GVB04B7D',
-                type: 'Course',
-                skills: ['React.js', 'Front-End Development', 'Performance Optimization'],
-                credentialUrl: '#',
-                icon: 'react',
-                brand: true
-            },
-            {
-                name: 'React Basics — Meta',
-                issued: 'Mar 2026',
-                credentialId: 'EBA76J9BFNA5',
-                type: 'Course',
-                skills: ['React.js', 'Front-End Development', 'JSX'],
-                credentialUrl: '#',
-                icon: 'react',
-                brand: true
-            },
-            {
-                name: 'Programming with JavaScript — Meta',
-                issued: 'Mar 2026',
-                credentialId: 'IXA9RNJY9YV1',
-                type: 'Course',
-                skills: ['JavaScript', 'Web Development', 'ES6+'],
-                credentialUrl: '#',
-                icon: 'js',
-                brand: true
-            }
         ]
     },
 ];

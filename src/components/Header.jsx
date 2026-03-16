@@ -4,7 +4,7 @@ import { useTheme } from '../theme/ThemeProvider';
 import { useLanguage, LANGUAGES } from '../context/LanguageContext';
 import useActiveSection from '../hooks/useActiveSection';
 
-const SECTION_IDS = ['home', 'services', 'skills', 'projects', 'education', 'experience', 'contact'];
+const SECTION_IDS = ['home', 'services', 'skills', 'projects', 'education', 'experience', 'certifications', 'contact'];
 
 function ThemeToggle({ showLabel = false, className = '' }) {
     const { theme, toggleTheme } = useTheme();
@@ -154,6 +154,7 @@ export default function Header() {
         { href: '#projects', id: 'projects', label: t('nav.projects') },
         { href: '#education', id: 'education', label: t('nav.education') },
         { href: '#experience', id: 'experience', label: t('nav.experience') },
+        { href: '#certifications', id: 'certifications', label: t('nav.certifications') },
         { href: '#contact', id: 'contact', label: t('nav.contact') },
     ];
 

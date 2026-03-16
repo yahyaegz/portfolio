@@ -15,6 +15,7 @@ export const translations = {
             education: 'Education',
             experience: 'Experience',
             languages: 'Languages',
+            certifications: 'Certifications',
             contact: 'Contact',
         },
         hero: {
@@ -238,6 +239,7 @@ export const translations = {
             education: 'التعليم',
             experience: 'الخبرة',
             languages: 'اللغات',
+            certifications: 'الشهادات',
             contact: 'التواصل',
         },
         hero: {
@@ -473,6 +475,7 @@ export const translations = {
             education: 'Formation',
             experience: 'Expérience',
             languages: 'Langues',
+            certifications: 'Certifications',
             contact: 'Contact',
         },
         hero: {
@@ -708,6 +711,7 @@ export const translations = {
             education: 'Formación',
             experience: 'Experiencia',
             languages: 'Idiomas',
+            certifications: 'Certificaciones',
             contact: 'Contacto',
         },
         hero: {
