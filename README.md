@@ -61,10 +61,9 @@ portfolio
 ---
 
 # 📸 Screenshots
-
 | Home | Projects | Contact |
 |------|----------|---------|
-| ![](/hero.png) | ![](/projects.png) | ![](/contact.png) |
+| ![](public/hero.png) | ![](public/projects.png) | ![](public/contact.png) |
 ---
 
 # 🚀 Installation
