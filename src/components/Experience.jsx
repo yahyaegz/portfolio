@@ -25,6 +25,7 @@ export default function Experience() {
                 <div className="space-y-4 md:space-y-6">
                     {items.map((e) => (
                         <TiltCard
+                            as={motion.article}
                             key={e.company}
                             className="rounded-xl card-bg border p-6 md:p-8 shadow-lg transition-all duration-300 hover:shadow-xl"
                         >

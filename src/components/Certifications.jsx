@@ -51,7 +51,7 @@ export default function Certifications() {
                                 viewport={{ once: true }}
                             >
                                 {category.items.map((cert) => (
-                                    <motion.div
+                                    <motion.article
                                         key={cert.name}
                                         variants={{
                                             hidden: { opacity: 0, y: 20 },
@@ -138,7 +138,7 @@ export default function Certifications() {
                                                 />
                                             </motion.a>
                                         )}
-                                    </motion.div>
+                                    </motion.article>
                                 ))}
                             </motion.div>
                         </motion.div>

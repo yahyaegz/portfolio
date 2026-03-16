@@ -17,6 +17,7 @@ const ProjectCard = ({ p, translatedItem }) => {
     const description = translatedItem?.description || p.description;
     return (
         <TiltCard
+            as={motion.article}
             className="group rounded-xl overflow-hidden card-bg border shadow-lg transition-all hover:shadow-2xl"
         >
             <motion.div variants={itemVariants} className="relative z-20">
