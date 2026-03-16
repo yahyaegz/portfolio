@@ -318,6 +318,21 @@ export const education = [
 
 export const experience = [
     {
+        company: 'Codveda Technologies',
+        role: 'Full-Stack Development Intern',
+        period: 'Mar 2026 – Present',
+        location: 'Remote',
+        link: '#',
+        summary: 'Selected as a Full Stack Development Intern at Codveda Technologies, working on real-world full-stack web development tasks including building REST APIs, developing frontend interfaces, integrating databases, and implementing authentication systems.',
+        highlights: [
+            'Working on real-world full-stack web development tasks',
+            'Developing front-end and back-end components',
+            'Integrating APIs and optimizing application performance',
+            'Building scalable and user-friendly web applications',
+            'Collaborating remotely while delivering project tasks within deadlines',
+        ],
+    },
+    {
         company: 'AIR BABOUCHE',
         role: 'Full-Stack Engineer',
         period: 'Apr 2025 – May 2025',

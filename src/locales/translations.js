@@ -75,6 +75,18 @@ export const translations = {
             visitCompany: 'Visit Company',
             items: [
                 {
+                    role: 'Full-Stack Development Intern',
+                    location: 'Remote',
+                    summary: 'Selected as a Full Stack Development Intern at Codveda Technologies, working on real-world full-stack web development tasks including building REST APIs, developing frontend interfaces, integrating databases, and implementing authentication systems.',
+                    highlights: [
+                        'Working on real-world full-stack web development tasks',
+                        'Developing front-end and back-end components',
+                        'Integrating APIs and optimizing application performance',
+                        'Building scalable and user-friendly web applications',
+                        'Collaborating remotely while delivering project tasks within deadlines',
+                    ],
+                },
+                {
                     role: 'Full-Stack Engineer',
                     location: 'Oujda, Morocco',
                     summary: 'Developed and deployed a full-stack e-commerce platform using React, Node.js, and REST APIs, increasing user engagement by 30%. Designed and implemented 10+ RESTful API endpoints, reducing response time by 25%. Optimized SQL queries and database indexing, improving overall system performance by 20%. Implemented secure JWT-based authentication, protecting 100% of restricted routes.',
@@ -299,6 +311,18 @@ export const translations = {
             subtitle: 'خبرة واقعية في بناء الحلول والتعاون مع فرق عمل موهوبة.',
             visitCompany: 'زيارة الشركة',
             items: [
+                {
+                    role: 'متدرب تطوير Full-Stack',
+                    location: 'عن بعد',
+                    summary: 'تم اختياري كمتدرب لتطوير Full-Stack في Codveda Technologies، للعمل على مهام تطوير الويب الشاملة في العالم الحقيقي بما في ذلك بناء واجهات REST APIs، وتطوير واجهات الـ Frontend، وتكامل قواعد البيانات، وتنفيذ أنظمة المصادقة.',
+                    highlights: [
+                        'العمل على مهام تطوير ويب Full-Stack حقيقية',
+                        'تطوير مكونات الواجهة الأمامية والخلفية',
+                        'دمج واجهات البرمجة التطبيقية وتحسين أداء التطبيق',
+                        'بناء تطبيقات ويب قابلة للتوسع وسهلة الاستخدام',
+                        'التعاون عن بعد مع تسليم مهام المشروع ضمن المواعيد النهائية',
+                    ],
+                },
                 {
                     role: 'مهندس Full-Stack',
                     location: 'وجدة، المغرب',
@@ -537,6 +561,18 @@ export const translations = {
             visitCompany: 'Visiter l\'Entreprise',
             items: [
                 {
+                    role: 'Stagiaire en Développement Full-Stack',
+                    location: 'À distance',
+                    summary: 'Sélectionné en tant que stagiaire en développement Full-Stack chez Codveda Technologies, travaillant sur des tâches de développement web en conditions réelles, notamment la création d\'API REST, le développement d\'interfaces frontend, l\'intégration de bases de données et la mise en œuvre de systèmes d\'authentification.',
+                    highlights: [
+                        'Travail sur des tâches de développement web Full-Stack réelles',
+                        'Développement de composants front-end et back-end',
+                        'Intégration d\'API et optimisation des performances des applications',
+                        'Construction d\'applications web évolutives et conviviales',
+                        'Collaboration à distance tout en respectant les délais des projets',
+                    ],
+                },
+                {
                     role: 'Ingénieur Full-Stack',
                     location: 'Oujda, Maroc',
                     summary: 'Développement et déploiement d\'une plateforme e-commerce Full-Stack avec React, Node.js et REST APIs, augmentant l\'engagement des utilisateurs de 30%. Conception et implémentation de plus de 10 endpoints RESTful API, réduisant le temps de réponse de 25%. Optimisation des requêtes SQL et de l\'indexation, améliorant les performances globales de 20%. Implémentation d\'une authentification JWT sécurisée protégeant 100% des routes restreintes.',
@@ -773,6 +809,18 @@ export const translations = {
             subtitle: 'Experiencia real construyendo soluciones y colaborando con equipos talentosos.',
             visitCompany: 'Visitar Empresa',
             items: [
+                {
+                    role: 'Pasante de Desarrollo Full-Stack',
+                    location: 'Remoto',
+                    summary: 'Seleccionado como pasante de desarrollo Full-Stack en Codveda Technologies, trabajando en tareas de desarrollo web del mundo real, incluyendo la creación de API REST, desarrollo de interfaces frontend, integración de bases de datos e implementación de sistemas de autenticación.',
+                    highlights: [
+                        'Trabajo en tareas de desarrollo web Full-Stack del mundo real',
+                        'Desarrollo de componentes front-end y back-end',
+                        'Integración de API y optimización del rendimiento de las aplicaciones',
+                        'Construcción de aplicaciones web escalables y fáciles de usar',
+                        'Colaboración remota cumpliendo con los plazos del proyecto',
+                    ],
+                },
                 {
                     role: 'Ingeniero Full-Stack',
                     location: 'Oujda, Marruecos',
