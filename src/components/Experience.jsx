@@ -56,7 +56,7 @@ export default function Experience() {
                                     className="inline-flex items-center gap-2 text-accent hover:underline transition font-semibold text-sm"
                                     href={e.link}
                                     target="_blank"
-                                    rel="noreferrer"
+                                    rel="noopener noreferrer"
                                 >
                                     <i className="fa fa-link" /> {t('experience.visitCompany')}
                                 </a>
