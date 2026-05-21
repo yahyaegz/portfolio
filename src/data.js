@@ -320,7 +320,7 @@ export const experience = [
     {
         company: 'Codveda Technologies',
         role: 'Full-Stack Development Intern',
-        period: 'Mar 2026 – Present',
+        period: 'Apr 2026 – May 2026',
         location: 'Remote',
         link: '#',
         summary: 'Selected as a Full Stack Development Intern at Codveda Technologies, working on real-world full-stack web development tasks including building REST APIs, developing frontend interfaces, integrating databases, and implementing authentication systems.',
