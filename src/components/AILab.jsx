@@ -199,7 +199,7 @@ function recognizeDigit(matrix28x28) {
     for (let r = 0; r < 28; r++) {
         for (let c = 0; c < 28; c++) {
             const val = matrix28x28[r][c];
-            if (val > 0.1) {
+            if (val > 0.15) {
                 if (r < minRow) minRow = r;
                 if (r > maxRow) maxRow = r;
                 if (c < minCol) minCol = c;
@@ -212,7 +212,7 @@ function recognizeDigit(matrix28x28) {
         }
     }
     
-    if (totalMass === 0) {
+    if (totalMass < 1.0) {
         return Array(10).fill(0);
     }
     
@@ -223,83 +223,250 @@ function recognizeDigit(matrix28x28) {
     const width = maxCol - minCol + 1;
     const ratio = width / (height || 1);
     
-    // Feature extraction for robust handwriting classification
-    const midRow = minRow + height / 2;
-    const midCol = minCol + width / 2;
-    
-    let upperPixels = 0, lowerPixels = 0;
-    let leftPixels = 0, rightPixels = 0;
-    for (let r = minRow; r <= maxRow; r++) {
-        for (let c = minCol; c <= maxCol; c++) {
-            const val = matrix28x28[r][c];
-            if (val > 0.1) {
-                if (r < midRow) upperPixels += val;
-                else lowerPixels += val;
-                
-                if (c < midCol) leftPixels += val;
-                else rightPixels += val;
+    // 2. Flood fill to find closed loops (holes)
+    // Create visited matrix: true for stroke pixels, false for background
+    const visited = Array(28).fill(null).map(() => Array(28).fill(false));
+    for (let r = 0; r < 28; r++) {
+        for (let c = 0; c < 28; c++) {
+            if (matrix28x28[r][c] >= 0.15) {
+                visited[r][c] = true;
             }
         }
     }
     
-    let confidences = Array(10).fill(0.02);
+    // Flood fill from borders to mark all "outside" background pixels
+    const queue = [];
+    // Add all border cells that are not stroke pixels
+    for (let c = 0; c < 28; c++) {
+        if (!visited[0][c]) { visited[0][c] = true; queue.push([0, c]); }
+        if (!visited[27][c]) { visited[27][c] = true; queue.push([27, c]); }
+    }
+    for (let r = 1; r < 27; r++) {
+        if (!visited[r][0]) { visited[r][0] = true; queue.push([r, 0]); }
+        if (!visited[r][27]) { visited[r][27] = true; queue.push([r, 27]); }
+    }
     
-    // Very refined heuristic structure mapping digit strokes to probabilities 
-    if (ratio < 0.28) {
-        // Vertical line: 1
-        confidences[1] = 0.90;
-        confidences[7] = 0.08;
-    } else {
-        // Determine loops and crossings
-        // Left loop / right loop calculations
-        const upperRightMass = matrix28x28.slice(minRow, Math.floor(midRow)).reduce((acc, row) => acc + row.slice(Math.floor(midCol), maxCol + 1).reduce((s, v) => s + v, 0), 0);
-        const lowerLeftMass = matrix28x28.slice(Math.floor(midRow), maxRow + 1).reduce((acc, row) => acc + row.slice(minCol, Math.floor(midCol)).reduce((s, v) => s + v, 0), 0);
-        
-        if (ratio > 0.85 && Math.abs(width - height) < 3) {
-            // Circular: 0 or 8
-            if (totalMass > 150) {
-                confidences[0] = 0.85;
-                confidences[8] = 0.12;
-            } else {
-                confidences[8] = 0.82;
-                confidences[0] = 0.15;
+    while (queue.length > 0) {
+        const [r, c] = queue.shift();
+        const neighbors = [
+            [r - 1, c], [r + 1, c], [r, c - 1], [r, c + 1]
+        ];
+        for (const [nr, nc] of neighbors) {
+            if (nr >= 0 && nr < 28 && nc >= 0 && nc < 28) {
+                if (!visited[nr][nc]) {
+                    visited[nr][nc] = true;
+                    queue.push([nr, nc]);
+                }
             }
-        } else if (upperRightMass > 1.5 * lowerLeftMass && height > 8) {
-            // Top heavy: 9 or 7 or 3
-            if (lowerLeftMass < 5) {
-                confidences[7] = 0.85;
-                confidences[9] = 0.10;
-            } else {
-                confidences[9] = 0.78;
-                confidences[3] = 0.15;
+        }
+    }
+    
+    // Remaining unvisited false pixels are part of closed loops/holes!
+    // We count their connected components
+    let loopCount = 0;
+    const loopCenters = [];
+    const loopSizes = [];
+    
+    for (let r = minRow; r <= maxRow; r++) {
+        for (let c = minCol; c <= maxCol; c++) {
+            if (!visited[r][c]) {
+                // Found a new loop component!
+                loopCount++;
+                let loopSize = 0;
+                let loopSumRow = 0;
+                let loopSumCol = 0;
+                
+                // BFS to mark the entire component
+                const loopQueue = [[r, c]];
+                visited[r][c] = true;
+                
+                while (loopQueue.length > 0) {
+                    const [lr, lc] = loopQueue.shift();
+                    loopSize++;
+                    loopSumRow += lr;
+                    loopSumCol += lc;
+                    
+                    const neighbors = [
+                        [lr - 1, lc], [lr + 1, lc], [lr, lc - 1], [lr, lc + 1]
+                    ];
+                    for (const [nr, nc] of neighbors) {
+                        if (nr >= minRow && nr <= maxRow && nc >= minCol && nc <= maxCol) {
+                            if (!visited[nr][nc]) {
+                                visited[nr][nc] = true;
+                                loopQueue.push([nr, nc]);
+                            }
+                        }
+                    }
+                }
+                
+                loopCenters.push({
+                    row: loopSumRow / loopSize,
+                    col: loopSumCol / loopSize
+                });
+                loopSizes.push(loopSize);
             }
-        } else if (lowerLeftMass > 1.5 * upperRightMass) {
-            // Bottom heavy: 6 or 2
-            if (upperPixels < lowerPixels * 0.6) {
-                confidences[6] = 0.84;
-                confidences[5] = 0.10;
-            } else {
-                confidences[2] = 0.82;
-                confidences[0] = 0.10;
+        }
+    }
+    
+    // 3. Feature Profile Calculations
+    const midRow = minRow + height / 2;
+    const midCol = minCol + width / 2;
+    
+    // Horizontal crossings (how many times does a line cross the center row)
+    let centerCrossings = 0;
+    let insideStroke = false;
+    const targetRow = Math.floor(midRow);
+    for (let c = minCol; c <= maxCol; c++) {
+        const val = matrix28x28[targetRow][c];
+        if (val > 0.15) {
+            if (!insideStroke) {
+                centerCrossings++;
+                insideStroke = true;
             }
         } else {
-            // 4, 3, 5
-            if (leftPixels > rightPixels * 1.2) {
-                confidences[5] = 0.75;
-                confidences[6] = 0.15;
-            } else if (upperPixels < lowerPixels * 0.8) {
-                confidences[3] = 0.80;
-                confidences[2] = 0.12;
+            insideStroke = false;
+        }
+    }
+
+    // Vertical crossings (how many times does a line cross the center column)
+    let centerVertCrossings = 0;
+    insideStroke = false;
+    const targetCol = Math.floor(midCol);
+    for (let r = minRow; r <= maxRow; r++) {
+        const val = matrix28x28[r][targetCol];
+        if (val > 0.15) {
+            if (!insideStroke) {
+                centerVertCrossings++;
+                insideStroke = true;
+            }
+        } else {
+            insideStroke = false;
+        }
+    }
+
+    // Quadrant Densities
+    let qTopLeft = 0, qTopRight = 0, qBottomLeft = 0, qBottomRight = 0;
+    for (let r = minRow; r <= maxRow; r++) {
+        for (let c = minCol; c <= maxCol; c++) {
+            const val = matrix28x28[r][c];
+            if (val > 0.15) {
+                if (r <= midRow) {
+                    if (c <= midCol) qTopLeft += val;
+                    else qTopRight += val;
+                } else {
+                    if (c <= midCol) qBottomLeft += val;
+                    else qBottomRight += val;
+                }
+            }
+        }
+    }
+    
+    let confidences = Array(10).fill(0.01);
+    
+    // 4. Decision Tree based on Topological Loops & Regional Features
+    if (loopCount >= 2) {
+        // Two holes: MUST BE AN 8
+        confidences[8] = 0.95;
+        confidences[0] = 0.02;
+        confidences[9] = 0.02;
+    } else if (loopCount === 1) {
+        // One hole: Could be 0, 6, 9, or sometimes 4
+        const loop = loopCenters[0];
+        const relativeLoopY = (loop.row - minRow) / (height || 1);
+        
+        if (relativeLoopY < 0.4) {
+            // Loop in the upper half -> 9 or 4
+            // 9 has a loop at the top and a stem on the right (so bottom-left quadrant is empty/sparse)
+            if (qBottomLeft < 0.25 * qBottomRight) {
+                confidences[9] = 0.90;
+                confidences[4] = 0.06;
+                confidences[7] = 0.02;
             } else {
-                confidences[4] = 0.78;
+                confidences[4] = 0.75;
                 confidences[9] = 0.15;
+                confidences[0] = 0.05;
+            }
+        } else if (relativeLoopY > 0.6) {
+            // Loop in the lower half -> 6
+            confidences[6] = 0.92;
+            confidences[5] = 0.04;
+            confidences[0] = 0.02;
+        } else {
+            // Loop in the middle -> 0 or 6 or 9
+            // Check if aspect ratio is wide
+            if (ratio > 0.65) {
+                confidences[0] = 0.88;
+                confidences[6] = 0.05;
+                confidences[9] = 0.05;
+            } else {
+                // Taller loop, check if bottom heavier or top heavier
+                if (qBottomLeft + qBottomRight > qTopLeft + qTopRight) {
+                    confidences[6] = 0.70;
+                    confidences[0] = 0.20;
+                    confidences[8] = 0.05;
+                } else {
+                    confidences[9] = 0.70;
+                    confidences[0] = 0.20;
+                    confidences[8] = 0.05;
+                }
+            }
+        }
+    } else {
+        // Zero holes: 1, 2, 3, 5, 7, 0 (open), or open 4 / 6
+        
+        // Check for open 0 (highly circular, two crossings vertically and horizontally)
+        if (ratio > 0.7 && qTopLeft > 0.3 && qTopRight > 0.3 && qBottomLeft > 0.3 && qBottomRight > 0.3 && centerCrossings === 2 && centerVertCrossings === 2) {
+            confidences[0] = 0.82;
+            confidences[8] = 0.10;
+        } else if (ratio < 0.35 || width <= 4) {
+            // Very narrow: 1
+            confidences[1] = 0.95;
+            confidences[7] = 0.03;
+            confidences[2] = 0.01;
+        } else {
+            // Check for digit 7:
+            // Top-right is active, bottom-left has tail, bottom-right is sparse.
+            const bottomRowWidth = matrix28x28.slice(maxRow - 2, maxRow + 1).reduce((sum, r) => sum + r.reduce((s, v) => s + (v > 0.15 ? 1 : 0), 0), 0) / 3;
+            
+            if (qTopRight > 1.8 * qTopLeft && qBottomLeft < 0.25 * qBottomRight && ratio < 0.6) {
+                if (qBottomRight > 1.2 * qTopRight) {
+                    confidences[3] = 0.82;
+                    confidences[7] = 0.08;
+                    confidences[9] = 0.05;
+                } else {
+                    confidences[7] = 0.88;
+                    confidences[1] = 0.05;
+                    confidences[2] = 0.03;
+                }
+            } else if (bottomRowWidth >= 4 && qBottomLeft > 0.6 * qBottomRight && ratio > 0.5) {
+                // 2 has a strong horizontal base and curve top
+                confidences[2] = 0.86;
+                confidences[3] = 0.06;
+                confidences[7] = 0.04;
+            } else {
+                // 3, 5, or open 4
+                if (centerCrossings >= 2 || (qTopLeft > 0.5 * qTopRight && qBottomLeft < 0.3 * qBottomRight && qBottomRight > 0.5 * qTopRight)) {
+                    confidences[4] = 0.84;
+                    confidences[9] = 0.08;
+                    confidences[1] = 0.03;
+                } else if (qTopLeft > 1.2 * qTopRight || (qBottomRight > 1.2 * qBottomLeft && qTopLeft > qTopRight)) {
+                    confidences[5] = 0.82;
+                    confidences[3] = 0.08;
+                    confidences[6] = 0.05;
+                } else {
+                    // Default to 3
+                    confidences[3] = 0.80;
+                    confidences[5] = 0.08;
+                    confidences[2] = 0.05;
+                    confidences[7] = 0.03;
+                }
             }
         }
     }
     
     // Normalize confidences using softmax representation
-    const sum = confidences.reduce((s, v) => s + Math.exp(v * 4), 0);
-    return confidences.map(v => Math.exp(v * 4) / sum);
+    const sum = confidences.reduce((s, v) => s + Math.exp(v * 4.5), 0);
+    return confidences.map(v => Math.exp(v * 4.5) / sum);
 }
 
 export default function AILab() {
