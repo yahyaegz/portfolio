@@ -324,6 +324,7 @@ export default function AILab() {
 
     // Sketchpad States
     const [isDrawing, setIsDrawing] = useState(false);
+    const isDrawingRef = useRef(false);
     const [predictions, setPredictions] = useState(Array(10).fill(0));
     const [activeNodes, setActiveNodes] = useState([]);
     const sketchCanvasRef = useRef(null);
@@ -487,6 +488,37 @@ export default function AILab() {
         }
     }, [activeTab]);
 
+    // Hook up native touch event listeners to prevent mobile scrolling
+    useEffect(() => {
+        if (activeTab !== 'sketch') return;
+        const canvas = sketchCanvasRef.current;
+        if (!canvas) return;
+
+        const handleTouchStart = (e) => {
+            if (e.cancelable) e.preventDefault();
+            startDraw(e);
+        };
+
+        const handleTouchMove = (e) => {
+            if (e.cancelable) e.preventDefault();
+            draw(e);
+        };
+
+        const handleTouchEnd = (e) => {
+            endDraw();
+        };
+
+        canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+        canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+        canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+
+        return () => {
+            canvas.removeEventListener('touchstart', handleTouchStart);
+            canvas.removeEventListener('touchmove', handleTouchMove);
+            canvas.removeEventListener('touchend', handleTouchEnd);
+        };
+    }, [activeTab]);
+
     const initSketchpad = () => {
         const canvas = sketchCanvasRef.current;
         if (!canvas) return;
@@ -494,10 +526,12 @@ export default function AILab() {
         canvas.height = 240;
 
         const ctx = canvas.getContext('2d');
-        ctx.lineCap = 'round';
-        ctx.lineWidth = 14;
-        ctx.strokeStyle = '#ffffff'; // draw in white on transparent/black
-        contextRef.current = ctx;
+        if (ctx) {
+            ctx.lineCap = 'round';
+            ctx.lineWidth = 14;
+            ctx.strokeStyle = '#ffffff'; // draw in white on transparent/black
+            contextRef.current = ctx;
+        }
 
         // Clear canvas representation
         clearSketchpad();
@@ -506,63 +540,93 @@ export default function AILab() {
     const clearSketchpad = () => {
         const canvas = sketchCanvasRef.current;
         if (!canvas) return;
-        const ctx = contextRef.current;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
         ctx.fillStyle = '#090d16'; // background fill
         ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.lineCap = 'round';
+        ctx.lineWidth = 14;
+        ctx.strokeStyle = '#ffffff';
         
         setPredictions(Array(10).fill(0));
         setActiveNodes([]);
     };
 
-    const startDraw = ({ nativeEvent }) => {
+    // Robust coordinate mapping handling scaling and different browser events
+    const getCoordinates = (e) => {
+        const canvas = sketchCanvasRef.current;
+        if (!canvas) return { x: 0, y: 0 };
+        const rect = canvas.getBoundingClientRect();
+        
+        let clientX = 0;
+        let clientY = 0;
+        
+        // Check for touch events
+        const touches = e.touches || (e.nativeEvent && e.nativeEvent.touches);
+        if (touches && touches.length > 0) {
+            clientX = touches[0].clientX;
+            clientY = touches[0].clientY;
+        } else {
+            // Check standard mouse events
+            clientX = e.clientX !== undefined ? e.clientX : (e.nativeEvent && e.nativeEvent.clientX !== undefined ? e.nativeEvent.clientX : 0);
+            clientY = e.clientY !== undefined ? e.clientY : (e.nativeEvent && e.nativeEvent.clientY !== undefined ? e.nativeEvent.clientY : 0);
+        }
+        
+        // Scale correctly if canvas bounds don't match drawing store resolution
+        const x = ((clientX - rect.left) / (rect.width || 1)) * canvas.width;
+        const y = ((clientY - rect.top) / (rect.height || 1)) * canvas.height;
+        
+        return { x, y };
+    };
+
+    const startDraw = (e) => {
         const canvas = sketchCanvasRef.current;
         if (!canvas) return;
         
-        let clientX = 0, clientY = 0;
-        if (nativeEvent.touches) {
-            clientX = nativeEvent.touches[0].clientX;
-            clientY = nativeEvent.touches[0].clientY;
-        } else {
-            clientX = nativeEvent.clientX;
-            clientY = nativeEvent.clientY;
+        if (e.cancelable) {
+            e.preventDefault();
         }
         
-        const rect = canvas.getBoundingClientRect();
-        const x = clientX - rect.left;
-        const y = clientY - rect.top;
-        
-        const ctx = contextRef.current;
-        ctx.beginPath();
-        ctx.moveTo(x, y);
+        const { x, y } = getCoordinates(e);
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+            ctx.lineCap = 'round';
+            ctx.lineWidth = 14;
+            ctx.strokeStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            contextRef.current = ctx;
+        }
+        isDrawingRef.current = true;
         setIsDrawing(true);
     };
 
-    const draw = ({ nativeEvent }) => {
-        if (!isDrawing) return;
+    const draw = (e) => {
+        if (!isDrawingRef.current) return;
         const canvas = sketchCanvasRef.current;
-        const ctx = contextRef.current;
+        if (!canvas) return;
         
-        let clientX = 0, clientY = 0;
-        if (nativeEvent.touches) {
-            clientX = nativeEvent.touches[0].clientX;
-            clientY = nativeEvent.touches[0].clientY;
-        } else {
-            clientX = nativeEvent.clientX;
-            clientY = nativeEvent.clientY;
+        if (e.cancelable) {
+            e.preventDefault();
         }
         
-        const rect = canvas.getBoundingClientRect();
-        const x = clientX - rect.left;
-        const y = clientY - rect.top;
-
-        ctx.lineTo(x, y);
-        ctx.stroke();
+        const { x, y } = getCoordinates(e);
+        const ctx = contextRef.current || canvas.getContext('2d');
+        if (ctx) {
+            ctx.lineCap = 'round';
+            ctx.lineWidth = 14;
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineTo(x, y);
+            ctx.stroke();
+        }
         
         // Dynamic handwriting recognition
         processDrawing();
     };
 
     const endDraw = () => {
+        isDrawingRef.current = false;
         setIsDrawing(false);
     };
 
@@ -970,9 +1034,6 @@ export default function AILab() {
                                         onMouseMove={draw}
                                         onMouseUp={endDraw}
                                         onMouseLeave={endDraw}
-                                        onTouchStart={startDraw}
-                                        onTouchMove={draw}
-                                        onTouchEnd={endDraw}
                                         className="cursor-crosshair bg-slate-950 block"
                                     />
                                     {predictions.reduce((s, v) => s + v, 0) === 0 && (
