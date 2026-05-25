@@ -36,6 +36,7 @@ export const extraTranslations = {
             subtitle: "Differentiating standard portfolios with custom, client-side neural networks running real-time browser training and deep computer vision inference.",
             tabSandbox: "NeuroFlow Sandbox",
             tabSketch: "MNIST Digit Draw",
+            tabGenetic: "EvoPath GA Sim",
             
             // Sandbox Controls
             sandboxTitle: "Neural Network 2D Classifier",
@@ -62,6 +63,21 @@ export const extraTranslations = {
             confidenceLabel: "Network Confidence & Predictions",
             placeholderDraw: "Draw a single digit here...",
             activePathway: "Highlighted Synapse Propagation",
+            
+            // Genetic controls
+            geneticTitle: "EvoPath: Genetic Pathfinder",
+            geneticDesc: "Watch autonomous agents evolve to navigate around obstacles. Adjust parameters, select templates, or click & drag on the canvas to draw custom wall barriers in real-time!",
+            geneticPopSize: "Population Size",
+            geneticMutation: "Mutation Rate",
+            geneticSpeed: "Simulation Speed",
+            geneticGen: "Gen",
+            geneticBest: "Best Fitness",
+            geneticSuccess: "Success Rate",
+            geneticClear: "Clear Walls",
+            geneticPresetCentral: "Central Wall",
+            geneticPresetSlits: "Twin Slits",
+            geneticPresetMaze: "Maze Grid",
+            geneticPresetClear: "Clear Space",
         },
         cvTimeline: {
             title: "Recruiter-Friendly",
@@ -144,6 +160,7 @@ export const extraTranslations = {
             subtitle: "التميز عن المحافظ التقليدية عبر شبكات عصبية مخصصة تعمل بالكامل على متصفح العميل مع تدريب حي في الوقت الفعلي واستدلال الرؤية الحاسوبية.",
             tabSandbox: "بيئة تدريب الشبكة العصبية",
             tabSketch: "رسم وتعرف أرقام MNIST",
+            tabGenetic: "خوارزمية EvoPath الجينية",
             
             sandboxTitle: "مصنف شبكة عصبية ثنائية الأبعاد",
             sandboxDesc: "قم بتكوين الطبقات المخفية، وتنشيط الخلايا العصبية، وشاهد خوارزمية الانتشار الخلفي ترسم حدود القرار غير الخطي في الوقت الفعلي.",
@@ -168,6 +185,21 @@ export const extraTranslations = {
             confidenceLabel: "ثقة التوقعات للشبكة",
             placeholderDraw: "ارسم رقماً هنا...",
             activePathway: "مسار انتشار السيالات النشط",
+            
+            // Genetic controls
+            geneticTitle: "EvoPath: مستكشف المسارات بالخوارزمية الجينية",
+            geneticDesc: "شاهد الجسيمات ذاتية القيادة تتطور لتتفادى العوائق. اضبط المعاملات، اختر القوالب الجاهزة، أو انقر واسحب لرسم حواجز مخصصة في الوقت الفعلي!",
+            geneticPopSize: "حجم المجموعة",
+            geneticMutation: "معدل الطفرة",
+            geneticSpeed: "سرعة المحاكاة",
+            geneticGen: "الجيل",
+            geneticBest: "أفضل ملاءمة",
+            geneticSuccess: "نسبة النجاح",
+            geneticClear: "مسح الجدران",
+            geneticPresetCentral: "جدار مركزي",
+            geneticPresetSlits: "شقوق مزدوجة",
+            geneticPresetMaze: "شبكة متاهة",
+            geneticPresetClear: "مساحة فارغة",
         },
         cvTimeline: {
             title: "السيرة الذاتية",
@@ -250,6 +282,7 @@ export const extraTranslations = {
             subtitle: "Se différencier des portfolios standard avec des réseaux de neurones personnalisés exécutés entièrement côté client, offrant un entraînement temps réel et de l'inférence de vision par ordinateur sur navigateur.",
             tabSandbox: "Bac à Sable NeuroFlow",
             tabSketch: "Reconnaissance MNIST",
+            tabGenetic: "EvoPath Sim Génétique",
             
             sandboxTitle: "Classifieur 2D par Réseau de Neurones",
             sandboxDesc: "Configurez les couches masquées, activez les neurones et observez la rétropropagation standard tracer une frontière de décision non-linéaire en temps réel.",
@@ -274,6 +307,21 @@ export const extraTranslations = {
             confidenceLabel: "Niveaux de Confiance des Prédictions",
             placeholderDraw: "Dessinez un seul chiffre ici...",
             activePathway: "Propagation Active des Synapses",
+            
+            // Genetic controls
+            geneticTitle: "EvoPath : Recherche Génétique",
+            geneticDesc: "Observez des agents autonomes évoluer pour éviter des obstacles. Ajustez les paramètres, sélectionnez des modèles, ou cliquez-glissez sur le canevas pour dessiner vos propres obstacles en temps réel !",
+            geneticPopSize: "Taille de Population",
+            geneticMutation: "Taux de Mutation",
+            geneticSpeed: "Vitesse de Sim",
+            geneticGen: "Gen",
+            geneticBest: "Meilleur Score",
+            geneticSuccess: "Taux de Réussite",
+            geneticClear: "Effacer Obstacles",
+            geneticPresetCentral: "Mur Central",
+            geneticPresetSlits: "Fentes Doubles",
+            geneticPresetMaze: "Grille Labyrinthe",
+            geneticPresetClear: "Espace Libre",
         },
         cvTimeline: {
             title: "CV Interactif &",
@@ -356,6 +404,7 @@ export const extraTranslations = {
             subtitle: "Diferenciarse de portfolios estándar con redes neuronales personalizadas ejecutadas en el navegador, con entrenamiento 2D a 60fps en vivo e inferencia de visión artificial.",
             tabSandbox: "Entorno NeuroFlow",
             tabSketch: "Reconocimiento MNIST",
+            tabGenetic: "EvoPath Sim Genético",
             
             sandboxTitle: "Clasificador 2D por Red Neuronal",
             sandboxDesc: "Configura capas, activa neuronas y mira cómo la retropropagación dibuja una frontera de decisión no lineal en tiempo real.",
@@ -380,6 +429,21 @@ export const extraTranslations = {
             confidenceLabel: "Confianza de las Predicciones",
             placeholderDraw: "Dibuja un solo número aquí...",
             activePathway: "Propagación Sináptica Activa",
+            
+            // Genetic controls
+            geneticTitle: "EvoPath: Pathfinder Genético",
+            geneticDesc: "Mira cómo evolucionan los agentes autónomos para evitar obstáculos. ¡Ajusta parámetros, selecciona plantillas o haz clic y arrastra en el lienzo para dibujar barreras en tiempo real!",
+            geneticPopSize: "Tamaño de Población",
+            geneticMutation: "Tasa de Mutación",
+            geneticSpeed: "Velocidad de Sim",
+            geneticGen: "Gen",
+            geneticBest: "Mejor Adaptación",
+            geneticSuccess: "Tasa de Éxito",
+            geneticClear: "Borrar Paredes",
+            geneticPresetCentral: "Pared Central",
+            geneticPresetSlits: "Doble Ranura",
+            geneticPresetMaze: "Red de Laberinto",
+            geneticPresetClear: "Espacio Libre",
         },
         cvTimeline: {
             title: "CV Interactivo &",

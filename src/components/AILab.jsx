@@ -641,6 +641,157 @@ class MNISTPretrainedMLP {
 
 const pretrainedMNISTModel = new MNISTPretrainedMLP(mnistWeights);
 
+// Genetic Algorithm DNA class storing vector forces
+class GeneticDNA {
+    constructor(lifetime = 200, genes = null) {
+        this.lifetime = lifetime;
+        if (genes) {
+            this.genes = genes;
+        } else {
+            this.genes = [];
+            for (let i = 0; i < this.lifetime; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                // Generate unit vectors representing push forces
+                this.genes.push({
+                    x: Math.cos(angle) * 0.4,
+                    y: Math.sin(angle) * 0.4
+                });
+            }
+        }
+    }
+    
+    // Crossover combination with another parent
+    crossover(partner) {
+        const childGenes = [];
+        const midpoint = Math.floor(Math.random() * this.lifetime);
+        for (let i = 0; i < this.lifetime; i++) {
+            if (i < midpoint) {
+                childGenes.push(this.genes[i]);
+            } else {
+                childGenes.push(partner.genes[i]);
+            }
+        }
+        return new GeneticDNA(this.lifetime, childGenes);
+    }
+    
+    // Random mutation on genes
+    mutate(rate) {
+        for (let i = 0; i < this.lifetime; i++) {
+            if (Math.random() < rate) {
+                const angle = Math.random() * Math.PI * 2;
+                this.genes[i] = {
+                    x: Math.cos(angle) * 0.4,
+                    y: Math.sin(angle) * 0.4
+                };
+            }
+        }
+    }
+}
+
+// Genetic Agent representation (Rocket/Particle evader)
+class GeneticAgent {
+    constructor(startX, startY, lifetime = 200, dna = null) {
+        this.pos = { x: startX, y: startY };
+        this.vel = { x: 0, y: 0 };
+        this.acc = { x: 0, y: 0 };
+        
+        this.startX = startX;
+        this.startY = startY;
+        this.dna = dna || new GeneticDNA(lifetime);
+        this.dead = false;
+        this.completed = false;
+        this.completeTime = 0;
+        this.trail = []; // position history
+        this.fitness = 0;
+    }
+    
+    applyForce(force) {
+        this.acc.x += force.x;
+        this.acc.y += force.y;
+    }
+    
+    update(frameIndex, obstacles, target, canvasW, canvasH, targetRadius = 14) {
+        if (this.dead || this.completed) return;
+        
+        // Apply gene force
+        if (frameIndex < this.dna.lifetime) {
+            this.applyForce(this.dna.genes[frameIndex]);
+        }
+        
+        // Physics update
+        this.vel.x += this.acc.x;
+        this.vel.y += this.acc.y;
+        
+        // Limit velocity to prevent extreme speedups
+        const speedLimit = 4.0;
+        const speed = Math.sqrt(this.vel.x * this.vel.x + this.vel.y * this.vel.y);
+        if (speed > speedLimit) {
+            this.vel.x = (this.vel.x / speed) * speedLimit;
+            this.vel.y = (this.vel.y / speed) * speedLimit;
+        }
+        
+        this.pos.x += this.vel.x;
+        this.pos.y += this.vel.y;
+        
+        // Reset acceleration
+        this.acc.x = 0;
+        this.acc.y = 0;
+        
+        // Add current coordinate to trail
+        this.trail.push({ x: this.pos.x, y: this.pos.y });
+        if (this.trail.length > 8) {
+            this.trail.shift();
+        }
+        
+        // Boundary collision check
+        if (this.pos.x < 0 || this.pos.x > canvasW || this.pos.y < 0 || this.pos.y > canvasH) {
+            this.dead = true;
+            return;
+        }
+        
+        // Obstacles collision check
+        for (const wall of obstacles) {
+            if (this.pos.x >= wall.x && this.pos.x <= wall.x + wall.w &&
+                this.pos.y >= wall.y && this.pos.y <= wall.y + wall.h) {
+                this.dead = true;
+                return;
+            }
+        }
+        
+        // Target checkpoint check
+        const dx = this.pos.x - target.x;
+        const dy = this.pos.y - target.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < targetRadius) {
+            this.completed = true;
+            this.completeTime = frameIndex;
+        }
+    }
+    
+    calcFitness(target) {
+        const dx = this.pos.x - target.x;
+        const dy = this.pos.y - target.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        
+        // Inverse distance fitness
+        let fit = 1.0 / (dist + 1.0);
+        
+        // Successful agents get huge bonus, scaled by speed
+        if (this.completed) {
+            fit *= (10.0 + (this.dna.lifetime - this.completeTime) * 3.0);
+        }
+        
+        // Dead crashed agents get huge penalty
+        if (this.dead) {
+            fit /= 10.0;
+        }
+        
+        // Squaring fitness strongly amplifies selective pressure for successful agents
+        this.fitness = fit * fit;
+        return this.fitness;
+    }
+}
+
 
 export default function AILab() {
     const { t, language } = useLanguage();
@@ -669,6 +820,28 @@ export default function AILab() {
     const [activeNodes, setActiveNodes] = useState([]);
     const sketchCanvasRef = useRef(null);
     const contextRef = useRef(null);
+
+    // Genetic Sandbox States & Refs
+    const [geneticPopSize, setGeneticPopSize] = useState(45);
+    const [geneticMutationRate, setGeneticMutationRate] = useState(0.02); // 2%
+    const [geneticSpeed, setGeneticSpeed] = useState(1); // speed multiplier
+    const [geneticIsRunning, setGeneticIsRunning] = useState(true);
+    const [geneticGen, setGeneticGen] = useState(1);
+    const [geneticBestFit, setGeneticBestFit] = useState(0);
+    const [geneticSuccessRate, setGeneticSuccessRate] = useState(0);
+    const [geneticAvgDist, setGeneticAvgDist] = useState(0);
+    const [geneticPreset, setGeneticPreset] = useState('central'); // 'central', 'slits', 'maze', 'clear'
+
+    const geneticCanvasRef = useRef(null);
+    const geneticLoopRef = useRef(null);
+    const geneticPopRef = useRef([]);
+    const geneticObstaclesRef = useRef([]);
+    const geneticFrameIndexRef = useRef(0);
+    const geneticGenRef = useRef(1);
+    const geneticIsDrawingObstacleRef = useRef(false);
+    const geneticObstacleStartRef = useRef({ x: 0, y: 0 });
+    const geneticObstacleCurrentRef = useRef({ x: 0, y: 0 });
+
 
     // Initialize Sandbox Dataset
     useEffect(() => {
@@ -1038,6 +1211,364 @@ export default function AILab() {
 
     };
 
+    // INITIALIZE GENETIC OBSTACLES AND POPULATION
+    const initGeneticSimulation = () => {
+        const canvas = geneticCanvasRef.current;
+        if (!canvas) return;
+        
+        canvas.width = 480;
+        canvas.height = 320;
+        
+        // Define obstacles based on current preset
+        let walls = [];
+        if (geneticPreset === 'central') {
+            walls = [{ x: 100, y: 150, w: 280, h: 16 }];
+        } else if (geneticPreset === 'slits') {
+            walls = [
+                { x: 0, y: 150, w: 170, h: 16 },
+                { x: 310, y: 150, w: 170, h: 16 }
+            ];
+        } else if (geneticPreset === 'maze') {
+            walls = [
+                { x: 0, y: 90, w: 340, h: 16 },
+                { x: 140, y: 190, w: 340, h: 16 }
+            ];
+        }
+        geneticObstaclesRef.current = walls;
+        
+        // Initialize population
+        const pop = [];
+        for (let i = 0; i < geneticPopSize; i++) {
+            pop.push(new GeneticAgent(240, 290, 200));
+        }
+        geneticPopRef.current = pop;
+        
+        geneticFrameIndexRef.current = 0;
+        geneticGenRef.current = 1;
+        
+        setGeneticGen(1);
+        setGeneticBestFit(0);
+        setGeneticSuccessRate(0);
+        setGeneticAvgDist(0);
+    };
+
+    // React Effect to initialize simulation when tab or preset changes
+    useEffect(() => {
+        if (activeTab === 'genetic') {
+            setTimeout(initGeneticSimulation, 100);
+        }
+        return () => {
+            if (geneticLoopRef.current) {
+                cancelAnimationFrame(geneticLoopRef.current);
+            }
+        };
+    }, [activeTab, geneticPreset, geneticPopSize]);
+
+    // Genetic Selection & Crossover Engine (Tournament Selection)
+    const runEvolution = () => {
+        const pop = geneticPopRef.current;
+        const target = { x: 240, y: 35 };
+        
+        // 1. Calculate fitness for all agents and gather stats
+        let bestAgent = pop[0];
+        let maxFit = 0;
+        let completedCount = 0;
+        let totalDist = 0;
+        
+        for (const agent of pop) {
+            const fit = agent.calcFitness(target);
+            if (fit > maxFit) {
+                maxFit = fit;
+                bestAgent = agent;
+            }
+            if (agent.completed) {
+                completedCount++;
+            }
+            
+            const dx = agent.pos.x - target.x;
+            const dy = agent.pos.y - target.y;
+            totalDist += Math.sqrt(dx * dx + dy * dy);
+        }
+        
+        const successRate = completedCount / pop.length;
+        const avgDist = totalDist / pop.length;
+        
+        setGeneticBestFit(maxFit);
+        setGeneticSuccessRate(successRate);
+        setGeneticAvgDist(avgDist);
+        
+        // 2. Select mating pool and breed new population
+        // Tournament Selection: Select best of k random candidates
+        const tournamentSelect = (poolSize = 5) => {
+            let best = pop[Math.floor(Math.random() * pop.length)];
+            for (let i = 1; i < poolSize; i++) {
+                const contender = pop[Math.floor(Math.random() * pop.length)];
+                if (contender.fitness > best.fitness) {
+                    best = contender;
+                }
+            }
+            return best;
+        };
+        
+        const nextPop = [];
+        for (let i = 0; i < geneticPopSize; i++) {
+            const parentA = tournamentSelect();
+            const parentB = tournamentSelect();
+            
+            // Crossover
+            const childDNA = parentA.dna.crossover(parentB.dna);
+            
+            // Mutation
+            childDNA.mutate(geneticMutationRate);
+            
+            // Instantiate child
+            nextPop.push(new GeneticAgent(240, 290, 200, childDNA));
+        }
+        
+        geneticPopRef.current = nextPop;
+        geneticFrameIndexRef.current = 0;
+        
+        const nextGen = geneticGenRef.current + 1;
+        geneticGenRef.current = nextGen;
+        setGeneticGen(nextGen);
+    };
+
+    // Simulation Frame Tick & Render Loop
+    const runGeneticFrame = () => {
+        const canvas = geneticCanvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        
+        const W = canvas.width;
+        const H = canvas.height;
+        const target = { x: 240, y: 35 };
+        const targetRadius = 14;
+        const start = { x: 240, y: 290 };
+        
+        // Handle simulation physics updates (sub-steps based on geneticSpeed)
+        if (geneticIsRunning) {
+            const steps = geneticSpeed;
+            for (let s = 0; s < steps; s++) {
+                const frameIndex = geneticFrameIndexRef.current;
+                const pop = geneticPopRef.current;
+                const obstacles = geneticObstaclesRef.current;
+                
+                // Update agents physics
+                let allFinished = true;
+                for (const agent of pop) {
+                    agent.update(frameIndex, obstacles, target, W, H, targetRadius);
+                    if (!agent.dead && !agent.completed) {
+                        allFinished = false;
+                    }
+                }
+                
+                // Increment frame index
+                geneticFrameIndexRef.current = frameIndex + 1;
+                
+                // If generation finishes (either time is up or all crashed/succeeded)
+                if (geneticFrameIndexRef.current >= 200 || allFinished) {
+                    runEvolution();
+                    break;
+                }
+            }
+        }
+        
+        // RENDER DRAWINGS ON CANVAS
+        // Fills deep dark slate background
+        ctx.fillStyle = '#090d16';
+        ctx.fillRect(0, 0, W, H);
+        
+        // Draw Grid Lines (glowing cybernet design)
+        ctx.strokeStyle = 'rgba(30, 41, 59, 0.4)';
+        ctx.lineWidth = 1;
+        for (let x = 0; x < W; x += 40) {
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+        }
+        for (let y = 0; y < H; y += 40) {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+        }
+        
+        // Draw Start Base (glowing pulsing capsule)
+        const pulseStart = 8 + Math.sin(Date.now() / 150) * 2;
+        ctx.beginPath();
+        ctx.arc(start.x, start.y, pulseStart, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(6, 182, 212, 0.15)';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(start.x, start.y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = '#06b6d4';
+        ctx.fill();
+        
+        // Draw Target Portal (pulsing neon portal ring)
+        const pulse = 16 + Math.sin(Date.now() / 120) * 3;
+        const grad = ctx.createRadialGradient(target.x, target.y, 0, target.x, target.y, pulse);
+        grad.addColorStop(0, 'rgba(16, 185, 129, 0.45)');
+        grad.addColorStop(0.5, 'rgba(6, 182, 212, 0.2)');
+        grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.beginPath();
+        ctx.arc(target.x, target.y, pulse, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.arc(target.x, target.y, 8, 0, Math.PI * 2);
+        ctx.strokeStyle = '#10b981';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(target.x, target.y, 3, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+        
+        // Draw Obstacles (translucent neon borders with glow)
+        const walls = geneticObstaclesRef.current;
+        ctx.strokeStyle = 'rgba(239, 68, 68, 0.85)';
+        ctx.lineWidth = 2;
+        for (const w of walls) {
+            ctx.fillStyle = 'rgba(239, 68, 68, 0.08)';
+            ctx.fillRect(w.x, w.y, w.w, w.h);
+            ctx.strokeRect(w.x, w.y, w.w, w.h);
+        }
+        
+        // Draw active drag obstacle if drawing
+        if (geneticIsDrawingObstacleRef.current) {
+            const x0 = geneticObstacleStartRef.current.x;
+            const y0 = geneticObstacleStartRef.current.y;
+            const x1 = geneticObstacleCurrentRef.current.x;
+            const y1 = geneticObstacleCurrentRef.current.y;
+            const rect = {
+                x: Math.min(x0, x1),
+                y: Math.min(y0, y1),
+                w: Math.abs(x1 - x0),
+                h: Math.abs(y1 - y0)
+            };
+            ctx.fillStyle = 'rgba(239, 68, 68, 0.15)';
+            ctx.strokeStyle = 'rgba(239, 68, 68, 0.95)';
+            ctx.lineWidth = 2.5;
+            ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+            ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
+        }
+        
+        // Draw Population Agents
+        const pop = geneticPopRef.current;
+        for (const agent of pop) {
+            if (agent.completed) {
+                // Glow green dot at target
+                ctx.beginPath();
+                ctx.arc(agent.pos.x, agent.pos.y, 2.5, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(16, 185, 129, 0.7)';
+                ctx.fill();
+                continue;
+            }
+            if (agent.dead) {
+                // Red crashed coordinates
+                ctx.fillStyle = 'rgba(239, 68, 68, 0.3)';
+                ctx.fillRect(agent.pos.x - 1, agent.pos.y - 1, 2, 2);
+                continue;
+            }
+            
+            // Draw Trail (neon streak)
+            if (agent.trail.length > 1) {
+                ctx.beginPath();
+                ctx.moveTo(agent.trail[0].x, agent.trail[0].y);
+                for (let i = 1; i < agent.trail.length; i++) {
+                    ctx.lineTo(agent.trail[i].x, agent.trail[i].y);
+                }
+                ctx.strokeStyle = 'rgba(6, 182, 212, 0.22)';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+            }
+            
+            // Draw triangular vehicle pointing in direction of velocity
+            const angle = Math.atan2(agent.vel.y, agent.vel.x);
+            const size = 5;
+            
+            ctx.save();
+            ctx.translate(agent.pos.x, agent.pos.y);
+            ctx.rotate(angle);
+            
+            ctx.beginPath();
+            ctx.moveTo(size * 1.5, 0);
+            ctx.lineTo(-size, -size * 0.7);
+            ctx.lineTo(-size, size * 0.7);
+            ctx.closePath();
+            
+            ctx.fillStyle = '#06b6d4';
+            ctx.fill();
+            
+            ctx.restore();
+        }
+        
+        // Trigger next frame
+        geneticLoopRef.current = requestAnimationFrame(runGeneticFrame);
+    };
+
+    // Effect to run simulation animation loop
+    useEffect(() => {
+        if (activeTab === 'genetic') {
+            geneticLoopRef.current = requestAnimationFrame(runGeneticFrame);
+        }
+        return () => {
+            if (geneticLoopRef.current) {
+                cancelAnimationFrame(geneticLoopRef.current);
+            }
+        };
+    }, [activeTab, geneticIsRunning, geneticSpeed, geneticMutationRate, geneticPopSize]);
+
+    // Handle mouse event listeners for custom wall drawing
+    const handleGeneticMouseDown = (e) => {
+        const canvas = geneticCanvasRef.current;
+        if (!canvas) return;
+        
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        geneticIsDrawingObstacleRef.current = true;
+        geneticObstacleStartRef.current = { x, y };
+        geneticObstacleCurrentRef.current = { x, y };
+    };
+
+    const handleGeneticMouseMove = (e) => {
+        if (!geneticIsDrawingObstacleRef.current) return;
+        const canvas = geneticCanvasRef.current;
+        if (!canvas) return;
+        
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        geneticObstacleCurrentRef.current = { x, y };
+    };
+
+    const handleGeneticMouseUp = (e) => {
+        if (!geneticIsDrawingObstacleRef.current) return;
+        geneticIsDrawingObstacleRef.current = false;
+        
+        const x0 = geneticObstacleStartRef.current.x;
+        const y0 = geneticObstacleStartRef.current.y;
+        const x1 = geneticObstacleCurrentRef.current.x;
+        const y1 = geneticObstacleCurrentRef.current.y;
+        
+        const w = Math.abs(x1 - x0);
+        const h = Math.abs(y1 - y0);
+        
+        // Ignore tiny accidental clicks (less than 4px size)
+        if (w < 4 || h < 4) return;
+        
+        const newWall = {
+            x: Math.min(x0, x1),
+            y: Math.min(y0, y1),
+            w,
+            h
+        };
+        
+        // Append custom barrier obstacle!
+        geneticObstaclesRef.current = [...geneticObstaclesRef.current, newWall];
+    };
+
+
     return (
         <section id="ai-lab" className="section-dark" aria-labelledby="ai-heading">
             <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 md:py-20">
@@ -1086,12 +1617,22 @@ export default function AILab() {
                             <i className="fa-solid fa-pen-nib mr-1.5" />
                             {t('aiLab.tabSketch')}
                         </button>
+                        <button
+                            onClick={() => { setActiveTab('genetic'); setIsTraining(false); }}
+                            className={`px-6 py-2 rounded-full text-sm font-semibold transition ${
+                                activeTab === 'genetic'
+                                    ? 'bg-accent text-black font-bold shadow-lg'
+                                    : 'text-secondary hover:text-primary'
+                            }`}
+                        >
+                            <i className="fa-solid fa-dna mr-1.5" />
+                            {t('aiLab.tabGenetic')}
+                        </button>
                     </div>
                 </div>
 
-                {/* DYNAMIC LAB VIEWPORT */}
                 <AnimatePresence mode="wait">
-                    {activeTab === 'sandbox' ? (
+                    {activeTab === 'sandbox' && (
                         <motion.div
                             key="sandbox"
                             initial={{ opacity: 0, y: 15 }}
@@ -1370,7 +1911,8 @@ export default function AILab() {
                                 </div>
                             </div>
                         </motion.div>
-                    ) : (
+                    )}
+                    {activeTab === 'sketch' && (
                         <motion.div
                             key="sketch"
                             initial={{ opacity: 0, y: 15 }}
@@ -1443,6 +1985,186 @@ export default function AILab() {
                                             </div>
                                         );
                                     })}
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                    {activeTab === 'genetic' && (
+                        <motion.div
+                            key="genetic"
+                            initial={{ opacity: 0, y: 15 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -15 }}
+                            className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start justify-center"
+                        >
+                            {/* Controls Panel */}
+                            <div className="lg:col-span-4 card-bg border rounded-2xl p-5 space-y-5">
+                                <div>
+                                    <h3 className="text-lg font-bold text-primary mb-1">{t('aiLab.geneticTitle')}</h3>
+                                    <p className="text-xs text-muted leading-relaxed">{t('aiLab.geneticDesc')}</p>
+                                </div>
+
+                                {/* Population Size Slider */}
+                                <div className="space-y-2">
+                                    <div className="flex justify-between text-xs font-bold text-secondary uppercase tracking-wider">
+                                        <span>{t('aiLab.geneticPopSize')}</span>
+                                        <span className="text-accent">{geneticPopSize}</span>
+                                    </div>
+                                    <input
+                                        type="range"
+                                        min="20"
+                                        max="80"
+                                        step="5"
+                                        value={geneticPopSize}
+                                        onChange={(e) => setGeneticPopSize(parseInt(e.target.value))}
+                                        className="w-full accent-accent h-1 bg-slate-900 rounded-lg appearance-none cursor-pointer"
+                                    />
+                                </div>
+
+                                {/* Mutation Rate Slider */}
+                                <div className="space-y-2">
+                                    <div className="flex justify-between text-xs font-bold text-secondary uppercase tracking-wider">
+                                        <span>{t('aiLab.geneticMutation')}</span>
+                                        <span className="text-accent">{(geneticMutationRate * 100).toFixed(1)}%</span>
+                                    </div>
+                                    <input
+                                        type="range"
+                                        min="0.001"
+                                        max="0.10"
+                                        step="0.001"
+                                        value={geneticMutationRate}
+                                        onChange={(e) => setGeneticMutationRate(parseFloat(e.target.value))}
+                                        className="w-full accent-accent h-1 bg-slate-900 rounded-lg appearance-none cursor-pointer"
+                                    />
+                                </div>
+
+                                {/* Simulation Speed */}
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-secondary uppercase tracking-wider block">{t('aiLab.geneticSpeed')}</label>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {[1, 2, 4].map((s) => (
+                                            <button
+                                                key={s}
+                                                onClick={() => setGeneticSpeed(s)}
+                                                className={`py-2 rounded-lg text-xs font-bold border transition ${
+                                                    geneticSpeed === s
+                                                        ? 'bg-accent border-accent text-black'
+                                                        : 'border-slate-800 text-secondary hover:border-slate-700'
+                                                }`}
+                                            >
+                                                {s}x
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Obstacles Preset */}
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-secondary uppercase tracking-wider block">Obstacle Presets</label>
+                                    <select
+                                        value={geneticPreset}
+                                        onChange={(e) => setGeneticPreset(e.target.value)}
+                                        className="w-full rounded-lg input-bg border px-3.5 py-2.5 text-sm font-medium focus:border-accent outline-none"
+                                    >
+                                        <option value="central">{t('aiLab.geneticPresetCentral')}</option>
+                                        <option value="slits">{t('aiLab.geneticPresetSlits')}</option>
+                                        <option value="maze">{t('aiLab.geneticPresetMaze')}</option>
+                                        <option value="clear">{t('aiLab.geneticPresetClear')}</option>
+                                    </select>
+                                </div>
+
+                                {/* Simulator Action Buttons */}
+                                <div className="space-y-2 pt-2">
+                                    <button
+                                        onClick={() => setGeneticIsRunning(!geneticIsRunning)}
+                                        className={`w-full font-bold text-xs py-3 rounded-full transition shadow-md flex items-center justify-center gap-1.5 ${
+                                            geneticIsRunning
+                                                ? 'bg-amber-500 hover:bg-amber-400 text-black'
+                                                : 'bg-emerald-500 hover:bg-emerald-400 text-black'
+                                        }`}
+                                    >
+                                        <i className={`fa-solid ${geneticIsRunning ? 'fa-pause' : 'fa-play'}`} />
+                                        {geneticIsRunning ? t('aiLab.btnPause') : 'Resume Simulation'}
+                                    </button>
+                                    
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <button
+                                            onClick={initGeneticSimulation}
+                                            className="w-full font-semibold text-xs border border-slate-700 hover:bg-slate-800 py-2.5 rounded-full transition"
+                                        >
+                                            <i className="fa-solid fa-rotate-left mr-1" />
+                                            Reset Sim
+                                        </button>
+                                        <button
+                                            onClick={() => { geneticObstaclesRef.current = []; setGeneticPreset('clear'); }}
+                                            className="w-full font-semibold text-xs border border-rose-500/30 text-rose-400 hover:bg-rose-500/10 py-2.5 rounded-full transition"
+                                        >
+                                            <i className="fa-solid fa-eraser mr-1" />
+                                            {t('aiLab.geneticClear')}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Canvas & Telemetry Display */}
+                            <div className="lg:col-span-8 flex flex-col gap-6">
+                                {/* Visualizer Area */}
+                                <div className="card-bg border rounded-2xl p-5 flex flex-col items-center">
+                                    <div className="border border-slate-800 rounded-xl overflow-hidden relative shadow-inner w-full max-w-[480px] bg-slate-950">
+                                        <canvas
+                                            ref={geneticCanvasRef}
+                                            onMouseDown={handleGeneticMouseDown}
+                                            onMouseMove={handleGeneticMouseMove}
+                                            onMouseUp={handleGeneticMouseUp}
+                                            className="cursor-crosshair block w-full aspect-[3/2]"
+                                        />
+                                        
+                                        {/* Click and drag drawing guide overlays */}
+                                        <div className="absolute top-2.5 left-2.5 pointer-events-none bg-slate-950/80 px-2.5 py-1.5 rounded border border-slate-800/80 text-[10px] font-semibold tracking-wide text-muted uppercase">
+                                            <i className="fa-solid fa-wand-magic-sparkles mr-1.5 text-accent" />
+                                            Drag mouse to draw custom walls
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* GA Telemetry Stats Dashboard */}
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                    {/* Stat 1: Gen */}
+                                    <div className="card-bg border rounded-xl p-3.5 text-center">
+                                        <span className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1">
+                                            {t('aiLab.geneticGen')}
+                                        </span>
+                                        <span className="text-xl font-black text-primary tabular-nums block">
+                                            {geneticGen}
+                                        </span>
+                                    </div>
+                                    {/* Stat 2: Best Fitness */}
+                                    <div className="card-bg border rounded-xl p-3.5 text-center">
+                                        <span className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1">
+                                            {t('aiLab.geneticBest')}
+                                        </span>
+                                        <span className="text-xl font-black text-accent tabular-nums block">
+                                            {geneticBestFit > 0 ? (1 / Math.sqrt(geneticBestFit)).toFixed(1) : '-'}
+                                        </span>
+                                    </div>
+                                    {/* Stat 3: Success Rate */}
+                                    <div className="card-bg border rounded-xl p-3.5 text-center">
+                                        <span className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1">
+                                            {t('aiLab.geneticSuccess')}
+                                        </span>
+                                        <span className="text-xl font-black text-emerald-400 tabular-nums block">
+                                            {(geneticSuccessRate * 100).toFixed(1)}%
+                                        </span>
+                                    </div>
+                                    {/* Stat 4: Avg Distance */}
+                                    <div className="card-bg border rounded-xl p-3.5 text-center">
+                                        <span className="text-[10px] font-bold text-muted uppercase tracking-wider block mb-1">
+                                            Avg Distance
+                                        </span>
+                                        <span className="text-xl font-black text-cyan-400 tabular-nums block">
+                                            {geneticAvgDist.toFixed(0)} px
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </motion.div>
