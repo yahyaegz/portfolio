@@ -78,6 +78,8 @@ export const extraTranslations = {
             geneticPresetSlits: "Twin Slits",
             geneticPresetMaze: "Maze Grid",
             geneticPresetClear: "Clear Space",
+            geneticDrawMode: "Draw Walls",
+            geneticEraseMode: "Wall Eraser",
         },
         devArcade: {
             title: "Developer Retro",
@@ -117,6 +119,40 @@ export const extraTranslations = {
             latency: "Decision Latency",
             bestScore: "Best Branch Score",
             ms: "ms",
+
+            // 4 New Games localization
+            tabPong: "Neural Pong",
+            tabGitMerge: "Git Merge",
+            tabBugInvaders: "Bug Invaders",
+            tabTyper: "Byte-Force Typer",
+            
+            // Pong
+            pongTitle: "Neural Pong: Player vs AI Simulation",
+            pongDesc: "Challenge a heuristic neural network simulator paddle. Telemetry shows live input/hidden layer activations on every bounce!",
+            pongPlayerScore: "Player",
+            pongAiScore: "Neural AI",
+            pongInputLayer: "Input Vector",
+            pongHiddenLayer: "Hidden Nodes",
+            pongOutputLayer: "Output Decision",
+            
+            // Git Merge
+            gitMergeTitle: "Git Merge: Rebase Block Puzzle",
+            gitMergeDesc: "Rotate and fit the falling Git Commits blocks (Feature, Bugfix, Hotfix). Clearing a line merges it into master and triggers a rebase compile!",
+            gitMergeCommitTerminal: "Commit Terminal Logs",
+            gitMergeMergedLines: "Merged Branches",
+            
+            // Bug Invaders
+            bugInvadersTitle: "Bug Invaders: Debugger Shooter",
+            bugInvadersDesc: "Control a command prompt spaceship (>) to shoot lasers (&&, ;) and destroy falling bugs (TypeError, SyntaxError, Memory Leak) before they crash your compiler!",
+            bugInvadersConsole: "Live Debugging Stream",
+            bugInvadersBugsDefeated: "Bugs Patched",
+            
+            // Byte-Force Typer
+            typerTitle: "Byte-Force: Terminal Typing Speed",
+            typerDesc: "Type the falling shell commands and code syntax before they hit the stack floor and trigger a Stack Overflow crash! Keep the compiler alive!",
+            typerWpm: "Typing Speed",
+            typerAccuracy: "Accuracy",
+            typerActiveCommand: "Target Command",
         },
         cvTimeline: {
             title: "Recruiter-Friendly",
@@ -239,6 +275,8 @@ export const extraTranslations = {
             geneticPresetSlits: "شقوق مزدوجة",
             geneticPresetMaze: "شبكة متاهة",
             geneticPresetClear: "مساحة فارغة",
+            geneticDrawMode: "رسم الجدران",
+            geneticEraseMode: "ممحاة العوائق",
         },
         devArcade: {
             title: "ألعاب المطورين",
@@ -278,6 +316,36 @@ export const extraTranslations = {
             latency: "سرعة اتخاذ القرار",
             bestScore: "أفضل تقييم للمسار",
             ms: "ملي ثانية",
+
+            // 4 New Games localization
+            tabPong: "بونغ العصبي",
+            tabGitMerge: "دمج جيت",
+            tabBugInvaders: "غزاة الثغرات",
+            tabTyper: "مسرع الحروف",
+            
+            pongTitle: "بونغ العصبي: اللاعب ضد الذكاء الاصطناعي",
+            pongDesc: "تحدى مضرب محاكاة الشبكة العصبية الكلاسيكي. تعرض لوحة التحكم تنشيطات الطبقات الخفية للشبكة العصبية في الوقت الفعلي عند كل ارتداد!",
+            pongPlayerScore: "اللاعب",
+            pongAiScore: "الذكاء الاصطناعي",
+            pongInputLayer: "ناقل المدخلات",
+            pongHiddenLayer: "العقد الخفية",
+            pongOutputLayer: "قرار المخرجات",
+            
+            gitMergeTitle: "دمج جيت: أحجية فرز الكتل",
+            gitMergeDesc: "قم بتدوير وترتيب كتل جيت المتساقطة (ميزة، إصلاح ثغرة، تعديل عاجل). مسح خط كامل يدمجه في الفرع الرئيسي ويفعل التجميع!",
+            gitMergeCommitTerminal: "سجل عمليات جيت",
+            gitMergeMergedLines: "الفروع المدمجة",
+            
+            bugInvadersTitle: "غزاة الثغرات: مطلق قذائف مصحح الأخطاء",
+            bugInvadersDesc: "تحكم في سفينة سطر الأوامر (>) لإطلاق أشعة الكود (&&, ;) وتدمير الثغرات المتساقطة (خطأ في النوع، خطأ نحوي، تسرب الذاكرة) قبل أن تتسبب في انهيار برنامجك!",
+            bugInvadersConsole: "بث تصحيح الأخطاء المباشر",
+            bugInvadersBugsDefeated: "الأخطاء المصححة",
+            
+            typerTitle: "قوة البايت: سرعة الكتابة البرمجية",
+            typerDesc: "اكتب الأوامر البرمجية والبروتوكولات المتساقطة قبل أن تصل إلى قاع الذاكرة وتتسبب في انهيار المكدس! حافظ على تشغيل المصحح!",
+            typerWpm: "سرعة الكتابة",
+            typerAccuracy: "الدقة",
+            typerActiveCommand: "الأمر المستهدف",
         },
         cvTimeline: {
             title: "السيرة الذاتية",
@@ -400,6 +468,8 @@ export const extraTranslations = {
             geneticPresetSlits: "Fentes Doubles",
             geneticPresetMaze: "Grille Labyrinthe",
             geneticPresetClear: "Espace Libre",
+            geneticDrawMode: "Dessiner Murs",
+            geneticEraseMode: "Gomme à Obstacles",
         },
         devArcade: {
             title: "Arcade Rétro",
@@ -439,6 +509,36 @@ export const extraTranslations = {
             latency: "Vitesse de Décision",
             bestScore: "Meilleure Note de Branche",
             ms: "ms",
+
+            // 4 New Games localization
+            tabPong: "Neural Pong",
+            tabGitMerge: "Git Merge",
+            tabBugInvaders: "Bug Invaders",
+            tabTyper: "Byte-Force Typer",
+            
+            pongTitle: "Neural Pong : Joueur vs Simulation IA",
+            pongDesc: "Défiez une raquette de simulation de réseau de neurones. La télémétrie affiche les activations de la couche cachée à chaque rebond !",
+            pongPlayerScore: "Joueur",
+            pongAiScore: "IA Neuronal",
+            pongInputLayer: "Entrées",
+            pongHiddenLayer: "Noeuds Cachés",
+            pongOutputLayer: "Décision de Sortie",
+            
+            gitMergeTitle: "Git Merge : Puzzle de Blocs Rebase",
+            gitMergeDesc: "Faites pivoter et assemblez les blocs de Git Commits (Feature, Bugfix, Hotfix). Compléter une ligne fusionne la branche dans master et compile !",
+            gitMergeCommitTerminal: "Logs Terminal de Commits",
+            gitMergeMergedLines: "Branches Fusionnées",
+            
+            bugInvadersTitle: "Bug Invaders : Destructeur de Bugs",
+            bugInvadersDesc: "Contrôlez un vaisseau terminal (`>`) pour tirer des lasers de code (`&&`, `;`) et détruire les bugs (`TypeError`, `SyntaxError`, `Memory Leak`) !",
+            bugInvadersConsole: "Console de Débogage en Direct",
+            bugInvadersBugsDefeated: "Bugs Corrigés",
+            
+            typerTitle: "Byte-Force : Vitesse de Frappe Terminal",
+            typerDesc: "Saisissez les commandes de terminal et syntaxes de code qui tombent avant qu'elles n'atteignent le bas et provoquent un Stack Overflow !",
+            typerWpm: "Vitesse",
+            typerAccuracy: "Précision",
+            typerActiveCommand: "Commande Cible",
         },
         cvTimeline: {
             title: "CV Interactif &",
@@ -561,6 +661,8 @@ export const extraTranslations = {
             geneticPresetSlits: "Doble Ranura",
             geneticPresetMaze: "Red de Laberinto",
             geneticPresetClear: "Espacio Libre",
+            geneticDrawMode: "Dibujar Paredes",
+            geneticEraseMode: "Borrador de Paredes",
         },
         devArcade: {
             title: "Arcade Retro",
@@ -600,6 +702,36 @@ export const extraTranslations = {
             latency: "Velocidad de Decisión",
             bestScore: "Mejor Nota de Rama",
             ms: "ms",
+
+            // 4 New Games localization
+            tabPong: "Neural Pong",
+            tabGitMerge: "Git Merge",
+            tabBugInvaders: "Bug Invaders",
+            tabTyper: "Byte-Force Typer",
+            
+            pongTitle: "Neural Pong: Jugador vs Simulación de IA",
+            pongDesc: "Desafía a una pala simuladora de red neuronal. ¡La telemetría muestra las activaciones de las capas ocultas en tiempo real con cada rebote!",
+            pongPlayerScore: "Jugador",
+            pongAiScore: "IA Neuronal",
+            pongInputLayer: "Entradas",
+            pongHiddenLayer: "Nodos Ocultos",
+            pongOutputLayer: "Decisión de Salida",
+            
+            gitMergeTitle: "Git Merge: Rompecabezas de Bloques Rebase",
+            gitMergeDesc: "Rota y encaja los bloques de Git Commits que caen (Feature, Bugfix, Hotfix). ¡Completar una línea los fusiona en master y activa la compilación!",
+            gitMergeCommitTerminal: "Registros del Terminal de Commits",
+            gitMergeMergedLines: "Ramas Fusionadas",
+            
+            bugInvadersTitle: "Bug Invaders: Destructor de Bugs",
+            bugInvadersDesc: "¡Controla una nave de terminal (`>`) para disparar láseres de código (`&&`, `;`) y destruir los bugs (`TypeError`, `SyntaxError`, `Memory Leak`) antes de que cuelguen tu compilador!",
+            bugInvadersConsole: "Consola de Depuración en Vivo",
+            bugInvadersBugsDefeated: "Bugs Corregidos",
+            
+            typerTitle: "Byte-Force: Velocidad de Escritura Terminal",
+            typerDesc: "¡Escribe los comandos de terminal y la sintaxis de código que caen antes de que golpeen el suelo de la pila y provoquen un Stack Overflow!",
+            typerWpm: "Velocidad",
+            typerAccuracy: "Precisión",
+            typerActiveCommand: "Comando Objetivo",
         },
         cvTimeline: {
             title: "CV Interactivo &",

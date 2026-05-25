@@ -841,6 +841,11 @@ export default function AILab() {
     const geneticIsDrawingObstacleRef = useRef(false);
     const geneticObstacleStartRef = useRef({ x: 0, y: 0 });
     const geneticObstacleCurrentRef = useRef({ x: 0, y: 0 });
+    
+    // Draw / Erase Mode & Champion Trail Refs for upgrades
+    const [geneticDrawMode, setGeneticDrawMode] = useState('draw'); // 'draw' or 'erase'
+    const geneticBestTrailRef = useRef([]); // history array of coordinates from the previous generation's champion
+
 
 
     // Initialize Sandbox Dataset
@@ -1296,6 +1301,11 @@ export default function AILab() {
         setGeneticBestFit(maxFit);
         setGeneticSuccessRate(successRate);
         setGeneticAvgDist(avgDist);
+
+        // Save previous generation champion's coordinate trail history
+        if (bestAgent) {
+            geneticBestTrailRef.current = [...bestAgent.trail];
+        }
         
         // 2. Select mating pool and breed new population
         // Tournament Selection: Select best of k random candidates
@@ -1311,7 +1321,15 @@ export default function AILab() {
         };
         
         const nextPop = [];
-        for (let i = 0; i < geneticPopSize; i++) {
+        
+        // Elitism: carry over the Champion DNA unchanged to guarantee fitness never decreases
+        if (bestAgent) {
+            const eliteChild = new GeneticAgent(240, 290, 200, bestAgent.dna);
+            nextPop.push(eliteChild);
+        }
+        
+        const startIdx = bestAgent ? 1 : 0;
+        for (let i = startIdx; i < geneticPopSize; i++) {
             const parentA = tournamentSelect();
             const parentB = tournamentSelect();
             
@@ -1420,6 +1438,18 @@ export default function AILab() {
         ctx.arc(target.x, target.y, 3, 0, Math.PI * 2);
         ctx.fillStyle = '#ffffff';
         ctx.fill();
+
+        // Target Portal Pulse Waves (Expanding concentric glowing rings)
+        const pulseTime = (Date.now() / 1000) % 1.5;
+        for (let r = 0; r < 2; r++) {
+            const progress = ((pulseTime + r * 0.75) % 1.5) / 1.5;
+            const size = targetRadius + progress * 20;
+            ctx.strokeStyle = `rgba(16, 185, 129, ${1.0 - progress})`;
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(target.x, target.y, size, 0, Math.PI * 2);
+            ctx.stroke();
+        }
         
         // Draw Obstacles (translucent neon borders with glow)
         const walls = geneticObstaclesRef.current;
@@ -1448,6 +1478,22 @@ export default function AILab() {
             ctx.lineWidth = 2.5;
             ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
             ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
+        }
+
+        // Draw Champion's Trail (glowing, semi-translucent purple dashed line)
+        const bestTrail = geneticBestTrailRef.current;
+        if (bestTrail && bestTrail.length > 1) {
+            ctx.save();
+            ctx.strokeStyle = 'rgba(168, 85, 247, 0.5)'; // Semitranslucent neon purple
+            ctx.lineWidth = 2.5;
+            ctx.setLineDash([4, 4]); // Dashed line
+            ctx.beginPath();
+            ctx.moveTo(bestTrail[0].x, bestTrail[0].y);
+            for (let i = 1; i < bestTrail.length; i++) {
+                ctx.lineTo(bestTrail[i].x, bestTrail[i].y);
+            }
+            ctx.stroke();
+            ctx.restore();
         }
         
         // Draw Population Agents
@@ -1480,6 +1526,20 @@ export default function AILab() {
                 ctx.stroke();
             }
             
+            // Draw active DNA force vector (pinkish-magenta vector line)
+            const frameIndex = geneticFrameIndexRef.current;
+            if (frameIndex < agent.dna.lifetime && agent.dna.genes[frameIndex]) {
+                const force = agent.dna.genes[frameIndex];
+                ctx.save();
+                ctx.strokeStyle = 'rgba(236, 72, 153, 0.6)'; // magenta force vector
+                ctx.lineWidth = 1.2;
+                ctx.beginPath();
+                ctx.moveTo(agent.pos.x, agent.pos.y);
+                ctx.lineTo(agent.pos.x + force.x * 20, agent.pos.y + force.y * 20);
+                ctx.stroke();
+                ctx.restore();
+            }
+
             // Draw triangular vehicle pointing in direction of velocity
             const angle = Math.atan2(agent.vel.y, agent.vel.x);
             const size = 5;
@@ -1525,6 +1585,15 @@ export default function AILab() {
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
         
+        if (geneticDrawMode === 'erase') {
+            const filtered = geneticObstaclesRef.current.filter(wall => {
+                return !(x >= wall.x && x <= wall.x + wall.w &&
+                         y >= wall.y && y <= wall.y + wall.h);
+            });
+            geneticObstaclesRef.current = filtered;
+            return;
+        }
+
         geneticIsDrawingObstacleRef.current = true;
         geneticObstacleStartRef.current = { x, y };
         geneticObstacleCurrentRef.current = { x, y };
@@ -2073,6 +2142,35 @@ export default function AILab() {
                                     </select>
                                 </div>
 
+                                {/* Editor Tool Draw/Erase Toggle */}
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-secondary uppercase tracking-wider block">Canvas Tool</label>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <button
+                                            onClick={() => setGeneticDrawMode('draw')}
+                                            className={`py-2 rounded-lg text-xs font-bold border transition flex items-center justify-center gap-1.5 ${
+                                                geneticDrawMode === 'draw'
+                                                    ? 'bg-accent border-accent text-black'
+                                                    : 'border-slate-800 text-secondary hover:border-slate-700'
+                                            }`}
+                                        >
+                                            <i className="fa-solid fa-pen text-[10px]" />
+                                            {t('aiLab.geneticDrawMode') || 'Draw Walls'}
+                                        </button>
+                                        <button
+                                            onClick={() => setGeneticDrawMode('erase')}
+                                            className={`py-2 rounded-lg text-xs font-bold border transition flex items-center justify-center gap-1.5 ${
+                                                geneticDrawMode === 'erase'
+                                                    ? 'bg-accent border-accent text-black'
+                                                    : 'border-slate-800 text-secondary hover:border-slate-700'
+                                            }`}
+                                        >
+                                            <i className="fa-solid fa-eraser text-[10px]" />
+                                            {t('aiLab.geneticEraseMode') || 'Wall Eraser'}
+                                        </button>
+                                    </div>
+                                </div>
+
                                 {/* Simulator Action Buttons */}
                                 <div className="space-y-2 pt-2">
                                     <button
@@ -2121,8 +2219,17 @@ export default function AILab() {
                                         
                                         {/* Click and drag drawing guide overlays */}
                                         <div className="absolute top-2.5 left-2.5 pointer-events-none bg-slate-950/80 px-2.5 py-1.5 rounded border border-slate-800/80 text-[10px] font-semibold tracking-wide text-muted uppercase">
-                                            <i className="fa-solid fa-wand-magic-sparkles mr-1.5 text-accent" />
-                                            Drag mouse to draw custom walls
+                                            {geneticDrawMode === 'draw' ? (
+                                                <>
+                                                    <i className="fa-solid fa-wand-magic-sparkles mr-1.5 text-accent" />
+                                                    Drag mouse to draw custom walls
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <i className="fa-solid fa-eraser mr-1.5 text-rose-400" />
+                                                    Click custom walls to erase them
+                                                </>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
