@@ -186,16 +186,78 @@ const generateDataset = (type, count = 200) => {
     return data;
 };
 
-// COMPRESSED LIGHTWEIGHT HANDWRITTEN MODEL (Pre-trained classifier model heuristic)
+// Robust matrix normalizer that centers and scales the digit to a standard 18x18 bounding box inside a 28x28 grid
+function normalizeMatrix28x28(matrix) {
+    let minRow = 28, maxRow = 0, minCol = 28, maxCol = 0;
+    let hasStroke = false;
+    
+    for (let r = 0; r < 28; r++) {
+        for (let c = 0; c < 28; c++) {
+            if (matrix[r][c] > 0.15) {
+                if (r < minRow) minRow = r;
+                if (r > maxRow) maxRow = r;
+                if (c < minCol) minCol = c;
+                if (c > maxCol) maxCol = c;
+                hasStroke = true;
+            }
+        }
+    }
+    
+    if (!hasStroke) {
+        return matrix;
+    }
+    
+    const height = maxRow - minRow + 1;
+    const width = maxCol - minCol + 1;
+    
+    // Create new 28x28 empty matrix
+    const norm = Array(28).fill(0).map(() => Array(28).fill(0));
+    
+    const targetSize = 18; // Make bounding box 18x18 to leave a clean 5-pixel margin on all sides
+    const targetStartRow = 5;
+    const targetStartCol = 5;
+    
+    const maxDim = Math.max(height, width);
+    const scale = targetSize / maxDim;
+    
+    const newHeight = height * scale;
+    const newWidth = width * scale;
+    const offsetRow = targetStartRow + (targetSize - newHeight) / 2;
+    const offsetCol = targetStartCol + (targetSize - newWidth) / 2;
+    
+    for (let r = 0; r < 28; r++) {
+        for (let c = 0; c < 28; c++) {
+            const srcR = minRow + (r - offsetRow) / scale;
+            const srcC = minCol + (c - offsetCol) / scale;
+            
+            if (srcR >= minRow && srcR <= maxRow && srcC >= minCol && srcC <= maxCol) {
+                const r0 = Math.floor(srcR);
+                const r1 = Math.min(maxRow, r0 + 1);
+                const c0 = Math.floor(srcC);
+                const c1 = Math.min(maxCol, c0 + 1);
+                
+                const weightR = srcR - r0;
+                const weightC = srcC - c0;
+                
+                const val = (1 - weightR) * (1 - weightC) * matrix[r0][c0] +
+                            weightR * (1 - weightC) * matrix[r1][c0] +
+                            (1 - weightR) * weightC * matrix[r0][c1] +
+                            weightR * weightC * matrix[r1][c1];
+                
+                norm[r][c] = val;
+            }
+        }
+    }
+    return norm;
+}
+
 // To perform drawing prediction instantly with high aesthetics and visual nodes propagation, 
 // we construct a robust geometric and feature-based classifier that acts as a real neural network 
-// in the frontend, running activations on downscaled 28x28 drawing matrices.
+// in the frontend, running activations on normalized 28x28 drawing matrices.
 function recognizeDigit(matrix28x28) {
-    // 1. Calculate bounding box of the drawn stroke
+    // 1. Calculate original properties first
     let minRow = 28, maxRow = 0, minCol = 28, maxCol = 0;
     let totalMass = 0;
-    let cogRow = 0, cogCol = 0;
-    
     for (let r = 0; r < 28; r++) {
         for (let c = 0; c < 28; c++) {
             const val = matrix28x28[r][c];
@@ -204,10 +266,7 @@ function recognizeDigit(matrix28x28) {
                 if (r > maxRow) maxRow = r;
                 if (c < minCol) minCol = c;
                 if (c > maxCol) maxCol = c;
-                
                 totalMass += val;
-                cogRow += r * val;
-                cogCol += c * val;
             }
         }
     }
@@ -216,27 +275,43 @@ function recognizeDigit(matrix28x28) {
         return Array(10).fill(0);
     }
     
-    cogRow /= totalMass;
-    cogCol /= totalMass;
+    const originalHeight = maxRow - minRow + 1;
+    const originalWidth = maxCol - minCol + 1;
+    const originalRatio = originalWidth / (originalHeight || 1);
     
-    const height = maxRow - minRow + 1;
-    const width = maxCol - minCol + 1;
-    const ratio = width / (height || 1);
+    // 2. Normalize the matrix to 18x18 bounding box centered in 28x28
+    const norm = normalizeMatrix28x28(matrix28x28);
     
-    // 2. Flood fill to find closed loops (holes)
-    // Create visited matrix: true for stroke pixels, false for background
+    // 3. Re-calculate bounding box and metrics on the normalized matrix
+    let nMinRow = 28, nMaxRow = 0, nMinCol = 28, nMaxCol = 0;
+    let nTotalMass = 0;
+    for (let r = 0; r < 28; r++) {
+        for (let c = 0; c < 28; c++) {
+            const val = norm[r][c];
+            if (val > 0.15) {
+                if (r < nMinRow) nMinRow = r;
+                if (r > nMaxRow) nMaxRow = r;
+                if (c < nMinCol) nMinCol = c;
+                if (c > nMaxCol) nMaxCol = c;
+                nTotalMass += val;
+            }
+        }
+    }
+    
+    const nHeight = nMaxRow - nMinRow + 1;
+    const nWidth = nMaxCol - nMinCol + 1;
+    
+    // 4. Run loop counting on the normalized matrix
     const visited = Array(28).fill(null).map(() => Array(28).fill(false));
     for (let r = 0; r < 28; r++) {
         for (let c = 0; c < 28; c++) {
-            if (matrix28x28[r][c] >= 0.15) {
+            if (norm[r][c] >= 0.15) {
                 visited[r][c] = true;
             }
         }
     }
     
-    // Flood fill from borders to mark all "outside" background pixels
     const queue = [];
-    // Add all border cells that are not stroke pixels
     for (let c = 0; c < 28; c++) {
         if (!visited[0][c]) { visited[0][c] = true; queue.push([0, c]); }
         if (!visited[27][c]) { visited[27][c] = true; queue.push([27, c]); }
@@ -248,9 +323,7 @@ function recognizeDigit(matrix28x28) {
     
     while (queue.length > 0) {
         const [r, c] = queue.shift();
-        const neighbors = [
-            [r - 1, c], [r + 1, c], [r, c - 1], [r, c + 1]
-        ];
+        const neighbors = [[r - 1, c], [r + 1, c], [r, c - 1], [r, c + 1]];
         for (const [nr, nc] of neighbors) {
             if (nr >= 0 && nr < 28 && nc >= 0 && nc < 28) {
                 if (!visited[nr][nc]) {
@@ -261,22 +334,17 @@ function recognizeDigit(matrix28x28) {
         }
     }
     
-    // Remaining unvisited false pixels are part of closed loops/holes!
-    // We count their connected components
     let loopCount = 0;
     const loopCenters = [];
-    const loopSizes = [];
     
-    for (let r = minRow; r <= maxRow; r++) {
-        for (let c = minCol; c <= maxCol; c++) {
+    for (let r = nMinRow; r <= nMaxRow; r++) {
+        for (let c = nMinCol; c <= nMaxCol; c++) {
             if (!visited[r][c]) {
-                // Found a new loop component!
                 loopCount++;
                 let loopSize = 0;
                 let loopSumRow = 0;
                 let loopSumCol = 0;
                 
-                // BFS to mark the entire component
                 const loopQueue = [[r, c]];
                 visited[r][c] = true;
                 
@@ -286,11 +354,9 @@ function recognizeDigit(matrix28x28) {
                     loopSumRow += lr;
                     loopSumCol += lc;
                     
-                    const neighbors = [
-                        [lr - 1, lc], [lr + 1, lc], [lr, lc - 1], [lr, lc + 1]
-                    ];
+                    const neighbors = [[lr - 1, lc], [lr + 1, lc], [lr, lc - 1], [lr, lc + 1]];
                     for (const [nr, nc] of neighbors) {
-                        if (nr >= minRow && nr <= maxRow && nc >= minCol && nc <= maxCol) {
+                        if (nr >= nMinRow && nr <= nMaxRow && nc >= nMinCol && nc <= nMaxCol) {
                             if (!visited[nr][nc]) {
                                 visited[nr][nc] = true;
                                 loopQueue.push([nr, nc]);
@@ -303,22 +369,19 @@ function recognizeDigit(matrix28x28) {
                     row: loopSumRow / loopSize,
                     col: loopSumCol / loopSize
                 });
-                loopSizes.push(loopSize);
             }
         }
     }
     
-    // 3. Feature Profile Calculations
-    const midRow = minRow + height / 2;
-    const midCol = minCol + width / 2;
+    // 5. Crossings and Densities on the normalized matrix
+    const nMidRow = nMinRow + nHeight / 2;
+    const nMidCol = nMinCol + nWidth / 2;
     
-    // Horizontal crossings (how many times does a line cross the center row)
     let centerCrossings = 0;
     let insideStroke = false;
-    const targetRow = Math.floor(midRow);
-    for (let c = minCol; c <= maxCol; c++) {
-        const val = matrix28x28[targetRow][c];
-        if (val > 0.15) {
+    const targetRow = Math.floor(nMidRow);
+    for (let c = nMinCol; c <= nMaxCol; c++) {
+        if (norm[targetRow][c] > 0.15) {
             if (!insideStroke) {
                 centerCrossings++;
                 insideStroke = true;
@@ -328,13 +391,11 @@ function recognizeDigit(matrix28x28) {
         }
     }
 
-    // Vertical crossings (how many times does a line cross the center column)
     let centerVertCrossings = 0;
     insideStroke = false;
-    const targetCol = Math.floor(midCol);
-    for (let r = minRow; r <= maxRow; r++) {
-        const val = matrix28x28[r][targetCol];
-        if (val > 0.15) {
+    const targetCol = Math.floor(nMidCol);
+    for (let r = nMinRow; r <= nMaxRow; r++) {
+        if (norm[r][targetCol] > 0.15) {
             if (!insideStroke) {
                 centerVertCrossings++;
                 insideStroke = true;
@@ -344,17 +405,16 @@ function recognizeDigit(matrix28x28) {
         }
     }
 
-    // Quadrant Densities
     let qTopLeft = 0, qTopRight = 0, qBottomLeft = 0, qBottomRight = 0;
-    for (let r = minRow; r <= maxRow; r++) {
-        for (let c = minCol; c <= maxCol; c++) {
-            const val = matrix28x28[r][c];
+    for (let r = nMinRow; r <= nMaxRow; r++) {
+        for (let c = nMinCol; c <= nMaxCol; c++) {
+            const val = norm[r][c];
             if (val > 0.15) {
-                if (r <= midRow) {
-                    if (c <= midCol) qTopLeft += val;
+                if (r <= nMidRow) {
+                    if (c <= nMidCol) qTopLeft += val;
                     else qTopRight += val;
                 } else {
-                    if (c <= midCol) qBottomLeft += val;
+                    if (c <= nMidCol) qBottomLeft += val;
                     else qBottomRight += val;
                 }
             }
@@ -363,50 +423,45 @@ function recognizeDigit(matrix28x28) {
     
     let confidences = Array(10).fill(0.01);
     
-    // 4. Decision Tree based on Topological Loops & Regional Features
+    // 6. Detailed Decision Rules using loop counting and normalized features
     if (loopCount >= 2) {
-        // Two holes: MUST BE AN 8
         confidences[8] = 0.95;
         confidences[0] = 0.02;
         confidences[9] = 0.02;
     } else if (loopCount === 1) {
-        // One hole: Could be 0, 6, 9, or sometimes 4
         const loop = loopCenters[0];
-        const relativeLoopY = (loop.row - minRow) / (height || 1);
+        const relativeLoopY = (loop.row - nMinRow) / (nHeight || 1);
         
-        if (relativeLoopY < 0.4) {
-            // Loop in the upper half -> 9 or 4
-            // 9 has a loop at the top and a stem on the right (so bottom-left quadrant is empty/sparse)
-            if (qBottomLeft < 0.25 * qBottomRight) {
-                confidences[9] = 0.90;
-                confidences[4] = 0.06;
+        if (relativeLoopY < 0.42) {
+            // Top loop -> 9 or 4
+            if (qBottomLeft < 0.28 * qBottomRight) {
+                confidences[9] = 0.92;
+                confidences[4] = 0.05;
                 confidences[7] = 0.02;
             } else {
-                confidences[4] = 0.75;
-                confidences[9] = 0.15;
-                confidences[0] = 0.05;
+                confidences[4] = 0.80;
+                confidences[9] = 0.12;
+                confidences[0] = 0.04;
             }
-        } else if (relativeLoopY > 0.6) {
-            // Loop in the lower half -> 6
-            confidences[6] = 0.92;
-            confidences[5] = 0.04;
+        } else if (relativeLoopY > 0.58) {
+            // Bottom loop -> 6
+            confidences[6] = 0.94;
+            confidences[5] = 0.03;
             confidences[0] = 0.02;
         } else {
-            // Loop in the middle -> 0 or 6 or 9
-            // Check if aspect ratio is wide
-            if (ratio > 0.65) {
-                confidences[0] = 0.88;
-                confidences[6] = 0.05;
-                confidences[9] = 0.05;
+            // Central loop -> 0, 6, or 9
+            if (originalRatio > 0.6) {
+                confidences[0] = 0.90;
+                confidences[6] = 0.04;
+                confidences[9] = 0.04;
             } else {
-                // Taller loop, check if bottom heavier or top heavier
                 if (qBottomLeft + qBottomRight > qTopLeft + qTopRight) {
-                    confidences[6] = 0.70;
-                    confidences[0] = 0.20;
+                    confidences[6] = 0.75;
+                    confidences[0] = 0.15;
                     confidences[8] = 0.05;
                 } else {
-                    confidences[9] = 0.70;
-                    confidences[0] = 0.20;
+                    confidences[9] = 0.75;
+                    confidences[0] = 0.15;
                     confidences[8] = 0.05;
                 }
             }
@@ -414,59 +469,59 @@ function recognizeDigit(matrix28x28) {
     } else {
         // Zero holes: 1, 2, 3, 5, 7, 0 (open), or open 4 / 6
         
-        // Check for open 0 (highly circular, two crossings vertically and horizontally)
-        if (ratio > 0.7 && qTopLeft > 0.3 && qTopRight > 0.3 && qBottomLeft > 0.3 && qBottomRight > 0.3 && centerCrossings === 2 && centerVertCrossings === 2) {
-            confidences[0] = 0.82;
-            confidences[8] = 0.10;
-        } else if (ratio < 0.35 || width <= 4) {
+        // Check for open 0: circular, two crossings vertically and horizontally, high density in all quadrants
+        if (originalRatio > 0.6 && qTopLeft > 0.4 && qTopRight > 0.4 && qBottomLeft > 0.4 && qBottomRight > 0.4 && centerCrossings === 2 && centerVertCrossings === 2) {
+            confidences[0] = 0.88;
+            confidences[8] = 0.06;
+            confidences[6] = 0.03;
+        } else if (originalRatio < 0.32 || originalWidth <= 4) {
             // Very narrow: 1
-            confidences[1] = 0.95;
+            confidences[1] = 0.96;
             confidences[7] = 0.03;
             confidences[2] = 0.01;
         } else {
-            // Check for digit 7:
-            // Top-right is active, bottom-left has tail, bottom-right is sparse.
-            const bottomRowWidth = matrix28x28.slice(maxRow - 2, maxRow + 1).reduce((sum, r) => sum + r.reduce((s, v) => s + (v > 0.15 ? 1 : 0), 0), 0) / 3;
+            const bottomRowWidth = norm.slice(nMaxRow - 2, nMaxRow + 1).reduce((sum, r) => sum + r.reduce((s, v) => s + (v > 0.15 ? 1 : 0), 0), 0) / 3;
             
-            if (qTopRight > 1.8 * qTopLeft && qBottomLeft < 0.25 * qBottomRight && ratio < 0.6) {
-                if (qBottomRight > 1.2 * qTopRight) {
-                    confidences[3] = 0.82;
+            if (qTopRight > 1.6 * qTopLeft && qBottomLeft < 0.22 * qBottomRight && originalRatio < 0.65) {
+                // 7 or 3
+                if (qBottomRight > 1.3 * qTopRight) {
+                    confidences[3] = 0.85;
                     confidences[7] = 0.08;
-                    confidences[9] = 0.05;
+                    confidences[9] = 0.04;
                 } else {
-                    confidences[7] = 0.88;
-                    confidences[1] = 0.05;
-                    confidences[2] = 0.03;
+                    confidences[7] = 0.92;
+                    confidences[1] = 0.04;
+                    confidences[2] = 0.02;
                 }
-            } else if (bottomRowWidth >= 4 && qBottomLeft > 0.6 * qBottomRight && ratio > 0.5) {
-                // 2 has a strong horizontal base and curve top
-                confidences[2] = 0.86;
-                confidences[3] = 0.06;
-                confidences[7] = 0.04;
+            } else if (bottomRowWidth >= 4 && qBottomLeft > 0.55 * qBottomRight && originalRatio > 0.45) {
+                // 2 has a wide flat horizontal base and curved top
+                confidences[2] = 0.90;
+                confidences[3] = 0.05;
+                confidences[7] = 0.03;
             } else {
                 // 3, 5, or open 4
+                // 3: open on the left (top-right and bottom-right are dense)
+                // 5: open on the right (top-left and bottom-right are dense)
                 if (centerCrossings >= 2 || (qTopLeft > 0.5 * qTopRight && qBottomLeft < 0.3 * qBottomRight && qBottomRight > 0.5 * qTopRight)) {
-                    confidences[4] = 0.84;
-                    confidences[9] = 0.08;
-                    confidences[1] = 0.03;
-                } else if (qTopLeft > 1.2 * qTopRight || (qBottomRight > 1.2 * qBottomLeft && qTopLeft > qTopRight)) {
-                    confidences[5] = 0.82;
-                    confidences[3] = 0.08;
-                    confidences[6] = 0.05;
+                    confidences[4] = 0.88;
+                    confidences[9] = 0.06;
+                    confidences[1] = 0.02;
+                } else if (qTopLeft > 1.1 * qTopRight || (qBottomRight > 1.1 * qBottomLeft && qTopLeft > qTopRight)) {
+                    confidences[5] = 0.86;
+                    confidences[3] = 0.06;
+                    confidences[6] = 0.04;
                 } else {
-                    // Default to 3
-                    confidences[3] = 0.80;
+                    confidences[3] = 0.84;
                     confidences[5] = 0.08;
-                    confidences[2] = 0.05;
-                    confidences[7] = 0.03;
+                    confidences[2] = 0.04;
                 }
             }
         }
     }
     
-    // Normalize confidences using softmax representation
-    const sum = confidences.reduce((s, v) => s + Math.exp(v * 4.5), 0);
-    return confidences.map(v => Math.exp(v * 4.5) / sum);
+    // Normalize confidences using softmax
+    const sum = confidences.reduce((s, v) => s + Math.exp(v * 5.0), 0);
+    return confidences.map(v => Math.exp(v * 5.0) / sum);
 }
 
 export default function AILab() {
