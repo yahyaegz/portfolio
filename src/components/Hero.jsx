@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import { motion } from 'framer-motion';
 import { profile } from '../data';
 import { useLanguage } from '../context/LanguageContext';
+import CurrentlyOpenTo from './CurrentlyOpenTo';
 
 const ParticleGlobe = lazy(() => import('./ParticleGlobe'));
 
@@ -87,6 +88,8 @@ export default function Hero() {
                     <motion.p variants={itemVariants} className="text-sm sm:text-base md:text-lg text-secondary leading-relaxed max-w-xl">
                         {t('hero.summary')}
                     </motion.p>
+
+                    <CurrentlyOpenTo variant="hero" />
 
                     <motion.div variants={itemVariants} className="flex gap-4 pt-4 flex-wrap">
                         {[

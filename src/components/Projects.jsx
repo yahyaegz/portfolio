@@ -1,17 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { projects } from '../data';
 import { useLanguage } from '../context/LanguageContext';
 import { staggerContainer, scaleUp } from '../utils/animationVariants';
 import SplitTextReveal from './SplitTextReveal';
 import TiltCard from './TiltCard';
+import ProjectCaseStudy from './ProjectCaseStudy';
 
 const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
 };
 
-const ProjectCard = ({ p, translatedItem }) => {
+const ProjectCard = ({ p, translatedItem, onOpenCaseStudy }) => {
     const { t } = useLanguage();
     const title = translatedItem?.title || p.title;
     const description = translatedItem?.description || p.description;
@@ -59,22 +60,34 @@ const ProjectCard = ({ p, translatedItem }) => {
                     </div>
                 </div>
 
-                {p.link !== '#' && (
-                    <motion.a
-                        href={p.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-accent hover:underline transition font-semibold group/link"
-                        whileHover={{ x: 5 }}
+                <div className="flex items-center justify-between gap-4 mt-auto pt-2 border-t" style={{ borderColor: 'var(--border-color)' }}>
+                    <motion.button
+                        onClick={() => onOpenCaseStudy(p)}
+                        className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-accent border border-accent/30 hover:border-accent hover:bg-accent/10 px-3.5 py-2 rounded-full transition"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                     >
-                        {t('projects.viewProject')}{' '}
-                        <motion.i
-                            className="fa fa-arrow-right"
-                            animate={{ x: [0, 3, 0] }}
-                            transition={{ duration: 1.5, repeat: Infinity }}
-                        />
-                    </motion.a>
-                )}
+                        <i className="fa-solid fa-file-invoice text-xs" />
+                        <span>{t('caseStudy.readCaseStudy')}</span>
+                    </motion.button>
+
+                    {p.link !== '#' && (
+                        <motion.a
+                            href={p.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-secondary hover:text-accent transition"
+                            whileHover={{ x: 3 }}
+                        >
+                            <span>Live Demo</span>
+                            <motion.i
+                                className="fa fa-arrow-right text-[10px]"
+                                animate={{ x: [0, 2, 0] }}
+                                transition={{ duration: 1.5, repeat: Infinity }}
+                            />
+                        </motion.a>
+                    )}
+                </div>
             </div>
         </motion.div>
         </TiltCard>
@@ -83,6 +96,7 @@ const ProjectCard = ({ p, translatedItem }) => {
 
 export default function Projects() {
     const { t } = useLanguage();
+    const [activeCaseStudy, setActiveCaseStudy] = useState(null);
     const translatedItems = t('projects.items');
     const realProjects = projects.filter(p => p.type === 'project');
 
@@ -113,10 +127,21 @@ export default function Projects() {
                     viewport={{ once: true }}
                 >
                     {realProjects.map((p) => (
-                        <ProjectCard key={p.title} p={p} translatedItem={getTranslation(p.title)} />
+                        <ProjectCard 
+                            key={p.title} 
+                            p={p} 
+                            translatedItem={getTranslation(p.title)} 
+                            onOpenCaseStudy={setActiveCaseStudy}
+                        />
                     ))}
                 </motion.div>
             </div>
+
+            <ProjectCaseStudy 
+                isOpen={activeCaseStudy !== null} 
+                onClose={() => setActiveCaseStudy(null)} 
+                project={activeCaseStudy}
+            />
         </section>
     );
 }

@@ -4,7 +4,7 @@ import { useTheme } from '../theme/ThemeProvider';
 import { useLanguage, LANGUAGES } from '../context/LanguageContext';
 import useActiveSection from '../hooks/useActiveSection';
 
-const SECTION_IDS = ['home', 'services', 'skills', 'projects', 'education', 'experience', 'certifications', 'contact'];
+const SECTION_IDS = ['home', 'services', 'skills', 'projects', 'ai-lab', 'resume-hub', 'certifications', 'contact'];
 
 function ThemeToggle({ showLabel = false, className = '' }) {
     const { theme, toggleTheme } = useTheme();
@@ -152,8 +152,8 @@ export default function Header() {
         { href: '#services', id: 'services', label: t('nav.services') },
         { href: '#skills', id: 'skills', label: t('nav.skills') },
         { href: '#projects', id: 'projects', label: t('nav.projects') },
-        { href: '#education', id: 'education', label: t('nav.education') },
-        { href: '#experience', id: 'experience', label: t('nav.experience') },
+        { href: '#ai-lab', id: 'ai-lab', label: t('nav.aiLab') },
+        { href: '#resume-hub', id: 'resume-hub', label: t('nav.resumeHub') },
         { href: '#certifications', id: 'certifications', label: t('nav.certifications') },
         { href: '#contact', id: 'contact', label: t('nav.contact') },
     ];

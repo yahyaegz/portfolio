@@ -31,28 +31,72 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Person",
-      "name": "Yahya El Gzouli",
-      "url": "https://yahyaelgzouli.engineer",
-      "image": "https://yahyaelgzouli.engineer/assets/main.jpg",
-      "sameAs": [
-        "https://www.linkedin.com/in/yahya-el-gzouli-99536b331",
-        "https://github.com/yahyaegz",
-        "https://x.com/YahyaEgz"
-      ],
-      "jobTitle": "Full-Stack Software Engineer",
-      "worksFor": {
-        "@type": "Organization",
-        "name": "Freelance"
-      },
-      "description": "Full-Stack Software Engineer specializing in React, Node.js, ASP.NET Core, and Machine Learning."
+      "@graph": [
+        {
+          "@type": "Person",
+          "@id": "https://yahyaelgzouli.engineer/#person",
+          "name": "Yahya El Gzouli",
+          "url": "https://yahyaelgzouli.engineer",
+          "image": "https://yahyaelgzouli.engineer/assets/main.jpg",
+          "sameAs": [
+            "https://www.linkedin.com/in/yahya-el-gzouli-99536b331",
+            "https://github.com/yahyaegz",
+            "https://x.com/YahyaEgz"
+          ],
+          "jobTitle": "Full-Stack Software Engineer",
+          "worksFor": {
+            "@type": "Organization",
+            "name": "Freelance"
+          },
+          "description": "Full-Stack Software Engineer specializing in React, Node.js, ASP.NET Core, and Machine Learning.",
+          "knowsAbout": [
+            "Full-Stack Development",
+            "RESTful API Design",
+            "Database Optimization",
+            "Machine Learning",
+            "AI Integration",
+            "Next.js",
+            "ASP.NET Core"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://yahyaelgzouli.engineer/#website",
+          "url": "https://yahyaelgzouli.engineer",
+          "name": "Yahya El Gzouli Portfolio",
+          "publisher": {
+            "@id": "https://yahyaelgzouli.engineer/#person"
+          }
+        },
+        {
+          "@type": "CreativeWork",
+          "name": "Cliniko - AI Healthcare SaaS Platform",
+          "creator": {
+            "@id": "https://yahyaelgzouli.engineer/#person"
+          },
+          "description": "SaaS platform for clinic management including patient records, appointment scheduling and AI-powered intelligent search.",
+          "genre": "AI Healthcare Software",
+          "keywords": "Next.js, React, Node.js, PostgreSQL, AI"
+        },
+        {
+          "@type": "CreativeWork",
+          "name": "AIR BABOUCHE E-Commerce Platform",
+          "creator": {
+            "@id": "https://yahyaelgzouli.engineer/#person"
+          },
+          "description": "Full-stack e-commerce platform with secure authentication, product management, and payment integration.",
+          "url": "https://www.airbabouche.com/",
+          "genre": "E-Commerce",
+          "keywords": "React, Node.js, Express.js, MySQL, JWT"
+        }
+      ]
     }
     </script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
-<div id="root"></div>
-<script type="module" src="/src/main.jsx"></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>

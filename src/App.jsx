@@ -13,12 +13,13 @@ const ScrollWarpDivider = lazy(() => import('./components/ScrollWarpDivider'));
 const Services = lazy(() => import('./components/Services'));
 const Skills = lazy(() => import('./components/Skills'));
 const Projects = lazy(() => import('./components/Projects'));
-const Education = lazy(() => import('./components/Education'));
-const Experience = lazy(() => import('./components/Experience'));
+const AILab = lazy(() => import('./components/AILab'));
+const InteractiveCV = lazy(() => import('./components/InteractiveCV'));
 const Certifications = lazy(() => import('./components/Certifications'));
 const CallToAction = lazy(() => import('./components/CallToAction'));
 const Contact = lazy(() => import('./components/Contact'));
 const Footer = lazy(() => import('./components/Footer'));
+const Telemetry = lazy(() => import('./components/Telemetry'));
 
 export default function App() {
     const [introDone, setIntroDone] = useState(
@@ -60,6 +61,7 @@ export default function App() {
                 <ScrollProgress />
                 <BackToTop />
                 <Chatbot />
+                <Telemetry />
             </Suspense>
             <Suspense fallback={<SkeletonLoader />}>
                 <Header />
@@ -76,9 +78,9 @@ export default function App() {
                     <ScrollWarpDivider />
                     <Projects />
                     <ScrollWarpDivider flip />
-                    <Education />
+                    <AILab />
                     <ScrollWarpDivider />
-                    <Experience />
+                    <InteractiveCV />
                     <ScrollWarpDivider flip />
                     <Certifications />
                     <ScrollWarpDivider />

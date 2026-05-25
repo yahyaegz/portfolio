@@ -1,5 +1,27 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { translations } from '../locales/translations';
+import { translations as baseTranslations } from '../locales/translations';
+import { extraTranslations } from '../locales/extraTranslations';
+
+const isObject = item => item && typeof item === 'object' && !Array.isArray(item);
+const deepMerge = (target, source) => {
+    const output = Object.assign({}, target);
+    if (isObject(target) && isObject(source)) {
+        Object.keys(source).forEach(key => {
+            if (isObject(source[key])) {
+                if (!(key in target)) {
+                    output[key] = source[key];
+                } else {
+                    output[key] = deepMerge(target[key], source[key]);
+                }
+            } else {
+                output[key] = source[key];
+            }
+        });
+    }
+    return output;
+};
+
+const translations = deepMerge(baseTranslations, extraTranslations);
 
 const LanguageContext = createContext();
 

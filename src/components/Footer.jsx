@@ -11,7 +11,8 @@ export default function Footer() {
         { name: t('nav.home'), href: '#home' },
         { name: t('nav.skills'), href: '#skills' },
         { name: t('nav.projects'), href: '#projects' },
-        { name: t('nav.experience'), href: '#experience' },
+        { name: t('nav.aiLab') || 'AI Lab', href: '#ai-lab' },
+        { name: t('nav.resumeHub') || 'Resume', href: '#resume-hub' },
         { name: t('certifications.title') + ' ' + t('certifications.titleSpan'), href: '#certifications' },
         { name: t('nav.contact'), href: '#contact' },
     ];

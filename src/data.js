@@ -45,7 +45,7 @@ export const certifications = [
                 credentialId: 'NQDPG73WKDGP',
                 type: 'Professional Certificate',
                 skills: ['Full-Stack Development', 'React.js', 'Node.js', 'Python', 'Django', 'REST APIs', 'Databases', 'Git'],
-                credentialUrl: '#',
+                credentialUrl: 'https://www.coursera.org/verify/professional-cert/NQDPG73WKDGP',
                 icon: 'certificate'
             },
             {
@@ -54,7 +54,7 @@ export const certifications = [
                 credentialId: 'EEUHU9MXOVV3',
                 type: 'Course',
                 skills: ['Django REST Framework', 'API REST', 'Web Development'],
-                credentialUrl: '#',
+                credentialUrl: 'https://www.coursera.org/verify/EEUHU9MXOVV3',
                 icon: 'gears'
             },
             {
@@ -63,7 +63,7 @@ export const certifications = [
                 credentialId: 'K10H9YWFQBBV',
                 type: 'Course',
                 skills: ['Git', 'Version Control', 'GitHub'],
-                credentialUrl: '#',
+                credentialUrl: 'https://www.coursera.org/verify/K10H9YWFQBBV',
                 icon: 'github',
                 brand: true
             },
@@ -73,7 +73,7 @@ export const certifications = [
                 credentialId: 'P0LB91TMSLGY',
                 type: 'Course',
                 skills: ['Django', 'Python', 'Back-End Development'],
-                credentialUrl: '#',
+                credentialUrl: 'https://www.coursera.org/verify/P0LB91TMSLGY',
                 icon: 'python',
                 brand: true
             },
@@ -83,7 +83,7 @@ export const certifications = [
                 credentialId: 'N33V5W2ENBX8',
                 type: 'Course',
                 skills: ['Python', 'Object-Oriented Programming (OOP)'],
-                credentialUrl: '#',
+                credentialUrl: 'https://www.coursera.org/verify/N33V5W2ENBX8',
                 icon: 'python',
                 brand: true
             },
@@ -93,7 +93,7 @@ export const certifications = [
                 credentialId: 'JK76WH80F5SC',
                 type: 'Course',
                 skills: ['HTML', 'CSS', 'Responsive Design'],
-                credentialUrl: '#',
+                credentialUrl: 'https://www.coursera.org/verify/JK76WH80F5SC',
                 icon: 'html5',
                 brand: true
             },
@@ -103,7 +103,7 @@ export const certifications = [
                 credentialId: 'JS31GVB04B7D',
                 type: 'Course',
                 skills: ['React.js', 'Front-End Development', 'Performance Optimization'],
-                credentialUrl: '#',
+                credentialUrl: 'https://www.coursera.org/verify/JS31GVB04B7D',
                 icon: 'react',
                 brand: true
             },
@@ -113,7 +113,7 @@ export const certifications = [
                 credentialId: 'EBA76J9BFNA5',
                 type: 'Course',
                 skills: ['React.js', 'Front-End Development', 'JSX'],
-                credentialUrl: '#',
+                credentialUrl: 'https://www.coursera.org/verify/EBA76J9BFNA5',
                 icon: 'react',
                 brand: true
             },
@@ -123,7 +123,7 @@ export const certifications = [
                 credentialId: 'IXA9RNJY9YV1',
                 type: 'Course',
                 skills: ['JavaScript', 'Web Development', 'ES6+'],
-                credentialUrl: '#',
+                credentialUrl: 'https://www.coursera.org/verify/IXA9RNJY9YV1',
                 icon: 'js',
                 brand: true
             }

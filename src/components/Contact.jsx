@@ -6,6 +6,7 @@ import { contactInfo } from '../data';
 import { useLanguage } from '../context/LanguageContext';
 import SplitTextReveal from './SplitTextReveal';
 import { slideRight } from '../utils/animationVariants';
+import CurrentlyOpenTo from './CurrentlyOpenTo';
 
 export default function Contact() {
     const [loading, setLoading] = useState(false);
@@ -112,6 +113,10 @@ export default function Contact() {
                         </motion.a>
                     ))}
                 </motion.div>
+
+                <div className="flex justify-center mb-8 md:mb-12">
+                    <CurrentlyOpenTo variant="contact" />
+                </div>
 
                 <motion.div
                     className="rounded-xl card-bg border backdrop-blur p-8 shadow-lg"
