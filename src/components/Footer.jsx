@@ -87,11 +87,11 @@ export default function Footer() {
                     >
                         <h4 className="font-semibold mb-4 uppercase text-sm tracking-wider">{t('footer.services')}</h4>
                         <ul className="space-y-2 text-sm text-secondary">
-                            <li className="hover:text-accent transition">{t('footer.webDev')}</li>
-                            <li className="hover:text-accent transition">{t('footer.fullstackSolutions')}</li>
-                            <li className="hover:text-accent transition">{t('footer.mlDataScience')}</li>
-                            <li className="hover:text-accent transition">{t('footer.apiDesign')}</li>
-                            <li className="hover:text-accent transition">{t('footer.cloudDeployment')}</li>
+                            <li><a href="#services" className="hover:text-accent transition">{t('footer.webDev')}</a></li>
+                            <li><a href="#services" className="hover:text-accent transition">{t('footer.fullstackSolutions')}</a></li>
+                            <li><a href="#ai-lab" className="hover:text-accent transition">{t('footer.mlDataScience')}</a></li>
+                            <li><a href="#skills" className="hover:text-accent transition">{t('footer.apiDesign')}</a></li>
+                            <li><a href="#skills" className="hover:text-accent transition">{t('footer.cloudDeployment')}</a></li>
                         </ul>
                     </motion.div>
 
@@ -145,18 +145,6 @@ export default function Footer() {
                         </motion.div>
                     </div>
                 </div>
-
-                <motion.a
-                    href="#home"
-                    className="fixed bottom-8 right-8 grid h-12 w-12 place-items-center rounded-full bg-accent text-black shadow-lg hover:shadow-xl transition z-40"
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    whileHover={{ y: -5 }}
-                    whileTap={{ scale: 0.95 }}
-                >
-                    <i className="fa fa-arrow-up" />
-                </motion.a>
             </div>
         </footer>
     );
