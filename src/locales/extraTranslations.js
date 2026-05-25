@@ -79,6 +79,45 @@ export const extraTranslations = {
             geneticPresetMaze: "Maze Grid",
             geneticPresetClear: "Clear Space",
         },
+        devArcade: {
+            title: "Developer Retro",
+            titleSpan: "AI Arcade",
+            subtitle: "Differentiating portfolios with custom mini-games. Play Vaporwave Snake or check out Minimax AI Tic-Tac-Toe featuring real-time heuristic search metrics.",
+            tabSnake: "Vaporwave Snake",
+            tabTtt: "Minimax AI Tic-Tac-Toe",
+            
+            // Snake controls
+            snakeTitle: "Neo-Snake: Vaporwave Edition",
+            snakeDesc: "Navigate the neon snake to consume glowing data blocks. Evade walls and your own tail. Mobile D-pad supported!",
+            score: "Score",
+            highScore: "High Score",
+            btnStart: "Play Game",
+            btnPause: "Pause",
+            gameOver: "Game Over!",
+            btnRestart: "Play Again",
+            
+            // TTT controls
+            tttTitle: "Tic-Tac-Toe vs Minimax AI",
+            tttDesc: "Play against an unbeatable Minimax game-tree search algorithm with Alpha-Beta pruning. Watch the telemetry panel calculate decision paths in real-time!",
+            difficulty: "AI Level",
+            diffUnbeatable: "Unbeatable Minimax AI",
+            playerTurn: "Your Turn (X)",
+            aiTurn: "AI is thinking (O)...",
+            aiWon: "AI Wins! (Unbeatable)",
+            playerWon: "You Win! (Impossible)",
+            draw: "It's a Draw!",
+            statsWins: "Recruiter Wins",
+            statsLosses: "AI Wins",
+            statsDraws: "Draws",
+            
+            // Telemetry panel
+            telemetryTitle: "AI Decision Telemetry",
+            nodesEvaluated: "Nodes Evaluated",
+            depthReached: "Max Search Depth",
+            latency: "Decision Latency",
+            bestScore: "Best Branch Score",
+            ms: "ms",
+        },
         cvTimeline: {
             title: "Recruiter-Friendly",
             titleSpan: "CV & Timeline",
@@ -200,6 +239,45 @@ export const extraTranslations = {
             geneticPresetSlits: "شقوق مزدوجة",
             geneticPresetMaze: "شبكة متاهة",
             geneticPresetClear: "مساحة فارغة",
+        },
+        devArcade: {
+            title: "ألعاب المطورين",
+            titleSpan: "منطقة الألعاب الذكية",
+            subtitle: "التميز عن الآخرين بألعاب كلاسيكية تفاعلية. العب لعبة الثعبان النيون أو تحدى خوارزمية البحث الذكي Tic-Tac-Toe مع لوحة مراقبة قرارات الذكاء الاصطناعي في الوقت الفعلي.",
+            tabSnake: "ثعبان النيون",
+            tabTtt: "إكس-أو الذكاء الاصطناعي",
+            
+            // Snake controls
+            snakeTitle: "ثعبان النيون: نسخة الويف",
+            snakeDesc: "وجه الثعبان المضيء لالتهام كتل البيانات. تجنب الاصطدام بالجدران أو بذيلك. متوافق تماماً مع الهواتف الذكية!",
+            score: "النقاط",
+            highScore: "أعلى نتيجة",
+            btnStart: "بدء اللعب",
+            btnPause: "إيقاف مؤقت",
+            gameOver: "انتهت اللعبة!",
+            btnRestart: "العب مجدداً",
+            
+            // TTT controls
+            tttTitle: "لعبة إكس-أو ضد الذكاء الاصطناعي",
+            tttDesc: "تحدى خوارزمية Minimax غير القابلة للهزيمة مع تقليم ألفا-بيتا. شاهد لوحة التحكم وهي ترسم وتدرس مسارات القرارات والتحركات في الوقت الفعلي!",
+            difficulty: "مستوى الخوارزمية",
+            diffUnbeatable: "خوارزمية Minimax الذكية",
+            playerTurn: "دورك الآن (X)",
+            aiTurn: "الذكاء الاصطناعي يفكر (O)...",
+            aiWon: "فاز الذكاء الاصطناعي! (لا يُهزم)",
+            playerWon: "لقد فزت! (مستحيل)",
+            draw: "تعادل!",
+            statsWins: "فوز الزائر",
+            statsLosses: "فوز الذكاء الاصطناعي",
+            statsDraws: "التعادلات",
+            
+            // Telemetry panel
+            telemetryTitle: "مراقبة قرارات الذكاء الاصطناعي",
+            nodesEvaluated: "العقد التي تمت دراستها",
+            depthReached: "أقصى عمق للبحث",
+            latency: "سرعة اتخاذ القرار",
+            bestScore: "أفضل تقييم للمسار",
+            ms: "ملي ثانية",
         },
         cvTimeline: {
             title: "السيرة الذاتية",
@@ -323,6 +401,45 @@ export const extraTranslations = {
             geneticPresetMaze: "Grille Labyrinthe",
             geneticPresetClear: "Espace Libre",
         },
+        devArcade: {
+            title: "Arcade Rétro",
+            titleSpan: "Zone de Jeux IA",
+            subtitle: "Se démarquer avec des mini-jeux développeur en ligne. Jouez au Snake Néon ou testez le Tic-Tac-Toe contre l'IA Minimax avec analyse des décisions en temps réel.",
+            tabSnake: "Snake Vaporwave",
+            tabTtt: "Morpion IA Minimax",
+            
+            // Snake controls
+            snakeTitle: "Néo-Snake : Édition Vaporwave",
+            snakeDesc: "Dirigez le serpent néon pour collecter des blocs de données. Évitez les collisions avec les murs ou votre propre corps. D-pad mobile inclus !",
+            score: "Score",
+            highScore: "Record",
+            btnStart: "Jouer",
+            btnPause: "Pause",
+            gameOver: "Partie Terminée !",
+            btnRestart: "Rejouer",
+            
+            // TTT controls
+            tttTitle: "Morpion vs IA Minimax",
+            tttDesc: "Affrontez un algorithme de recherche d'arbre de jeu Minimax imbattable avec élagage Alpha-Bêta. Observez la télémétrie analyser les chemins de décision en temps réel !",
+            difficulty: "Niveau de l'IA",
+            diffUnbeatable: "IA Minimax Imbattable",
+            playerTurn: "Votre tour (X)",
+            aiTurn: "L'IA réfléchit (O)...",
+            aiWon: "L'IA a gagné ! (Imbattable)",
+            playerWon: "Vous avez gagné ! (Impossible)",
+            draw: "Match Nul !",
+            statsWins: "Victoires Recruteur",
+            statsLosses: "Victoires IA",
+            statsDraws: "Nuls",
+            
+            // Telemetry panel
+            telemetryTitle: "Télémétrie Décisionnelle IA",
+            nodesEvaluated: "Nœuds Évalués",
+            depthReached: "Profondeur de Recherche",
+            latency: "Vitesse de Décision",
+            bestScore: "Meilleure Note de Branche",
+            ms: "ms",
+        },
         cvTimeline: {
             title: "CV Interactif &",
             titleSpan: "Ligne de Carrière",
@@ -444,6 +561,45 @@ export const extraTranslations = {
             geneticPresetSlits: "Doble Ranura",
             geneticPresetMaze: "Red de Laberinto",
             geneticPresetClear: "Espacio Libre",
+        },
+        devArcade: {
+            title: "Arcade Retro",
+            titleSpan: "Zona de Juegos IA",
+            subtitle: "Diferenciarse de portfolios estándar con minijuegos de desarrollo interactivos. Juega al Snake de Neón o reta a la IA Minimax en Tres en Raya con análisis heurístico en vivo.",
+            tabSnake: "Snake Vaporwave",
+            tabTtt: "Tres en Raya IA Minimax",
+            
+            // Snake controls
+            snakeTitle: "Neo-Snake: Edición Vaporwave",
+            snakeDesc: "Dirige la serpiente de neón para recolectar bloques de datos. Evita chocar contra las paredes o tu propio cuerpo. ¡D-pad móvil incluido!",
+            score: "Puntuación",
+            highScore: "Record",
+            btnStart: "Jugar",
+            btnPause: "Pausa",
+            gameOver: "¡Juego Terminado!",
+            btnRestart: "Jugar de Nuevo",
+            
+            // TTT controls
+            tttTitle: "Tres en Raya vs IA Minimax",
+            tttDesc: "Juega contra un algoritmo imbatible de búsqueda en árbol de juego Minimax con poda Alfa-Beta. ¡Mira el panel de telemetría analizar los caminos de decisión en tiempo real!",
+            difficulty: "Nivel de IA",
+            diffUnbeatable: "IA Minimax Imbatible",
+            playerTurn: "Tu turno (X)",
+            aiTurn: "La IA está pensando (O)...",
+            aiWon: "¡La IA gana! (Imbatible)",
+            playerWon: "¡Tú ganas! (Imposible)",
+            draw: "¡Empate!",
+            statsWins: "Victorias Reclutador",
+            statsLosses: "Victorias IA",
+            statsDraws: "Empates",
+            
+            // Telemetry panel
+            telemetryTitle: "Telemetría de Decisiones IA",
+            nodesEvaluated: "Nodos Evaluados",
+            depthReached: "Profundidad de Búsqueda",
+            latency: "Velocidad de Decisión",
+            bestScore: "Mejor Nota de Rama",
+            ms: "ms",
         },
         cvTimeline: {
             title: "CV Interactivo &",

@@ -15,6 +15,7 @@ const Skills = lazy(() => import('./components/Skills'));
 const Projects = lazy(() => import('./components/Projects'));
 const AILab = lazy(() => import('./components/AILab'));
 const InteractiveCV = lazy(() => import('./components/InteractiveCV'));
+const DevArcade = lazy(() => import('./components/DevArcade'));
 const Certifications = lazy(() => import('./components/Certifications'));
 const CallToAction = lazy(() => import('./components/CallToAction'));
 const Contact = lazy(() => import('./components/Contact'));
@@ -82,6 +83,8 @@ export default function App() {
                     <ScrollWarpDivider />
                     <InteractiveCV />
                     <ScrollWarpDivider flip />
+                    <DevArcade />
+                    <ScrollWarpDivider />
                     <Certifications />
                     <ScrollWarpDivider />
                     <CallToAction />
