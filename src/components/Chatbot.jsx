@@ -3,6 +3,60 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { profile, skills, experience, projects, education, contactInfo, services, certifications, coreCompetencies, testimonials, languages as langData } from '../data';
 import { useLanguage } from '../context/LanguageContext';
 
+const PUTER_SDK_SRC = 'https://js.puter.com/v2/';
+
+let puterLoadPromise;
+
+function setPuterQuietMode() {
+    window.PUTER_QUIET = true;
+    window.puter = window.puter || {};
+    window.puter.quiet = true;
+}
+
+function loadPuter() {
+    if (typeof window === 'undefined') {
+        return Promise.reject(new Error('Puter is only available in the browser.'));
+    }
+
+    setPuterQuietMode();
+
+    if (window.puter?.ai?.chat) {
+        return Promise.resolve(window.puter);
+    }
+
+    if (puterLoadPromise) {
+        return puterLoadPromise;
+    }
+
+    puterLoadPromise = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = PUTER_SDK_SRC;
+        script.async = true;
+        script.dataset.puterSdk = 'true';
+
+        script.onload = () => {
+            setPuterQuietMode();
+
+            if (window.puter?.ai?.chat) {
+                resolve(window.puter);
+                return;
+            }
+
+            puterLoadPromise = undefined;
+            reject(new Error('Puter AI did not initialize.'));
+        };
+
+        script.onerror = () => {
+            puterLoadPromise = undefined;
+            reject(new Error('Puter SDK failed to load.'));
+        };
+
+        document.head.appendChild(script);
+    });
+
+    return puterLoadPromise;
+}
+
 function YLogo({ size = 36 }) {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width={size} height={size}>
@@ -150,7 +204,8 @@ export default function Chatbot() {
         }
 
         try {
-            const response = await window.puter.ai.chat(
+            const puter = await loadPuter();
+            const response = await puter.ai.chat(
                 [
                     { role: 'system', content: systemPrompt },
                     ...conversationRef.current,
@@ -167,8 +222,7 @@ export default function Chatbot() {
             ];
 
             return botText;
-        } catch (err) {
-            console.error('Puter AI error:', err);
+        } catch {
             return t('chatbot.smartDefault');
         }
     }, [language, t]);
