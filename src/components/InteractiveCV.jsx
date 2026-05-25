@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { experience, education, skills, contactInfo } from '../data';
 import { useLanguage } from '../context/LanguageContext';
+import SplitTextReveal from './SplitTextReveal';
 
 export default function InteractiveCV() {
     const { t, language } = useLanguage();
