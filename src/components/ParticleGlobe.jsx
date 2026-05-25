@@ -11,7 +11,7 @@ function seededRandom(seed) {
 }
 
 function useReducedMotion() {
-    const [reduced, setReduced] = useState(true);
+    const [reduced, setReduced] = useState(false);
 
     useEffect(() => {
         const media = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -26,14 +26,16 @@ function useReducedMotion() {
     return reduced;
 }
 
-function ParticleSphere({ animated, compact }) {
+function ParticleSphere({ animated, compact, motionScale }) {
     const ref = useRef(null);
     const count = compact ? 420 : 920;
 
-    const { positions, colors } = useMemo(() => {
+    const { positions, basePositions, colors, phaseValues } = useMemo(() => {
         const rand = seededRandom(42);
+        const base = new Float32Array(count * 3);
         const pos = new Float32Array(count * 3);
         const colorValues = new Float32Array(count * 3);
+        const phases = new Float32Array(count);
         const green = new Color('#10b981');
         const cyan = new Color('#06b6d4');
         const pale = new Color('#d1fae5');
@@ -45,25 +47,48 @@ function ParticleSphere({ animated, compact }) {
             const r = 2.05 + Math.sin(i * 0.27) * 0.09 + rand() * 0.28;
             const color = green.clone().lerp(i % 3 === 0 ? pale : cyan, rand() * 0.85);
 
-            pos[i3] = r * Math.sin(phi) * Math.cos(theta);
-            pos[i3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-            pos[i3 + 2] = r * Math.cos(phi);
+            base[i3] = r * Math.sin(phi) * Math.cos(theta);
+            base[i3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+            base[i3 + 2] = r * Math.cos(phi);
+
+            pos[i3] = base[i3];
+            pos[i3 + 1] = base[i3 + 1];
+            pos[i3 + 2] = base[i3 + 2];
 
             colorValues[i3] = color.r;
             colorValues[i3 + 1] = color.g;
             colorValues[i3 + 2] = color.b;
+
+            phases[i] = rand() * Math.PI * 2;
         }
 
-        return { positions: pos, colors: colorValues };
+        return { positions: pos, basePositions: base, colors: colorValues, phaseValues: phases };
     }, [count]);
 
     useFrame((state) => {
         if (!animated || !ref.current) return;
 
-        const t = state.clock.getElapsedTime();
-        ref.current.rotation.y = t * 0.09 + state.pointer.x * 0.18;
-        ref.current.rotation.x = Math.sin(t * 0.1) * 0.12 + state.pointer.y * 0.15;
-        ref.current.rotation.z = Math.sin(t * 0.07) * 0.05;
+        const t = state.clock.elapsedTime;
+        const position = ref.current.geometry.attributes.position;
+        const values = position.array;
+
+        for (let i = 0; i < count; i++) {
+            const i3 = i * 3;
+            const phase = phaseValues[i];
+            const pulse = 1
+                + Math.sin(t * 1.15 + phase) * 0.035 * motionScale
+                + Math.sin(t * 2.05 + phase * 0.45) * 0.012 * motionScale;
+
+            values[i3] = basePositions[i3] * pulse;
+            values[i3 + 1] = basePositions[i3 + 1] * pulse;
+            values[i3 + 2] = basePositions[i3 + 2] * pulse;
+        }
+
+        position.needsUpdate = true;
+        ref.current.rotation.y = t * 0.22 * motionScale + state.pointer.x * 0.18 * motionScale;
+        ref.current.rotation.x = Math.sin(t * 0.2) * 0.16 * motionScale + state.pointer.y * 0.15 * motionScale;
+        ref.current.rotation.z = Math.sin(t * 0.16) * 0.075 * motionScale;
+        ref.current.material.opacity = 0.72 + Math.sin(t * 1.25) * 0.1 * motionScale;
     });
 
     return (
@@ -85,15 +110,20 @@ function ParticleSphere({ animated, compact }) {
     );
 }
 
-function OrbitRings({ animated, compact }) {
+function OrbitRings({ animated, compact, motionScale }) {
     const ref = useRef(null);
 
     useFrame((state) => {
         if (!animated || !ref.current) return;
 
-        const t = state.clock.getElapsedTime();
-        ref.current.rotation.y = t * 0.18;
-        ref.current.rotation.x = Math.sin(t * 0.2) * 0.08;
+        const t = state.clock.elapsedTime;
+        ref.current.rotation.y = t * 0.34 * motionScale;
+        ref.current.rotation.x = Math.sin(t * 0.32) * 0.11 * motionScale;
+
+        ref.current.children.forEach((ring, index) => {
+            ring.rotation.z += (0.0015 + index * 0.0008) * motionScale;
+            ring.material.opacity = (index === 1 ? 0.24 : 0.17) + Math.sin(t * 1.1 + index) * 0.055 * motionScale;
+        });
     });
 
     return (
@@ -121,7 +151,7 @@ function OrbitRings({ animated, compact }) {
     );
 }
 
-function DataArcs({ animated, compact }) {
+function DataArcs({ animated, compact, motionScale }) {
     const ref = useRef(null);
     const arcs = useMemo(() => {
         const rand = seededRandom(77);
@@ -160,8 +190,14 @@ function DataArcs({ animated, compact }) {
     useFrame((state) => {
         if (!animated || !ref.current) return;
 
-        ref.current.rotation.y = -state.clock.getElapsedTime() * 0.08;
-        ref.current.rotation.z = MathUtils.lerp(ref.current.rotation.z, state.pointer.x * 0.12, 0.04);
+        const t = state.clock.elapsedTime;
+        ref.current.rotation.y = -t * 0.18 * motionScale;
+        ref.current.rotation.z = MathUtils.lerp(ref.current.rotation.z, state.pointer.x * 0.12 * motionScale, 0.04);
+
+        ref.current.children.forEach((arc, index) => {
+            arc.position.y = Math.sin(t * 0.85 + index * 0.6) * 0.035 * motionScale;
+            arc.material.opacity = arcs[index].opacity * (0.68 + Math.sin(t * 1.55 + index) * 0.32 * motionScale);
+        });
     });
 
     return (
@@ -184,14 +220,15 @@ function DataArcs({ animated, compact }) {
     );
 }
 
-function CoreGlow({ animated, compact }) {
+function CoreGlow({ animated, compact, motionScale }) {
     const ref = useRef(null);
 
     useFrame((state) => {
         if (!animated || !ref.current) return;
 
-        const scale = 1 + Math.sin(state.clock.getElapsedTime() * 1.2) * 0.035;
+        const scale = 1 + Math.sin(state.clock.elapsedTime * 1.45) * 0.075 * motionScale;
         ref.current.scale.setScalar(scale);
+        ref.current.rotation.y = state.clock.elapsedTime * 0.16 * motionScale;
     });
 
     return (
@@ -209,22 +246,31 @@ function CoreGlow({ animated, compact }) {
     );
 }
 
-function GlobeRig({ animated, compact }) {
+function GlobeRig({ animated, compact, motionScale }) {
     const ref = useRef(null);
 
     useFrame((state) => {
         if (!animated || !ref.current) return;
 
-        ref.current.rotation.x = MathUtils.lerp(ref.current.rotation.x, state.pointer.y * 0.08, 0.04);
-        ref.current.rotation.y = MathUtils.lerp(ref.current.rotation.y, state.pointer.x * 0.1, 0.04);
+        const t = state.clock.elapsedTime;
+        ref.current.rotation.x = MathUtils.lerp(
+            ref.current.rotation.x,
+            (Math.sin(t * 0.18) * 0.04 + state.pointer.y * 0.08) * motionScale,
+            0.04,
+        );
+        ref.current.rotation.y = MathUtils.lerp(
+            ref.current.rotation.y,
+            (Math.cos(t * 0.16) * 0.05 + state.pointer.x * 0.1) * motionScale,
+            0.04,
+        );
     });
 
     return (
         <group ref={ref} position={compact ? [0.25, -0.15, 0] : [0.75, 0, 0]}>
-            <CoreGlow animated={animated} compact={compact} />
-            <ParticleSphere animated={animated} compact={compact} />
-            <OrbitRings animated={animated} compact={compact} />
-            <DataArcs animated={animated} compact={compact} />
+            <CoreGlow animated={animated} compact={compact} motionScale={motionScale} />
+            <ParticleSphere animated={animated} compact={compact} motionScale={motionScale} />
+            <OrbitRings animated={animated} compact={compact} motionScale={motionScale} />
+            <DataArcs animated={animated} compact={compact} motionScale={motionScale} />
         </group>
     );
 }
@@ -232,6 +278,7 @@ function GlobeRig({ animated, compact }) {
 export default function ParticleGlobe() {
     const reducedMotion = useReducedMotion();
     const [compact, setCompact] = useState(false);
+    const motionScale = reducedMotion ? 0.3 : 1;
 
     useEffect(() => {
         const update = () => setCompact(window.innerWidth < 768);
@@ -245,13 +292,13 @@ export default function ParticleGlobe() {
     return (
         <div className="absolute inset-0 z-0 pointer-events-none opacity-75" aria-hidden="true">
             <Canvas
-                frameloop={reducedMotion ? 'demand' : 'always'}
+                frameloop="always"
                 camera={{ position: [0, 0, compact ? 5.7 : 5.2], fov: compact ? 48 : 43 }}
                 dpr={compact ? [1, 1.2] : [1, 1.7]}
                 gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
                 style={{ background: 'transparent' }}
             >
-                <GlobeRig animated={!reducedMotion} compact={compact} />
+                <GlobeRig animated compact={compact} motionScale={motionScale} />
             </Canvas>
         </div>
     );
