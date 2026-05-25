@@ -193,7 +193,7 @@ function normalizeMatrix28x28(matrix) {
     
     for (let r = 0; r < 28; r++) {
         for (let c = 0; c < 28; c++) {
-            if (matrix[r][c] > 0.15) {
+            if (matrix[r][c] > 0.08) {
                 if (r < minRow) minRow = r;
                 if (r > maxRow) maxRow = r;
                 if (c < minCol) minCol = c;
@@ -261,7 +261,7 @@ function recognizeDigit(matrix28x28) {
     for (let r = 0; r < 28; r++) {
         for (let c = 0; c < 28; c++) {
             const val = matrix28x28[r][c];
-            if (val > 0.15) {
+            if (val > 0.08) {
                 if (r < minRow) minRow = r;
                 if (r > maxRow) maxRow = r;
                 if (c < minCol) minCol = c;
@@ -288,7 +288,7 @@ function recognizeDigit(matrix28x28) {
     for (let r = 0; r < 28; r++) {
         for (let c = 0; c < 28; c++) {
             const val = norm[r][c];
-            if (val > 0.15) {
+            if (val > 0.08) {
                 if (r < nMinRow) nMinRow = r;
                 if (r > nMaxRow) nMaxRow = r;
                 if (c < nMinCol) nMinCol = c;
@@ -305,7 +305,7 @@ function recognizeDigit(matrix28x28) {
     const visited = Array(28).fill(null).map(() => Array(28).fill(false));
     for (let r = 0; r < 28; r++) {
         for (let c = 0; c < 28; c++) {
-            if (norm[r][c] >= 0.15) {
+            if (norm[r][c] >= 0.08) {
                 visited[r][c] = true;
             }
         }
@@ -381,7 +381,7 @@ function recognizeDigit(matrix28x28) {
     let insideStroke = false;
     const targetRow = Math.floor(nMidRow);
     for (let c = nMinCol; c <= nMaxCol; c++) {
-        if (norm[targetRow][c] > 0.15) {
+        if (norm[targetRow][c] > 0.08) {
             if (!insideStroke) {
                 centerCrossings++;
                 insideStroke = true;
@@ -395,7 +395,7 @@ function recognizeDigit(matrix28x28) {
     insideStroke = false;
     const targetCol = Math.floor(nMidCol);
     for (let r = nMinRow; r <= nMaxRow; r++) {
-        if (norm[r][targetCol] > 0.15) {
+        if (norm[r][targetCol] > 0.08) {
             if (!insideStroke) {
                 centerVertCrossings++;
                 insideStroke = true;
@@ -409,7 +409,7 @@ function recognizeDigit(matrix28x28) {
     for (let r = nMinRow; r <= nMaxRow; r++) {
         for (let c = nMinCol; c <= nMaxCol; c++) {
             const val = norm[r][c];
-            if (val > 0.15) {
+            if (val > 0.08) {
                 if (r <= nMidRow) {
                     if (c <= nMidCol) qTopLeft += val;
                     else qTopRight += val;
@@ -474,15 +474,20 @@ function recognizeDigit(matrix28x28) {
             confidences[0] = 0.88;
             confidences[8] = 0.06;
             confidences[6] = 0.03;
-        } else if (originalRatio < 0.32 || originalWidth <= 4) {
+        } else if (originalRatio < 0.26) {
             // Very narrow: 1
             confidences[1] = 0.96;
             confidences[7] = 0.03;
             confidences[2] = 0.01;
         } else {
-            const bottomRowWidth = norm.slice(nMaxRow - 2, nMaxRow + 1).reduce((sum, r) => sum + r.reduce((s, v) => s + (v > 0.15 ? 1 : 0), 0), 0) / 3;
+            const bottomRowWidth = norm.slice(nMaxRow - 2, nMaxRow + 1).reduce((sum, r) => sum + r.reduce((s, v) => s + (v > 0.08 ? 1 : 0), 0), 0) / 3;
             
-            if (qTopRight > 1.6 * qTopLeft && qBottomLeft < 0.22 * qBottomRight && originalRatio < 0.65) {
+            if (qTopLeft + qTopRight > 1.05 * (qBottomLeft + qBottomRight) && qBottomLeft < 0.25 * qBottomRight && originalRatio < 0.65) {
+                // 9 with a filled/closed loop (0 loops)
+                confidences[9] = 0.90;
+                confidences[4] = 0.06;
+                confidences[7] = 0.04;
+            } else if (qTopRight > 1.6 * qTopLeft && qBottomLeft < 0.22 * qBottomRight && originalRatio < 0.65) {
                 // 7 or 3
                 if (qBottomRight > 1.3 * qTopRight) {
                     confidences[3] = 0.85;
