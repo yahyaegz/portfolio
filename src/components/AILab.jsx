@@ -251,282 +251,490 @@ function normalizeMatrix28x28(matrix) {
     return norm;
 }
 
-// To perform drawing prediction instantly with high aesthetics and visual nodes propagation, 
-// we construct a robust geometric and feature-based classifier that acts as a real neural network 
-// in the frontend, running activations on normalized 28x28 drawing matrices.
-function recognizeDigit(matrix28x28) {
-    // 1. Calculate original properties first
-    let minRow = 28, maxRow = 0, minCol = 28, maxCol = 0;
-    let totalMass = 0;
-    for (let r = 0; r < 28; r++) {
-        for (let c = 0; c < 28; c++) {
-            const val = matrix28x28[r][c];
-            if (val > 0.08) {
-                if (r < minRow) minRow = r;
-                if (r > maxRow) maxRow = r;
-                if (c < minCol) minCol = c;
-                if (c > maxCol) maxCol = c;
-                totalMass += val;
-            }
-        }
+const RAW_TEMPLATES = [
+    // 0
+    {
+        digit: 0,
+        grid: [
+            "....####....",
+            "..##....##..",
+            ".##......##.",
+            "##........##",
+            "##........##",
+            "##........##",
+            "##........##",
+            "##........##",
+            "##........##",
+            ".##......##.",
+            "..##....##..",
+            "....####...."
+        ]
+    },
+    {
+        digit: 0,
+        grid: [
+            ".....###....",
+            "...##...##..",
+            "..##.....##.",
+            ".##.......##",
+            ".##.......##",
+            ".##.......##",
+            ".##.......##",
+            ".##.......##",
+            "..##.....##.",
+            "...##...##..",
+            ".....###....",
+            "............"
+        ]
+    },
+    // 1
+    {
+        digit: 1,
+        grid: [
+            "....##......",
+            "...###......",
+            "....##......",
+            "....##......",
+            "....##......",
+            "....##......",
+            "....##......",
+            "....##......",
+            "....##......",
+            "....##......",
+            "...####.....",
+            "............"
+        ]
+    },
+    {
+        digit: 1,
+        grid: [
+            "......##....",
+            "......##....",
+            ".....##.....",
+            ".....##.....",
+            ".....##.....",
+            "....##......",
+            "....##......",
+            "....##......",
+            "...##.......",
+            "...##.......",
+            "...##.......",
+            "............"
+        ]
+    },
+    // 2
+    {
+        digit: 2,
+        grid: [
+            "...####.....",
+            "..##..##....",
+            "##.....##...",
+            "......##....",
+            ".....##.....",
+            "....##......",
+            "...##.......",
+            "..##........",
+            ".##.........",
+            "##..........",
+            "##########..",
+            "............"
+        ]
+    },
+    {
+        digit: 2,
+        grid: [
+            "..#####.....",
+            ".##...##....",
+            "......##....",
+            ".....##.....",
+            "....##......",
+            "...##.......",
+            "..##........",
+            ".##.........",
+            "##.....##...",
+            "##....##....",
+            ".######.....",
+            "............"
+        ]
+    },
+    // 3
+    {
+        digit: 3,
+        grid: [
+            "..#####.....",
+            ".##...##....",
+            "......##....",
+            ".....##.....",
+            "....###.....",
+            "......##....",
+            ".......##...",
+            "........##..",
+            "........##..",
+            ".##....##...",
+            "..######....",
+            "............"
+        ]
+    },
+    {
+        digit: 3,
+        grid: [
+            "########....",
+            ".....##.....",
+            "....##......",
+            "...##.......",
+            "....###.....",
+            "......##....",
+            ".......##...",
+            "........##..",
+            "........##..",
+            ".......##...",
+            "..######....",
+            "............"
+        ]
+    },
+    // 4
+    {
+        digit: 4,
+        grid: [
+            "....##.##...",
+            "...##..##...",
+            "..##...##...",
+            ".##....##...",
+            "##.....##...",
+            "#########...",
+            ".......##...",
+            ".......##...",
+            ".......##...",
+            ".......##...",
+            ".......##...",
+            "............"
+        ]
+    },
+    {
+        digit: 4,
+        grid: [
+            "......##....",
+            ".....###....",
+            "....####....",
+            "...##.##....",
+            "..##..##....",
+            ".##...##....",
+            "#########...",
+            "......##....",
+            "......##....",
+            "......##....",
+            "......##....",
+            "............"
+        ]
+    },
+    // 5
+    {
+        digit: 5,
+        grid: [
+            "########....",
+            "##..........",
+            "##..........",
+            "#####.......",
+            "....###.....",
+            "......##....",
+            ".......##...",
+            "........##..",
+            "........##..",
+            "##.....##...",
+            ".#######....",
+            "............"
+        ]
+    },
+    {
+        digit: 5,
+        grid: [
+            ".#######....",
+            ".##.........",
+            ".##.........",
+            ".######.....",
+            "......##....",
+            ".......##...",
+            "........##..",
+            "........##..",
+            ".......##...",
+            ".##...##....",
+            "..#####.....",
+            "............"
+        ]
+    },
+    // 6
+    {
+        digit: 6,
+        grid: [
+            "....####....",
+            "...##.......",
+            "..##........",
+            ".##.........",
+            ".######.....",
+            "##....##....",
+            "##.....##...",
+            "##.....##...",
+            "##.....##...",
+            "##....##....",
+            ".######.....",
+            "............"
+        ]
+    },
+    {
+        digit: 6,
+        grid: [
+            ".....###....",
+            "....##......",
+            "...##.......",
+            "..##........",
+            "..######....",
+            ".##....##...",
+            ".##.....##..",
+            ".##.....##..",
+            ".##....##...",
+            "..######....",
+            "............",
+            "............"
+        ]
+    },
+    // 7
+    {
+        digit: 7,
+        grid: [
+            "##########..",
+            ".......##...",
+            "......##....",
+            ".....##.....",
+            "....##......",
+            "...##.......",
+            "...##.......",
+            "..##........",
+            "..##........",
+            ".##.........",
+            ".##.........",
+            "............"
+        ]
+    },
+    {
+        digit: 7,
+        grid: [
+            "########....",
+            ".....##.....",
+            "....##......",
+            "...##.......",
+            "..#####.....",
+            "...##.......",
+            "..##........",
+            "..##........",
+            ".##.........",
+            ".##.........",
+            "............",
+            "............"
+        ]
+    },
+    // 8
+    {
+        digit: 8,
+        grid: [
+            "....####....",
+            "..##....##..",
+            ".##......##.",
+            "..##....##..",
+            "....####....",
+            "..##....##..",
+            ".##......##.",
+            "##........##",
+            "##........##",
+            ".##......##.",
+            "..##....##..",
+            "....####...."
+        ]
+    },
+    {
+        digit: 8,
+        grid: [
+            "....###.....",
+            "..##...##...",
+            ".##.....##..",
+            "..##...##...",
+            "....###.....",
+            "..##...##...",
+            ".##.....##..",
+            ".##.....##..",
+            "..##...##...",
+            "....###.....",
+            "............",
+            "............"
+        ]
+    },
+    // 9
+    {
+        digit: 9,
+        grid: [
+            "....####....",
+            "..##....##..",
+            ".##......##.",
+            "##........##",
+            "##........##",
+            ".##......##.",
+            "..##....##..",
+            "....######..",
+            "........##..",
+            ".......##...",
+            "....####....",
+            "............"
+        ]
+    },
+    {
+        digit: 9,
+        grid: [
+            "....####....",
+            "..##....##..",
+            "##........##",
+            "##........##",
+            "..##....##..",
+            "....######..",
+            "........##..",
+            "........##..",
+            ".......##...",
+            "......##....",
+            "....###.....",
+            "............"
+        ]
     }
-    
-    if (totalMass < 1.0) {
-        return Array(10).fill(0);
-    }
-    
-    const originalHeight = maxRow - minRow + 1;
-    const originalWidth = maxCol - minCol + 1;
-    const originalRatio = originalWidth / (originalHeight || 1);
-    
-    // 2. Normalize the matrix to 18x18 bounding box centered in 28x28
-    const norm = normalizeMatrix28x28(matrix28x28);
-    
-    // 3. Re-calculate bounding box and metrics on the normalized matrix
-    let nMinRow = 28, nMaxRow = 0, nMinCol = 28, nMaxCol = 0;
-    let nTotalMass = 0;
-    for (let r = 0; r < 28; r++) {
-        for (let c = 0; c < 28; c++) {
-            const val = norm[r][c];
-            if (val > 0.08) {
-                if (r < nMinRow) nMinRow = r;
-                if (r > nMaxRow) nMaxRow = r;
-                if (c < nMinCol) nMinCol = c;
-                if (c > nMaxCol) nMaxCol = c;
-                nTotalMass += val;
-            }
-        }
-    }
-    
-    const nHeight = nMaxRow - nMinRow + 1;
-    const nWidth = nMaxCol - nMinCol + 1;
-    
-    // 4. Run loop counting on the normalized matrix
-    const visited = Array(28).fill(null).map(() => Array(28).fill(false));
-    for (let r = 0; r < 28; r++) {
-        for (let c = 0; c < 28; c++) {
-            if (norm[r][c] >= 0.08) {
-                visited[r][c] = true;
-            }
-        }
-    }
-    
-    const queue = [];
-    for (let c = 0; c < 28; c++) {
-        if (!visited[0][c]) { visited[0][c] = true; queue.push([0, c]); }
-        if (!visited[27][c]) { visited[27][c] = true; queue.push([27, c]); }
-    }
-    for (let r = 1; r < 27; r++) {
-        if (!visited[r][0]) { visited[r][0] = true; queue.push([r, 0]); }
-        if (!visited[r][27]) { visited[r][27] = true; queue.push([r, 27]); }
-    }
-    
-    while (queue.length > 0) {
-        const [r, c] = queue.shift();
-        const neighbors = [[r - 1, c], [r + 1, c], [r, c - 1], [r, c + 1]];
-        for (const [nr, nc] of neighbors) {
-            if (nr >= 0 && nr < 28 && nc >= 0 && nc < 28) {
-                if (!visited[nr][nc]) {
-                    visited[nr][nc] = true;
-                    queue.push([nr, nc]);
+];
+
+const parseTemplates = () => {
+    const dataset = [];
+    for (const item of RAW_TEMPLATES) {
+        const inputs = Array(144).fill(0);
+        for (let r = 0; r < 12; r++) {
+            const rowStr = item.grid[r];
+            for (let c = 0; c < 12; c++) {
+                if (rowStr && rowStr[c] === '#') {
+                    inputs[r * 12 + c] = 1.0;
                 }
             }
         }
-    }
-    
-    let loopCount = 0;
-    const loopCenters = [];
-    
-    for (let r = nMinRow; r <= nMaxRow; r++) {
-        for (let c = nMinCol; c <= nMaxCol; c++) {
-            if (!visited[r][c]) {
-                loopCount++;
-                let loopSize = 0;
-                let loopSumRow = 0;
-                let loopSumCol = 0;
-                
-                const loopQueue = [[r, c]];
-                visited[r][c] = true;
-                
-                while (loopQueue.length > 0) {
-                    const [lr, lc] = loopQueue.shift();
-                    loopSize++;
-                    loopSumRow += lr;
-                    loopSumCol += lc;
-                    
-                    const neighbors = [[lr - 1, lc], [lr + 1, lc], [lr, lc - 1], [lr, lc + 1]];
-                    for (const [nr, nc] of neighbors) {
-                        if (nr >= nMinRow && nr <= nMaxRow && nc >= nMinCol && nc <= nMaxCol) {
-                            if (!visited[nr][nc]) {
-                                visited[nr][nc] = true;
-                                loopQueue.push([nr, nc]);
-                            }
+        
+        // Soften/blur the templates slightly to make them act like natural stroke activations
+        const blurredInputs = Array(144).fill(0);
+        for (let r = 0; r < 12; r++) {
+            for (let c = 0; c < 12; c++) {
+                let sum = 0;
+                let count = 0;
+                for (let dr = -1; dr <= 1; dr++) {
+                    for (let dc = -1; dc <= 1; dc++) {
+                        const nr = r + dr;
+                        const nc = c + dc;
+                        if (nr >= 0 && nr < 12 && nc >= 0 && nc < 12) {
+                            sum += inputs[nr * 12 + nc];
+                            count++;
                         }
                     }
                 }
+                blurredInputs[r * 12 + c] = sum / count;
+            }
+        }
+        
+        const target = Array(10).fill(0.01);
+        target[item.digit] = 0.99;
+        dataset.push({ inputs: blurredInputs, target });
+    }
+    return dataset;
+};
+
+// 3-layer Feedforward Neural Network running real backpropagation gradient updates
+class SketchNeuralNetwork {
+    constructor() {
+        this.inputSize = 144;
+        this.hiddenSize = 16;
+        this.outputSize = 10;
+        
+        // Initialize weights and biases (Xavier/He initialization)
+        const scale1 = Math.sqrt(2.0 / this.inputSize);
+        this.w1 = Array(this.hiddenSize).fill(0).map(() => 
+            Array(this.inputSize).fill(0).map(() => (Math.random() * 2 - 1) * scale1)
+        );
+        this.b1 = Array(this.hiddenSize).fill(0);
+        
+        const scale2 = Math.sqrt(2.0 / this.hiddenSize);
+        this.w2 = Array(this.outputSize).fill(0).map(() => 
+            Array(this.hiddenSize).fill(0).map(() => (Math.random() * 2 - 1) * scale2)
+        );
+        this.b2 = Array(this.outputSize).fill(0);
+    }
+    
+    sigmoid(x) {
+        return 1.0 / (1.0 + Math.exp(-Math.max(-15, Math.min(15, x))));
+    }
+    
+    forward(inputs) {
+        // Hidden layer activations
+        const h = Array(this.hiddenSize).fill(0);
+        for (let j = 0; j < this.hiddenSize; j++) {
+            let sum = this.b1[j];
+            for (let i = 0; i < this.inputSize; i++) {
+                sum += inputs[i] * this.w1[j][i];
+            }
+            h[j] = this.sigmoid(sum);
+        }
+        
+        // Output layer activations
+        const out = Array(this.outputSize).fill(0);
+        for (let k = 0; k < this.outputSize; k++) {
+            let sum = this.b2[k];
+            for (let j = 0; j < this.hiddenSize; j++) {
+                sum += h[j] * this.w2[k][j];
+            }
+            out[k] = this.sigmoid(sum);
+        }
+        return { h, out };
+    }
+    
+    trainBatch(dataset, epochs = 300, lr = 0.45) {
+        for (let epoch = 0; epoch < epochs; epoch++) {
+            for (const sample of dataset) {
+                const { inputs, target } = sample;
                 
-                loopCenters.push({
-                    row: loopSumRow / loopSize,
-                    col: loopSumCol / loopSize
-                });
-            }
-        }
-    }
-    
-    // 5. Crossings and Densities on the normalized matrix
-    const nMidRow = nMinRow + nHeight / 2;
-    const nMidCol = nMinCol + nWidth / 2;
-    
-    let centerCrossings = 0;
-    let insideStroke = false;
-    const targetRow = Math.floor(nMidRow);
-    for (let c = nMinCol; c <= nMaxCol; c++) {
-        if (norm[targetRow][c] > 0.08) {
-            if (!insideStroke) {
-                centerCrossings++;
-                insideStroke = true;
-            }
-        } else {
-            insideStroke = false;
-        }
-    }
-
-    let centerVertCrossings = 0;
-    insideStroke = false;
-    const targetCol = Math.floor(nMidCol);
-    for (let r = nMinRow; r <= nMaxRow; r++) {
-        if (norm[r][targetCol] > 0.08) {
-            if (!insideStroke) {
-                centerVertCrossings++;
-                insideStroke = true;
-            }
-        } else {
-            insideStroke = false;
-        }
-    }
-
-    let qTopLeft = 0, qTopRight = 0, qBottomLeft = 0, qBottomRight = 0;
-    for (let r = nMinRow; r <= nMaxRow; r++) {
-        for (let c = nMinCol; c <= nMaxCol; c++) {
-            const val = norm[r][c];
-            if (val > 0.08) {
-                if (r <= nMidRow) {
-                    if (c <= nMidCol) qTopLeft += val;
-                    else qTopRight += val;
-                } else {
-                    if (c <= nMidCol) qBottomLeft += val;
-                    else qBottomRight += val;
+                // 1. Forward pass
+                const { h, out } = this.forward(inputs);
+                
+                // 2. Compute output errors and deltas
+                const dOut = Array(this.outputSize).fill(0);
+                for (let k = 0; k < this.outputSize; k++) {
+                    const error = out[k] - target[k];
+                    dOut[k] = error * out[k] * (1.0 - out[k]);
+                }
+                
+                // 3. Compute hidden layer errors and deltas
+                const dHidden = Array(this.hiddenSize).fill(0);
+                for (let j = 0; j < this.hiddenSize; j++) {
+                    let err = 0;
+                    for (let k = 0; k < this.outputSize; k++) {
+                        err += dOut[k] * this.w2[k][j];
+                    }
+                    dHidden[j] = err * h[j] * (1.0 - h[j]);
+                }
+                
+                // 4. Update output weights & biases
+                for (let k = 0; k < this.outputSize; k++) {
+                    for (let j = 0; j < this.hiddenSize; j++) {
+                        this.w2[k][j] -= lr * dOut[k] * h[j];
+                    }
+                    this.b2[k] -= lr * dOut[k];
+                }
+                
+                // 5. Update hidden weights & biases
+                for (let j = 0; j < this.hiddenSize; j++) {
+                    for (let i = 0; i < this.inputSize; i++) {
+                        this.w1[j][i] -= lr * dHidden[j] * inputs[i];
+                    }
+                    this.b1[j] -= lr * dHidden[j];
                 }
             }
         }
     }
-    
-    let confidences = Array(10).fill(0.01);
-    
-    // 6. Detailed Decision Rules using loop counting and normalized features
-    if (loopCount >= 2) {
-        confidences[8] = 0.95;
-        confidences[0] = 0.02;
-        confidences[9] = 0.02;
-    } else if (loopCount === 1) {
-        const loop = loopCenters[0];
-        const relativeLoopY = (loop.row - nMinRow) / (nHeight || 1);
-        
-        if (relativeLoopY < 0.42) {
-            // Top loop -> 9 or 4
-            if (qBottomLeft < 0.28 * qBottomRight) {
-                confidences[9] = 0.92;
-                confidences[4] = 0.05;
-                confidences[7] = 0.02;
-            } else {
-                confidences[4] = 0.80;
-                confidences[9] = 0.12;
-                confidences[0] = 0.04;
-            }
-        } else if (relativeLoopY > 0.58) {
-            // Bottom loop -> 6
-            confidences[6] = 0.94;
-            confidences[5] = 0.03;
-            confidences[0] = 0.02;
-        } else {
-            // Central loop -> 0, 6, or 9
-            if (originalRatio > 0.6) {
-                confidences[0] = 0.90;
-                confidences[6] = 0.04;
-                confidences[9] = 0.04;
-            } else {
-                if (qBottomLeft + qBottomRight > qTopLeft + qTopRight) {
-                    confidences[6] = 0.75;
-                    confidences[0] = 0.15;
-                    confidences[8] = 0.05;
-                } else {
-                    confidences[9] = 0.75;
-                    confidences[0] = 0.15;
-                    confidences[8] = 0.05;
-                }
-            }
-        }
-    } else {
-        // Zero holes: 1, 2, 3, 5, 7, 0 (open), or open 4 / 6
-        
-        // Check for open 0: circular, two crossings vertically and horizontally, high density in all quadrants
-        if (originalRatio > 0.6 && qTopLeft > 0.4 && qTopRight > 0.4 && qBottomLeft > 0.4 && qBottomRight > 0.4 && centerCrossings === 2 && centerVertCrossings === 2) {
-            confidences[0] = 0.88;
-            confidences[8] = 0.06;
-            confidences[6] = 0.03;
-        } else if (originalRatio < 0.26) {
-            // Very narrow: 1
-            confidences[1] = 0.96;
-            confidences[7] = 0.03;
-            confidences[2] = 0.01;
-        } else {
-            const bottomRowWidth = norm.slice(nMaxRow - 2, nMaxRow + 1).reduce((sum, r) => sum + r.reduce((s, v) => s + (v > 0.08 ? 1 : 0), 0), 0) / 3;
-            
-            if (qTopLeft + qTopRight > 1.05 * (qBottomLeft + qBottomRight) && qBottomLeft < 0.25 * qBottomRight && originalRatio < 0.65) {
-                // 9 with a filled/closed loop (0 loops)
-                confidences[9] = 0.90;
-                confidences[4] = 0.06;
-                confidences[7] = 0.04;
-            } else if (qTopRight > 1.6 * qTopLeft && qBottomLeft < 0.22 * qBottomRight && originalRatio < 0.65) {
-                // 7 or 3
-                if (qBottomRight > 1.3 * qTopRight) {
-                    confidences[3] = 0.85;
-                    confidences[7] = 0.08;
-                    confidences[9] = 0.04;
-                } else {
-                    confidences[7] = 0.92;
-                    confidences[1] = 0.04;
-                    confidences[2] = 0.02;
-                }
-            } else if (bottomRowWidth >= 4 && qBottomLeft > 0.55 * qBottomRight && originalRatio > 0.45) {
-                // 2 has a wide flat horizontal base and curved top
-                confidences[2] = 0.90;
-                confidences[3] = 0.05;
-                confidences[7] = 0.03;
-            } else {
-                // 3, 5, or open 4
-                // 3: open on the left (top-right and bottom-right are dense)
-                // 5: open on the right (top-left and bottom-right are dense)
-                if (centerCrossings >= 2 || (qTopLeft > 0.5 * qTopRight && qBottomLeft < 0.3 * qBottomRight && qBottomRight > 0.5 * qTopRight)) {
-                    confidences[4] = 0.88;
-                    confidences[9] = 0.06;
-                    confidences[1] = 0.02;
-                } else if (qTopLeft > 1.1 * qTopRight || (qBottomRight > 1.1 * qBottomLeft && qTopLeft > qTopRight)) {
-                    confidences[5] = 0.86;
-                    confidences[3] = 0.06;
-                    confidences[6] = 0.04;
-                } else {
-                    confidences[3] = 0.84;
-                    confidences[5] = 0.08;
-                    confidences[2] = 0.04;
-                }
-            }
-        }
-    }
-    
-    // Normalize confidences using softmax
-    const sum = confidences.reduce((s, v) => s + Math.exp(v * 5.0), 0);
-    return confidences.map(v => Math.exp(v * 5.0) / sum);
 }
 
 export default function AILab() {
@@ -556,6 +764,15 @@ export default function AILab() {
     const [activeNodes, setActiveNodes] = useState([]);
     const sketchCanvasRef = useRef(null);
     const contextRef = useRef(null);
+    const sketchMLPRef = useRef(null);
+
+    // Live-train the MLP neural network on standard digit templates on component mount
+    useEffect(() => {
+        const dataset = parseTemplates();
+        const nn = new SketchNeuralNetwork();
+        nn.trainBatch(dataset, 300, 0.45);
+        sketchMLPRef.current = nn;
+    }, []);
 
     // Initialize Sandbox Dataset
     useEffect(() => {
@@ -865,14 +1082,13 @@ export default function AILab() {
         // Grabs 240x240 image pixels
         const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         
-        // 28x28 normalized matrix downscaler
+        // 1. 28x28 normalized matrix downscaler
         const grid28x28 = Array(28).fill(0).map(() => Array(28).fill(0));
         const cellW = canvas.width / 28;
         const cellH = canvas.height / 28;
         
         for (let r = 0; r < 28; r++) {
             for (let c = 0; c < 28; c++) {
-                // Sum pixel intensities inside cell area
                 let cellSum = 0;
                 let sampleCount = 0;
                 
@@ -882,7 +1098,6 @@ export default function AILab() {
                 for (let sy = startY; sy < startY + cellH; sy += 2) {
                     for (let sx = startX; sx < startX + cellW; sx += 2) {
                         const pixelIdx = (sy * canvas.width + sx) * 4;
-                        // Red channel is white intensity
                         const redVal = imgData.data[pixelIdx];
                         cellSum += redVal || 0;
                         sampleCount++;
@@ -890,20 +1105,59 @@ export default function AILab() {
                 }
                 
                 const valNorm = (cellSum / (sampleCount || 1)) / 255.0;
-                grid28x28[r][c] = valNorm;
+                grid28x28[r][c] = valNorm > 0.08 ? valNorm : 0.0;
             }
         }
 
-        // Run client inference
-        const probs = recognizeDigit(grid28x28);
-        setPredictions(probs);
-
-        // Highlight visual synapses propagating based on the winning index
-        const winningIndex = probs.indexOf(Math.max(...probs));
-        if (Math.max(...probs) > 0.2) {
-            setActiveNodes([winningIndex]);
-        } else {
+        // 2. Center and scale the 28x28 grid to a standard 18x18 bounding box inside 28x28
+        const norm28x28 = normalizeMatrix28x28(grid28x28);
+        
+        // 3. Downscale the normalized 28x28 matrix to a 12x12 matrix for MLP input (144 inputs)
+        const grid12x12 = Array(12).fill(0).map(() => Array(12).fill(0));
+        const factor = 28 / 12;
+        for (let r = 0; r < 12; r++) {
+            for (let c = 0; c < 12; c++) {
+                let sum = 0;
+                let count = 0;
+                const startY = Math.floor(r * factor);
+                const startX = Math.floor(c * factor);
+                for (let sy = startY; sy < startY + factor && sy < 28; sy++) {
+                    for (let sx = startX; sx < startX + factor && sx < 28; sx++) {
+                        sum += norm28x28[sy][sx];
+                        count++;
+                    }
+                }
+                grid12x12[r][c] = sum / (count || 1);
+            }
+        }
+        
+        // Flatten 12x12 to a 144 length array
+        const inputs = grid12x12.flat();
+        
+        // Check if there is any drawing mass
+        const totalMass = inputs.reduce((s, v) => s + v, 0);
+        if (totalMass < 0.1) {
+            setPredictions(Array(10).fill(0));
             setActiveNodes([]);
+            return;
+        }
+        
+        // Run forward propagation through our live-trained MLP neural network!
+        if (sketchMLPRef.current) {
+            const { out } = sketchMLPRef.current.forward(inputs);
+            
+            // Normalize confidences using softmax so they are smooth and add up to 100%
+            const sumExp = out.reduce((s, v) => s + Math.exp(v * 6.5), 0);
+            const probs = out.map(v => Math.exp(v * 6.5) / sumExp);
+            
+            setPredictions(probs);
+            
+            const winningIndex = probs.indexOf(Math.max(...probs));
+            if (Math.max(...probs) > 0.2) {
+                setActiveNodes([winningIndex]);
+            } else {
+                setActiveNodes([]);
+            }
         }
     };
 
