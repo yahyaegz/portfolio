@@ -1310,12 +1310,15 @@ export default function AILab() {
         // 2. Select mating pool and breed new population
         // Tournament Selection: Select best of k random candidates
         const tournamentSelect = (poolSize = 5) => {
+            if (!pop || pop.length === 0) return null;
             let best = pop[Math.floor(Math.random() * pop.length)];
             for (let i = 1; i < poolSize; i++) {
                 const contender = pop[Math.floor(Math.random() * pop.length)];
-                if (contender.fitness > best.fitness) {
-                    best = contender;
-                }
+                if (!contender) continue;
+                // .fitness is set by calcFitness(); fall back to 0 for un-evaluated agents
+                const cFit = contender.fitness ?? 0;
+                const bFit = best.fitness ?? 0;
+                if (cFit > bFit) best = contender;
             }
             return best;
         };
@@ -1333,6 +1336,9 @@ export default function AILab() {
             const parentA = tournamentSelect();
             const parentB = tournamentSelect();
             
+            // Guard against empty pool edge case
+            if (!parentA || !parentB) continue;
+
             // Crossover
             const childDNA = parentA.dna.crossover(parentB.dna);
             

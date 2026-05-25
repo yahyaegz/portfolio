@@ -651,7 +651,7 @@ export default function DevArcade() {
 
     const gitCanvasRef        = useRef(null);
     const gitLoopRef          = useRef(null);
-    const gitGridRef          = useRef([]);
+    const gitGridRef          = useRef(Array(GH).fill(null).map(() => Array(GW).fill(null)));
     const currentGitPieceRef  = useRef(null);
     const gitNextRef          = useRef(null);
     const gitHoldRef          = useRef(null);
@@ -689,12 +689,14 @@ export default function DevArcade() {
     };
 
     const gitCollide = (px, py, shape, grid) => {
+        if (!grid || !shape) return false;
         for (let r = 0; r < shape.length; r++) {
+            if (!shape[r]) continue;
             for (let c = 0; c < shape[r].length; c++) {
                 if (shape[r][c]) {
                     const gx = px+c, gy = py+r;
                     if (gx < 0 || gx >= GW || gy >= GH) return true;
-                    if (gy >= 0 && grid[gy][gx]) return true;
+                    if (gy >= 0 && grid[gy] && grid[gy][gx]) return true;
                 }
             }
         }
@@ -843,7 +845,9 @@ export default function DevArcade() {
         // Locked cells
         const grid = gitGridRef.current;
         const flashRows = gitFlashRowsRef.current;
+        if (!grid || grid.length < GH) return;
         for (let r = 0; r < GH; r++) {
+            if (!grid[r]) continue;
             for (let c = 0; c < GW; c++) {
                 const cell = grid[r][c];
                 if (cell) {
