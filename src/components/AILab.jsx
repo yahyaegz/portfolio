@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import SplitTextReveal from './SplitTextReveal';
+import mnistWeights from '../data/mnist_weights.json';
 
 // Custom lightweight Feedforward Neural Network for Sandbox (2D classification)
 class SandboxNN {
@@ -604,73 +605,20 @@ const RAW_TEMPLATES = [
     }
 ];
 
-const parseTemplates = () => {
-    const dataset = [];
-    for (const item of RAW_TEMPLATES) {
-        const inputs = Array(144).fill(0);
-        for (let r = 0; r < 12; r++) {
-            const rowStr = item.grid[r];
-            for (let c = 0; c < 12; c++) {
-                if (rowStr && rowStr[c] === '#') {
-                    inputs[r * 12 + c] = 1.0;
-                }
-            }
-        }
-        
-        // Soften/blur the templates slightly to make them act like natural stroke activations
-        const blurredInputs = Array(144).fill(0);
-        for (let r = 0; r < 12; r++) {
-            for (let c = 0; c < 12; c++) {
-                let sum = 0;
-                let count = 0;
-                for (let dr = -1; dr <= 1; dr++) {
-                    for (let dc = -1; dc <= 1; dc++) {
-                        const nr = r + dr;
-                        const nc = c + dc;
-                        if (nr >= 0 && nr < 12 && nc >= 0 && nc < 12) {
-                            sum += inputs[nr * 12 + nc];
-                            count++;
-                        }
-                    }
-                }
-                blurredInputs[r * 12 + c] = sum / count;
-            }
-        }
-        
-        const target = Array(10).fill(0.01);
-        target[item.digit] = 0.99;
-        dataset.push({ inputs: blurredInputs, target });
-    }
-    return dataset;
-};
-
-// 3-layer Feedforward Neural Network running real backpropagation gradient updates
-class SketchNeuralNetwork {
-    constructor() {
-        this.inputSize = 144;
-        this.hiddenSize = 16;
+class MNISTPretrainedMLP {
+    constructor(weights) {
+        this.w1 = weights.w1; // (64, 784)
+        this.b1 = weights.b1; // (64,)
+        this.w2 = weights.w2; // (10, 64)
+        this.b2 = weights.b2; // (10,)
+        this.inputSize = 784;
+        this.hiddenSize = 64;
         this.outputSize = 10;
-        
-        // Initialize weights and biases (Xavier/He initialization)
-        const scale1 = Math.sqrt(2.0 / this.inputSize);
-        this.w1 = Array(this.hiddenSize).fill(0).map(() => 
-            Array(this.inputSize).fill(0).map(() => (Math.random() * 2 - 1) * scale1)
-        );
-        this.b1 = Array(this.hiddenSize).fill(0);
-        
-        const scale2 = Math.sqrt(2.0 / this.hiddenSize);
-        this.w2 = Array(this.outputSize).fill(0).map(() => 
-            Array(this.hiddenSize).fill(0).map(() => (Math.random() * 2 - 1) * scale2)
-        );
-        this.b2 = Array(this.outputSize).fill(0);
     }
-    
     sigmoid(x) {
         return 1.0 / (1.0 + Math.exp(-Math.max(-15, Math.min(15, x))));
     }
-    
     forward(inputs) {
-        // Hidden layer activations
         const h = Array(this.hiddenSize).fill(0);
         for (let j = 0; j < this.hiddenSize; j++) {
             let sum = this.b1[j];
@@ -679,8 +627,6 @@ class SketchNeuralNetwork {
             }
             h[j] = this.sigmoid(sum);
         }
-        
-        // Output layer activations
         const out = Array(this.outputSize).fill(0);
         for (let k = 0; k < this.outputSize; k++) {
             let sum = this.b2[k];
@@ -689,53 +635,12 @@ class SketchNeuralNetwork {
             }
             out[k] = this.sigmoid(sum);
         }
-        return { h, out };
-    }
-    
-    trainBatch(dataset, epochs = 300, lr = 0.45) {
-        for (let epoch = 0; epoch < epochs; epoch++) {
-            for (const sample of dataset) {
-                const { inputs, target } = sample;
-                
-                // 1. Forward pass
-                const { h, out } = this.forward(inputs);
-                
-                // 2. Compute output errors and deltas
-                const dOut = Array(this.outputSize).fill(0);
-                for (let k = 0; k < this.outputSize; k++) {
-                    const error = out[k] - target[k];
-                    dOut[k] = error * out[k] * (1.0 - out[k]);
-                }
-                
-                // 3. Compute hidden layer errors and deltas
-                const dHidden = Array(this.hiddenSize).fill(0);
-                for (let j = 0; j < this.hiddenSize; j++) {
-                    let err = 0;
-                    for (let k = 0; k < this.outputSize; k++) {
-                        err += dOut[k] * this.w2[k][j];
-                    }
-                    dHidden[j] = err * h[j] * (1.0 - h[j]);
-                }
-                
-                // 4. Update output weights & biases
-                for (let k = 0; k < this.outputSize; k++) {
-                    for (let j = 0; j < this.hiddenSize; j++) {
-                        this.w2[k][j] -= lr * dOut[k] * h[j];
-                    }
-                    this.b2[k] -= lr * dOut[k];
-                }
-                
-                // 5. Update hidden weights & biases
-                for (let j = 0; j < this.hiddenSize; j++) {
-                    for (let i = 0; i < this.inputSize; i++) {
-                        this.w1[j][i] -= lr * dHidden[j] * inputs[i];
-                    }
-                    this.b1[j] -= lr * dHidden[j];
-                }
-            }
-        }
+        return { out };
     }
 }
+
+const pretrainedMNISTModel = new MNISTPretrainedMLP(mnistWeights);
+
 
 export default function AILab() {
     const { t, language } = useLanguage();
@@ -764,15 +669,6 @@ export default function AILab() {
     const [activeNodes, setActiveNodes] = useState([]);
     const sketchCanvasRef = useRef(null);
     const contextRef = useRef(null);
-    const sketchMLPRef = useRef(null);
-
-    // Live-train the MLP neural network on standard digit templates on component mount
-    useEffect(() => {
-        const dataset = parseTemplates();
-        const nn = new SketchNeuralNetwork();
-        nn.trainBatch(dataset, 300, 0.45);
-        sketchMLPRef.current = nn;
-    }, []);
 
     // Initialize Sandbox Dataset
     useEffect(() => {
@@ -1112,27 +1008,8 @@ export default function AILab() {
         // 2. Center and scale the 28x28 grid to a standard 18x18 bounding box inside 28x28
         const norm28x28 = normalizeMatrix28x28(grid28x28);
         
-        // 3. Downscale the normalized 28x28 matrix to a 12x12 matrix for MLP input (144 inputs)
-        const grid12x12 = Array(12).fill(0).map(() => Array(12).fill(0));
-        const factor = 28 / 12;
-        for (let r = 0; r < 12; r++) {
-            for (let c = 0; c < 12; c++) {
-                let sum = 0;
-                let count = 0;
-                const startY = Math.floor(r * factor);
-                const startX = Math.floor(c * factor);
-                for (let sy = startY; sy < startY + factor && sy < 28; sy++) {
-                    for (let sx = startX; sx < startX + factor && sx < 28; sx++) {
-                        sum += norm28x28[sy][sx];
-                        count++;
-                    }
-                }
-                grid12x12[r][c] = sum / (count || 1);
-            }
-        }
-        
-        // Flatten 12x12 to a 144 length array
-        const inputs = grid12x12.flat();
+        // 3. Flatten the normalized 28x28 matrix to 784 inputs for the deep MNIST model
+        const inputs = norm28x28.flat();
         
         // Check if there is any drawing mass
         const totalMass = inputs.reduce((s, v) => s + v, 0);
@@ -1142,23 +1019,23 @@ export default function AILab() {
             return;
         }
         
-        // Run forward propagation through our live-trained MLP neural network!
-        if (sketchMLPRef.current) {
-            const { out } = sketchMLPRef.current.forward(inputs);
-            
-            // Normalize confidences using softmax so they are smooth and add up to 100%
-            const sumExp = out.reduce((s, v) => s + Math.exp(v * 6.5), 0);
-            const probs = out.map(v => Math.exp(v * 6.5) / sumExp);
-            
-            setPredictions(probs);
-            
-            const winningIndex = probs.indexOf(Math.max(...probs));
-            if (Math.max(...probs) > 0.2) {
-                setActiveNodes([winningIndex]);
-            } else {
-                setActiveNodes([]);
-            }
+        // 4. Run forward propagation through our pre-trained high-accuracy MNIST neural network!
+        const { out } = pretrainedMNISTModel.forward(inputs);
+        
+        // Normalize confidences using softmax so they are smooth and add up to 100%
+        // Softmax with temperature scaling (e.g. 7.0) ensures clean classification decisions
+        const sumExp = out.reduce((s, v) => s + Math.exp(v * 7.0), 0);
+        const probs = out.map(v => Math.exp(v * 7.0) / sumExp);
+        
+        setPredictions(probs);
+        
+        const winningIndex = probs.indexOf(Math.max(...probs));
+        if (Math.max(...probs) > 0.2) {
+            setActiveNodes([winningIndex]);
+        } else {
+            setActiveNodes([]);
         }
+
     };
 
     return (
