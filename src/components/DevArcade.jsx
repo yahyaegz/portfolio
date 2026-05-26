@@ -649,6 +649,8 @@ export default function DevArcade() {
     const [gitNextPiece, setGitNextPiece] = useState(null);
     const [terminalLogsState, setTerminalLogsState] = useState([]);
 
+    const GW = 10, GH = 20, GCS = 13; // grid width, height, cell size
+
     const gitCanvasRef        = useRef(null);
     const gitLoopRef          = useRef(null);
     const gitGridRef          = useRef(Array(GH).fill(null).map(() => Array(GW).fill(null)));
@@ -662,8 +664,6 @@ export default function DevArcade() {
     const gitTerminalLogsRef  = useRef([]);
     const gitFlashRowsRef     = useRef([]);
     const gitFlashTimerRef    = useRef(null);
-
-    const GW = 10, GH = 20, GCS = 13; // grid width, height, cell size
 
     const GIT_PIECES = [
         { shape:[[1,1,1,1]],           color:'#06b6d4', label:'feat'    },
@@ -925,7 +925,13 @@ export default function DevArcade() {
                 case 'ArrowRight': case 'd': case 'D': moveGitPiece(1,0); e.preventDefault(); break;
                 case 'ArrowDown': case 's': case 'S': if(!moveGitPiece(0,1)){gitLockPiece();} e.preventDefault(); break;
                 case 'ArrowUp': case 'w': case 'W': rotateGitPiece(); e.preventDefault(); break;
-                case ' ': while(moveGitPiece(0,1)){} gitLockPiece(); e.preventDefault(); break;
+                case ' ': {
+                    let canDrop = moveGitPiece(0, 1);
+                    while (canDrop) canDrop = moveGitPiece(0, 1);
+                    gitLockPiece();
+                    e.preventDefault();
+                    break;
+                }
                 case 'c': case 'C': gitHold(); e.preventDefault(); break;
                 default: break;
             }
