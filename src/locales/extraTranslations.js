@@ -3,6 +3,7 @@ export const extraTranslations = {
         nav: {
             aiLab: "AI Lab",
             resumeHub: "Resume Dashboard",
+            devArcade: "Dev Arcade",
         },
         currentlyOpenTo: {
             title: "CURRENTLY OPEN TO",
@@ -395,6 +396,7 @@ export const extraTranslations = {
         nav: {
             aiLab: "Lab IA",
             resumeHub: "Mon CV Interactif",
+            devArcade: "Arcade Dev",
         },
         currentlyOpenTo: {
             title: "ACTUELLEMENT OUVERT À",
@@ -588,6 +590,7 @@ export const extraTranslations = {
         nav: {
             aiLab: "Lab IA",
             resumeHub: "CV Interactivo",
+            devArcade: "Arcade Dev",
         },
         currentlyOpenTo: {
             title: "ACTUALMENTE ABIERTO A",

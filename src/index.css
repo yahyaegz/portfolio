@@ -9,6 +9,7 @@
 
 html {
     scroll-behavior: smooth;
+    scroll-padding-top: 76px;
     overflow-x: hidden;
     width: 100%;
 }
@@ -17,6 +18,10 @@ body {
     overflow-x: hidden;
     width: 100%;
     position: relative;
+}
+
+section[id] {
+    scroll-margin-top: 76px;
 }
 
 ::-webkit-scrollbar { width: 8px; }
