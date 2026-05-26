@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import SplitTextReveal from './SplitTextReveal';
@@ -7,7 +7,7 @@ import SplitTextReveal from './SplitTextReveal';
 const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 
 export default function DevArcade() {
-    const { t, language } = useLanguage();
+    const { t } = useLanguage();
     const [activeTab, setActiveTab] = useState('snake');
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -24,7 +24,6 @@ export default function DevArcade() {
     const [snakeIsOver, setSnakeIsOver] = useState(false);
     const [snakeSpeed, setSnakeSpeed] = useState(1);
     const [snakeWrap, setSnakeWrap] = useState(false);
-    const [snakeCombo, setSnakeCombo] = useState(0);
 
     const snakeCanvasRef    = useRef(null);
     const snakeLoopRef      = useRef(null);
@@ -35,6 +34,8 @@ export default function DevArcade() {
     const snakeScoreRef     = useRef(0);
     const snakeComboRef     = useRef(0);
     const snakeWrapsRef     = useRef(false);
+    const snakeNextDirRef   = useRef({ x: 0, y: -1 });
+    const snakeReadyRef     = useRef(false);
 
     const GRID = 20, CELL = 15;
 
@@ -93,14 +94,16 @@ export default function DevArcade() {
     const initSnakeGame = () => {
         snakeBodyRef.current = [{ x: 10, y: 10 }, { x: 10, y: 11 }, { x: 10, y: 12 }];
         snakeDirRef.current  = { x: 0, y: -1 };
+        snakeNextDirRef.current = { x: 0, y: -1 };
         snakeFoodsRef.current = [];
         snakeParticlesRef.current = [];
         snakeScoreRef.current = 0;
         snakeComboRef.current = 0;
-        setSnakeScore(0); setSnakeCombo(0);
+        setSnakeScore(0);
         setSnakeIsOver(false); setSnakeIsRunning(false);
         snakeWrapsRef.current = snakeWrap;
         ensureFoods();
+        snakeReadyRef.current = true;
     };
 
     const drawSnakeFrame = () => {
@@ -142,7 +145,7 @@ export default function DevArcade() {
                 ctx.fillStyle = '#fff';
                 ctx.font = `bold ${CELL - 4}px monospace`;
                 ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                ctx.fillText('×', fx, fy + 1);
+                ctx.fillText('x', fx, fy + 1);
             } else if (f.type === 'bonus') {
                 ctx.fillStyle = f.color;
                 ctx.beginPath();
@@ -232,7 +235,7 @@ export default function DevArcade() {
             ctx.fillStyle = `hsl(${40 + combo * 20},100%,60%)`;
             ctx.shadowBlur = 8; ctx.shadowColor = '#facc15';
             ctx.textAlign = 'right'; ctx.textBaseline = 'top';
-            ctx.fillText(`×${combo} COMBO`, W - 4, 4);
+            ctx.fillText(`x${combo} COMBO`, W - 4, 4);
             ctx.restore();
         }
     };
@@ -240,13 +243,10 @@ export default function DevArcade() {
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (!snakeIsRunning || snakeIsOver || activeTab !== 'snake') return;
-            const dir = snakeDirRef.current;
             const map = { ArrowUp: [0,-1], w: [0,-1], W: [0,-1], ArrowDown: [0,1], s: [0,1], S: [0,1], ArrowLeft: [-1,0], a: [-1,0], A: [-1,0], ArrowRight: [1,0], d: [1,0], D: [1,0] };
             const nd = map[e.key];
             if (!nd) return;
-            if (nd[0] !== 0 && dir.x !== 0) return;
-            if (nd[1] !== 0 && dir.y !== 0) return;
-            snakeDirRef.current = { x: nd[0], y: nd[1] };
+            changeSnakeDir(nd[0], nd[1]);
             e.preventDefault();
         };
         window.addEventListener('keydown', handleKeyDown);
@@ -254,9 +254,13 @@ export default function DevArcade() {
     }, [snakeIsRunning, snakeIsOver, activeTab]);
 
     const changeSnakeDir = (dx, dy) => {
-        const cur = snakeDirRef.current;
-        if (dx !== 0 && cur.x === 0) snakeDirRef.current = { x: dx, y: 0 };
-        if (dy !== 0 && cur.y === 0) snakeDirRef.current = { x: 0, y: dy };
+        const next = { x: dx, y: dy };
+        const current = snakeDirRef.current;
+        const queued = snakeNextDirRef.current;
+        const reversesCurrent = next.x + current.x === 0 && next.y + current.y === 0;
+        const reversesQueued = next.x + queued.x === 0 && next.y + queued.y === 0;
+        if (reversesCurrent || reversesQueued) return;
+        snakeNextDirRef.current = next;
     };
 
     useEffect(() => {
@@ -275,7 +279,8 @@ export default function DevArcade() {
                     lastTick = time;
                     const body = [...snakeBodyRef.current];
                     const head = body[0];
-                    const dir  = snakeDirRef.current;
+                    const dir  = snakeNextDirRef.current;
+                    snakeDirRef.current = dir;
                     let nx = head.x + dir.x;
                     let ny = head.y + dir.y;
 
@@ -301,7 +306,6 @@ export default function DevArcade() {
                             // Bomb removes 3 tail segments
                             for (let j = 0; j < 3; j++) if (body.length > 1) body.pop();
                             snakeComboRef.current = 0;
-                            setSnakeCombo(0);
                             spawnSnakeParticles(nx * CELL + CELL/2, ny * CELL + CELL/2, '#ef4444', 25);
                         } else {
                             const gain = food.points;
@@ -309,11 +313,9 @@ export default function DevArcade() {
                             snakeScoreRef.current = newScore;
                             if (food.type === 'bonus') {
                                 snakeComboRef.current++;
-                                setSnakeCombo(snakeComboRef.current);
                                 spawnSnakeParticles(nx * CELL + CELL/2, ny * CELL + CELL/2, '#facc15', 30);
                             } else {
                                 snakeComboRef.current = 0;
-                                setSnakeCombo(0);
                                 spawnSnakeParticles(nx * CELL + CELL/2, ny * CELL + CELL/2, '#ec4899', 18);
                             }
                             setSnakeScore(newScore);
@@ -347,6 +349,7 @@ export default function DevArcade() {
     const [tttStats, setTttStats] = useState({ wins: 0, losses: 0, draws: 0 });
     const [aiTelemetry, setAiTelemetry] = useState({ nodes: 0, depth: 0, latency: 0, score: 0 });
     const [winLine, setWinLine] = useState(null);
+    const tttAiTimeoutRef = useRef(null);
 
     const checkBoardWinner = (b) => {
         const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
@@ -364,7 +367,11 @@ export default function DevArcade() {
         const res = checkBoardWinner(nb);
         if (res) { setTttWinner(res.winner); setWinLine(res.line); updateTttStats(res.winner); return; }
         setIsAiThinking(true);
-        setTimeout(() => runAiMinimax(nb), 350);
+        clearTimeout(tttAiTimeoutRef.current);
+        tttAiTimeoutRef.current = setTimeout(() => {
+            tttAiTimeoutRef.current = null;
+            runAiMinimax([...nb]);
+        }, 350);
     };
 
     const updateTttStats = (w) => setTttStats(prev => w === 'X' ? {...prev, wins: prev.wins+1} : w === 'O' ? {...prev, losses: prev.losses+1} : {...prev, draws: prev.draws+1});
@@ -397,7 +404,17 @@ export default function DevArcade() {
         setIsAiThinking(false);
     };
 
-    const resetTttGame = () => { setBoard(Array(9).fill(null)); setTttWinner(null); setWinLine(null); setIsAiThinking(false); setAiTelemetry({nodes:0,depth:0,latency:0,score:0}); };
+    const resetTttGame = () => {
+        clearTimeout(tttAiTimeoutRef.current);
+        tttAiTimeoutRef.current = null;
+        setBoard(Array(9).fill(null));
+        setTttWinner(null);
+        setWinLine(null);
+        setIsAiThinking(false);
+        setAiTelemetry({nodes:0,depth:0,latency:0,score:0});
+    };
+
+    useEffect(() => () => clearTimeout(tttAiTimeoutRef.current), []);
 
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -411,7 +428,6 @@ export default function DevArcade() {
     const [pongIsOver, setPongIsOver] = useState(false);
     const [pongWinner, setPongWinner] = useState(null);
     const [pongDifficulty, setPongDifficulty] = useState('medium'); // easy|medium|hard
-    const [pongFlash, setPongFlash] = useState(null); // 'left' | 'right'
 
     const pongCanvasRef        = useRef(null);
     const pongLoopRef          = useRef(null);
@@ -424,15 +440,26 @@ export default function DevArcade() {
     const pongScoreRef         = useRef({ player: 0, ai: 0 });
     const pongFlashRef         = useRef(null);
     const pongFlashTimerRef    = useRef(null);
+    const pongReadyRef         = useRef(false);
     const [pongNN, setPongNN]  = useState({ inputs:[0,0,0,0], hidden:[0,0,0,0,0], outputs:[0,0] });
     const pongWidth = 320, pongHeight = 240, pongPW = 9;
 
-    const handlePongMouseMove = (e) => {
+    const movePongPaddle = (dy) => {
+        if (!pongIsRunning || pongIsOver || activeTab !== 'pong') return;
+        const paddle = pongPlayerPaddleRef.current;
+        paddle.y = clamp(paddle.y + dy, 0, pongHeight - paddle.h);
+    };
+
+    const setPongPaddleFromClientY = (clientY) => {
         if (!pongIsRunning || pongIsOver || activeTab !== 'pong') return;
         const canvas = pongCanvasRef.current; if (!canvas) return;
         const rect = canvas.getBoundingClientRect();
-        const relY = ((e.clientY - rect.top) / rect.height) * pongHeight;
+        const relY = ((clientY - rect.top) / rect.height) * pongHeight;
         pongPlayerPaddleRef.current.y = clamp(relY - pongPlayerPaddleRef.current.h / 2, 0, pongHeight - pongPlayerPaddleRef.current.h);
+    };
+
+    const handlePongPointerMove = (e) => {
+        setPongPaddleFromClientY(e.clientY);
     };
 
     const spawnPongParticles = (x, y, color) => {
@@ -471,6 +498,8 @@ export default function DevArcade() {
         pongParticlesRef.current = [];
         pongDifficultyRef.current = pongDifficulty;
         pongFlashRef.current = null;
+        clearTimeout(pongFlashTimerRef.current);
+        pongReadyRef.current = true;
     };
 
     const drawPongFrame = () => {
@@ -634,6 +663,22 @@ export default function DevArcade() {
         return () => cancelAnimationFrame(pongLoopRef.current);
     }, [pongIsRunning, pongIsOver, activeTab]);
 
+    useEffect(() => {
+        const keyDown = (e) => {
+            if (!pongIsRunning || pongIsOver || activeTab !== 'pong') return;
+            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') {
+                movePongPaddle(-18);
+                e.preventDefault();
+            }
+            if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') {
+                movePongPaddle(18);
+                e.preventDefault();
+            }
+        };
+        window.addEventListener('keydown', keyDown);
+        return () => window.removeEventListener('keydown', keyDown);
+    }, [pongIsRunning, pongIsOver, activeTab]);
+
 
     // ══════════════════════════════════════════════════════════════════════════
     //  GIT MERGE — TETRIS (Enhanced)
@@ -664,6 +709,7 @@ export default function DevArcade() {
     const gitTerminalLogsRef  = useRef([]);
     const gitFlashRowsRef     = useRef([]);
     const gitFlashTimerRef    = useRef(null);
+    const gitReadyRef         = useRef(false);
 
     const GIT_PIECES = [
         { shape:[[1,1,1,1]],           color:'#06b6d4', label:'feat'    },
@@ -718,11 +764,12 @@ export default function DevArcade() {
     const gitLockPiece = () => {
         const p = currentGitPieceRef.current;
         const grid = gitGridRef.current;
+        if (!p || !grid) return;
         for (let r = 0; r < p.shape.length; r++) {
             for (let c = 0; c < p.shape[r].length; c++) {
                 if (p.shape[r][c]) {
                     const gy = p.y+r, gx = p.x+c;
-                    if (gy >= 0) grid[gy][gx] = { color: p.color, label: p.label };
+                    if (gy >= 0 && gy < GH && gx >= 0 && gx < GW) grid[gy][gx] = { color: p.color, label: p.label };
                 }
             }
         }
@@ -761,7 +808,7 @@ export default function DevArcade() {
                 setGitMergedLines(gitLinesRef.current);
                 setGitLevel(newLevel);
                 gitLogTerminal(`$ git merge --squash (${gained} line${gained>1?'s':''} cleared!)`, 'command');
-                const mergeMsg = ['Hotfix merged into main!','Squash complete — history clean!','Rebase successful!','Feature branch integrated!'][Math.floor(Math.random()*4)];
+                const mergeMsg = ['Hotfix merged into main!','Squash complete - history clean!','Rebase successful!','Feature branch integrated!'][Math.floor(Math.random()*4)];
                 gitLogTerminal(`[SUCCESS] ${mergeMsg}`, 'success');
             }, 180);
         }
@@ -774,8 +821,8 @@ export default function DevArcade() {
 
         if (gitCollide(currentGitPieceRef.current.x, currentGitPieceRef.current.y, currentGitPieceRef.current.shape, grid)) {
             setGitIsOver(true); setGitIsRunning(false);
-            gitLogTerminal(`[CRITICAL] Fatal merge conflict — repository corrupted!`, 'error');
-            gitLogTerminal(`$ git reset --hard HEAD~1  →  to restart`, 'system');
+            gitLogTerminal(`[CRITICAL] Fatal merge conflict - repository corrupted!`, 'error');
+            gitLogTerminal(`$ git reset --hard HEAD~1  ->  to restart`, 'system');
         }
     };
 
@@ -815,7 +862,16 @@ export default function DevArcade() {
         }
     };
 
+    const hardDropGitPiece = () => {
+        if (!gitIsRunning || gitIsOver) return;
+        let canDrop = moveGitPiece(0, 1);
+        while (canDrop) canDrop = moveGitPiece(0, 1);
+        gitLockPiece();
+    };
+
     const initGitGame = () => {
+        clearTimeout(gitFlashTimerRef.current);
+        gitFlashRowsRef.current = [];
         gitGridRef.current = gitInitGrid();
         gitScoreRef.current = 0; gitLinesRef.current = 0; gitLevelRef.current = 1;
         setGitScore(0); setGitMergedLines(0); setGitLevel(1);
@@ -829,6 +885,7 @@ export default function DevArcade() {
         currentGitPieceRef.current = gitMakePiece();
         gitNextRef.current = gitMakePiece();
         setGitNextPiece({ ...gitNextRef.current });
+        gitReadyRef.current = true;
     };
 
     const drawGitFrame = () => {
@@ -925,13 +982,7 @@ export default function DevArcade() {
                 case 'ArrowRight': case 'd': case 'D': moveGitPiece(1,0); e.preventDefault(); break;
                 case 'ArrowDown': case 's': case 'S': if(!moveGitPiece(0,1)){gitLockPiece();} e.preventDefault(); break;
                 case 'ArrowUp': case 'w': case 'W': rotateGitPiece(); e.preventDefault(); break;
-                case ' ': {
-                    let canDrop = moveGitPiece(0, 1);
-                    while (canDrop) canDrop = moveGitPiece(0, 1);
-                    gitLockPiece();
-                    e.preventDefault();
-                    break;
-                }
+                case ' ': hardDropGitPiece(); e.preventDefault(); break;
                 case 'c': case 'C': gitHold(); e.preventDefault(); break;
                 default: break;
             }
@@ -988,7 +1039,8 @@ export default function DevArcade() {
     const bugDefeatedRef     = useRef(0);
     const bugShakeRef        = useRef(0); // frames of shake remaining
     const bugFireCooldownRef = useRef(0);
-    const bugSpeedRef        = useRef(1);
+    const bugReadyRef        = useRef(false);
+    const bugKeysRef         = useRef({ left: false, right: false, fire: false });
     const [bugLogsState, setBugLogsState] = useState([]);
 
     const BUG_W = 260, BUG_H = 260;
@@ -1013,7 +1065,7 @@ export default function DevArcade() {
 
         if (isBossWave) {
             bugEntitiesRef.current.push({ ...BOSS_TYPE, x: BUG_W/2 - BOSS_TYPE.w/2, y: -30, maxHp: BOSS_TYPE.hp, pts: BOSS_TYPE.pts * wave });
-            logBugConsole(`>>> WAVE ${wave}: BOSS ENCOUNTER — KERNEL_PANIC <<<`, 'error');
+            logBugConsole(`>>> WAVE ${wave}: BOSS ENCOUNTER - KERNEL_PANIC <<<`, 'error');
             logBugConsole(`Critical exploit detected in kernel ring-0!`, 'sys');
         } else {
             const count = 3 + wave * 2;
@@ -1055,10 +1107,13 @@ export default function DevArcade() {
         setBugScore(0); setBugLives(3); setBugWave(1); setBugsDefeated(0);
         setBugIsOver(false); setBugIsRunning(false);
         bugPlayerRef.current = { x: BUG_W/2 - 11, w: 22, h: 12 };
-        bugBulletsRef.current = []; bugParticlesRef.current = [];
+        bugBulletsRef.current = []; bugParticlesRef.current = []; bugEntitiesRef.current = [];
+        bugKeysRef.current = { left: false, right: false, fire: false };
+        bugFireCooldownRef.current = 0; bugShakeRef.current = 0;
         bugLogsRef.current = [{ text:'> Starting debugger runtime v3.0...', type:'sys' },{ text:'> Memory allocator initialized. 0 leaks.', type:'sys' }];
         setBugLogsState([...bugLogsRef.current]);
         spawnBugWave(1);
+        bugReadyRef.current = true;
     };
 
     const drawBugFrame = () => {
@@ -1157,12 +1212,21 @@ export default function DevArcade() {
     useEffect(() => {
         const keyDown = (e) => {
             if (!bugIsRunning || bugIsOver || activeTab !== 'buginvaders') return;
-            if (e.key==='ArrowLeft'||e.key==='a'||e.key==='A'){handleMoveBugPlayer(-14);e.preventDefault();}
-            if (e.key==='ArrowRight'||e.key==='d'||e.key==='D'){handleMoveBugPlayer(14);e.preventDefault();}
-            if (e.key===' '||e.key==='ArrowUp'||e.key==='w'||e.key==='W'){fireBugLaser();e.preventDefault();}
+            if (e.key==='ArrowLeft'||e.key==='a'||e.key==='A'){bugKeysRef.current.left = true;e.preventDefault();}
+            if (e.key==='ArrowRight'||e.key==='d'||e.key==='D'){bugKeysRef.current.right = true;e.preventDefault();}
+            if (e.key===' '||e.key==='ArrowUp'||e.key==='w'||e.key==='W'){bugKeysRef.current.fire = true;e.preventDefault();}
+        };
+        const keyUp = (e) => {
+            if (e.key==='ArrowLeft'||e.key==='a'||e.key==='A') bugKeysRef.current.left = false;
+            if (e.key==='ArrowRight'||e.key==='d'||e.key==='D') bugKeysRef.current.right = false;
+            if (e.key===' '||e.key==='ArrowUp'||e.key==='w'||e.key==='W') bugKeysRef.current.fire = false;
         };
         window.addEventListener('keydown', keyDown);
-        return () => window.removeEventListener('keydown', keyDown);
+        window.addEventListener('keyup', keyUp);
+        return () => {
+            window.removeEventListener('keydown', keyDown);
+            window.removeEventListener('keyup', keyUp);
+        };
     }, [bugIsRunning, bugIsOver, activeTab]);
 
     useEffect(() => {
@@ -1172,6 +1236,12 @@ export default function DevArcade() {
 
         const loop = () => {
             if (bugIsRunning && !bugIsOver) {
+                const keys = bugKeysRef.current;
+                const player = bugPlayerRef.current;
+                if (keys.left) player.x = clamp(player.x - 3.8, 0, BUG_W - player.w);
+                if (keys.right) player.x = clamp(player.x + 3.8, 0, BUG_W - player.w);
+                if (keys.fire) fireBugLaser();
+
                 if (bugFireCooldownRef.current > 0) bugFireCooldownRef.current--;
 
                 // Bullets
@@ -1195,7 +1265,10 @@ export default function DevArcade() {
                         bugs.splice(i, 1);
                         bugShakeRef.current = 10;
                         logBugConsole(`[BREACHED] ${b.label} has crashed the compiler! -1 life`, 'error');
-                        if (bugLivesRef.current <= 0) { setBugIsOver(true); setBugIsRunning(false); return; }
+                        if (bugLivesRef.current <= 0) {
+                            bugKeysRef.current = { left: false, right: false, fire: false };
+                            setBugIsOver(true); setBugIsRunning(false); return;
+                        }
                         continue;
                     }
 
@@ -1264,6 +1337,7 @@ export default function DevArcade() {
     const typerWpmHistRef     = useRef([]);
     const typerInputRef       = useRef('');
     const typerInputElRef     = useRef(null);
+    const typerReadyRef       = useRef(false);
 
     const TYPER_W = 260, TYPER_H = 260;
     const TYPER_SNIPPETS = [
@@ -1322,7 +1396,7 @@ export default function DevArcade() {
             if (typerWpmHistRef.current.length > 20) typerWpmHistRef.current.shift();
             setTyperWpmHistory([...typerWpmHistRef.current]);
 
-            const acc = Math.round((typerCorrectRef.current / typerTotalRef.current) * 100);
+            const acc = Math.round((typerCorrectRef.current / Math.max(1, typerTotalRef.current)) * 100);
             setTyperAccuracy(acc);
         }
     };
@@ -1332,11 +1406,12 @@ export default function DevArcade() {
         setTyperIsOver(false); setTyperIsRunning(false);
         setTyperInput(''); setTyperCombo(0); setTyperWpmHistory([]);
         typerCommandsRef.current = []; typerParticlesRef.current = [];
-        typerCorrectRef.current = 0; typerTotalRef.current = 1;
+        typerCorrectRef.current = 0; typerTotalRef.current = 0;
         typerComboRef.current = 0; typerScoreRef.current = 0; typerStackRef.current = 100;
         typerFlashRef.current = 0; typerWpmHistRef.current = [];
-        typerStartTimeRef.current = Date.now();
+        typerStartTimeRef.current = 0;
         typerInputRef.current = '';
+        typerReadyRef.current = true;
     };
 
     const drawTyperFrame = () => {
@@ -1428,7 +1503,7 @@ export default function DevArcade() {
             ctx.fillStyle = combo >= 5 ? '#facc15' : '#a5f3fc';
             ctx.shadowBlur = combo >= 5 ? 10 : 5; ctx.shadowColor = ctx.fillStyle;
             ctx.textAlign = 'right'; ctx.textBaseline = 'top';
-            ctx.fillText(`×${combo} COMBO`, W-4, 4);
+            ctx.fillText(`x${combo} COMBO`, W-4, 4);
             ctx.restore();
         }
 
@@ -1460,7 +1535,7 @@ export default function DevArcade() {
                         const next = typerStackRef.current - 22;
                         typerStackRef.current = next;
                         setTyperStackHealth(next);
-                        const acc = Math.round((typerCorrectRef.current / typerTotalRef.current) * 100);
+                        const acc = Math.round((typerCorrectRef.current / Math.max(1, typerTotalRef.current)) * 100);
                         setTyperAccuracy(acc);
                         if (next <= 0) { setTyperIsOver(true); setTyperIsRunning(false); }
                     }
@@ -1488,6 +1563,54 @@ export default function DevArcade() {
         setGitIsRunning(false);
         setBugIsRunning(false);
         setTyperIsRunning(false);
+        bugKeysRef.current = { left: false, right: false, fire: false };
+    };
+
+    const handleSnakeStartPause = () => {
+        if (snakeIsRunning) {
+            setSnakeIsRunning(false);
+            return;
+        }
+        if (!snakeReadyRef.current || snakeIsOver) initSnakeGame();
+        setSnakeIsRunning(true);
+    };
+
+    const handlePongStartPause = () => {
+        if (pongIsRunning) {
+            setPongIsRunning(false);
+            return;
+        }
+        if (!pongReadyRef.current || pongIsOver) initPongGame();
+        setPongIsRunning(true);
+    };
+
+    const handleGitStartPause = () => {
+        if (gitIsRunning) {
+            setGitIsRunning(false);
+            return;
+        }
+        if (!gitReadyRef.current || gitIsOver) initGitGame();
+        setGitIsRunning(true);
+    };
+
+    const handleBugStartPause = () => {
+        if (bugIsRunning) {
+            setBugIsRunning(false);
+            bugKeysRef.current = { left: false, right: false, fire: false };
+            return;
+        }
+        if (!bugReadyRef.current || bugIsOver) initBugGame();
+        setBugIsRunning(true);
+    };
+
+    const handleTyperStartPause = () => {
+        if (typerIsRunning) {
+            setTyperIsRunning(false);
+            return;
+        }
+        if (!typerReadyRef.current || typerIsOver) initTyperGame();
+        if (!typerStartTimeRef.current) typerStartTimeRef.current = Date.now();
+        setTyperIsRunning(true);
     };
 
     const TABS = [
@@ -1573,22 +1696,22 @@ export default function DevArcade() {
                                 </div>
                                 <div className="pt-1">
                                     {!snakeIsOver ? (
-                                        <button onClick={()=>setSnakeIsRunning(v=>!v)}
+                                        <button onClick={handleSnakeStartPause}
                                             className={`w-full font-bold text-xs py-3 rounded-full transition shadow-md flex items-center justify-center gap-1.5 ${snakeIsRunning?'bg-amber-500 hover:bg-amber-400 text-black':'bg-accent text-black'}`}>
                                             <i className={`fa-solid ${snakeIsRunning?'fa-pause':'fa-play'}`}/>
                                             {snakeIsRunning?t('devArcade.btnPause'):t('devArcade.btnStart')}
                                         </button>
                                     ) : (
-                                        <button onClick={initSnakeGame}
+                                        <button onClick={handleSnakeStartPause}
                                             className="w-full font-bold text-xs bg-rose-500 hover:bg-rose-400 text-black py-3 rounded-full transition shadow-md flex items-center justify-center gap-1.5">
                                             <i className="fa-solid fa-rotate-left"/> {t('devArcade.btnRestart')}
                                         </button>
                                     )}
                                 </div>
                                 <div className="text-[10px] text-muted space-y-0.5 border-t border-slate-800 pt-3">
-                                    <p><span className="text-cyan-400">●</span> Normal food = +1pt</p>
-                                    <p><span className="text-yellow-400">★</span> Bonus food = +3pts + combo</p>
-                                    <p><span className="text-rose-500">◆</span> Bomb = -2pts & shrink!</p>
+                                    <p><span className="text-cyan-400">Normal</span> food = +1pt</p>
+                                    <p><span className="text-yellow-400">Bonus</span> food = +3pts + combo</p>
+                                    <p><span className="text-rose-500">Bomb</span> = -2pts and shrink</p>
                                 </div>
                             </div>
                             <div className="md:col-span-7 flex flex-col items-center gap-4">
@@ -1598,7 +1721,7 @@ export default function DevArcade() {
                                         <div className="absolute inset-0 bg-slate-950/80 flex flex-col items-center justify-center text-center p-4 pointer-events-none">
                                             <i className="fa-solid fa-gamepad text-4xl text-accent mb-3 animate-pulse"/>
                                             <span className="text-xs uppercase font-extrabold tracking-widest text-secondary block mb-1">Neo-Snake Vaporwave</span>
-                                            <span className="text-[10px] text-muted block">W/A/S/D or arrow keys · D-pad below</span>
+                                            <span className="text-[10px] text-muted block">W/A/S/D or arrow keys / D-pad below</span>
                                             {snakeWrap && <span className="text-[10px] text-accent mt-1">Wrap-walls ON</span>}
                                         </div>
                                     )}
@@ -1607,7 +1730,7 @@ export default function DevArcade() {
                                             <i className="fa-solid fa-skull-crossbones text-4xl text-rose-500 mb-3"/>
                                             <span className="text-base uppercase font-black text-rose-500 block mb-1">{t('devArcade.gameOver')}</span>
                                             <span className="text-sm font-bold text-primary block">{t('devArcade.score')}: {snakeScore}</span>
-                                            {snakeScore >= snakeHigh && snakeScore > 0 && <span className="text-xs text-accent font-bold mt-1">🏆 New High Score!</span>}
+                                            {snakeScore >= snakeHigh && snakeScore > 0 && <span className="text-xs text-accent font-bold mt-1">New High Score!</span>}
                                         </div>
                                     )}
                                 </div>
@@ -1727,17 +1850,17 @@ export default function DevArcade() {
                                     </div>
                                 </div>
                                 <div className="text-[10px] text-muted border-t border-slate-800 pt-2">
-                                    First to <span className="text-accent font-bold">7 points</span> wins. Move your mouse on the canvas to control your paddle.
+                                    First to <span className="text-accent font-bold">7 points</span> wins. Use mouse, touch, or W/S keys to control your paddle.
                                 </div>
                                 <div className="pt-1">
                                     {!pongIsOver ? (
-                                        <button onClick={()=>setPongIsRunning(v=>!v)}
+                                        <button onClick={handlePongStartPause}
                                             className={`w-full font-bold text-xs py-3 rounded-full transition flex items-center justify-center gap-1.5 ${pongIsRunning?'bg-amber-500 hover:bg-amber-400 text-black':'bg-accent text-black'}`}>
                                             <i className={`fa-solid ${pongIsRunning?'fa-pause':'fa-play'}`}/>
                                             {pongIsRunning?t('devArcade.btnPause'):t('devArcade.btnStart')}
                                         </button>
                                     ) : (
-                                        <button onClick={initPongGame}
+                                        <button onClick={handlePongStartPause}
                                             className="w-full font-bold text-xs bg-rose-500 hover:bg-rose-400 text-black py-3 rounded-full transition flex items-center justify-center gap-1.5">
                                             <i className="fa-solid fa-rotate-left"/> {t('devArcade.btnRestart')}
                                         </button>
@@ -1746,12 +1869,18 @@ export default function DevArcade() {
                             </div>
                             <div className="md:col-span-7 flex flex-col items-center gap-4">
                                 <div className="border border-slate-700/80 rounded-2xl overflow-hidden relative shadow-inner w-full max-w-[320px] bg-slate-950" style={{aspectRatio:'320/240'}}>
-                                    <canvas ref={pongCanvasRef} onMouseMove={handlePongMouseMove} className="block w-full cursor-none" style={{aspectRatio:'320/240'}}/>
+                                    <canvas
+                                        ref={pongCanvasRef}
+                                        onPointerDown={handlePongPointerMove}
+                                        onPointerMove={handlePongPointerMove}
+                                        className="block w-full cursor-none touch-none"
+                                        style={{aspectRatio:'320/240'}}
+                                    />
                                     {!pongIsRunning && !pongIsOver && (
                                         <div className="absolute inset-0 bg-slate-950/80 flex flex-col items-center justify-center text-center p-4 pointer-events-none">
                                             <i className="fa-solid fa-brain text-4xl text-accent mb-3 animate-pulse"/>
                                             <span className="text-xs uppercase font-extrabold tracking-widest text-secondary block mb-1">Neural Pong</span>
-                                            <span className="text-[10px] text-muted block">Move mouse on canvas to steer your blue paddle</span>
+                                            <span className="text-[10px] text-muted block">Use mouse, touch, or W/S to steer your blue paddle</span>
                                         </div>
                                     )}
                                     {pongIsOver && (
@@ -1760,9 +1889,17 @@ export default function DevArcade() {
                                             <span className={`text-base uppercase font-black block mb-1 ${pongWinner==='player'?'text-accent':'text-rose-400'}`}>
                                                 {pongWinner==='player'?'YOU BEAT THE AI!':'NEURAL AI WINS!'}
                                             </span>
-                                            <span className="text-sm text-primary">{pongScore.player} – {pongScore.ai}</span>
+                                            <span className="text-sm text-primary">{pongScore.player} - {pongScore.ai}</span>
                                         </div>
                                     )}
+                                </div>
+                                <div className="flex gap-3 w-full max-w-[320px] select-none justify-center">
+                                    <button onClick={()=>movePongPaddle(-24)} className="h-10 flex-1 border border-slate-800 rounded-xl active:bg-slate-800 flex items-center justify-center gap-2 text-secondary bg-slate-950/50 text-xs font-bold uppercase">
+                                        <i className="fa-solid fa-chevron-up"/> Up
+                                    </button>
+                                    <button onClick={()=>movePongPaddle(24)} className="h-10 flex-1 border border-slate-800 rounded-xl active:bg-slate-800 flex items-center justify-center gap-2 text-secondary bg-slate-950/50 text-xs font-bold uppercase">
+                                        <i className="fa-solid fa-chevron-down"/> Down
+                                    </button>
                                 </div>
                                 <div className="card-bg border border-slate-800 rounded-xl p-3 w-full">
                                     <h4 className="text-[10px] font-bold text-secondary uppercase tracking-widest mb-2 flex items-center gap-1.5">
@@ -1793,7 +1930,7 @@ export default function DevArcade() {
                                             )))}
                                         </svg>
                                         <div className="flex flex-col gap-4">
-                                            {['▲','▼'].map((label,o)=>(
+                                            {['UP','DN'].map((label,o)=>(
                                                 <div key={o} className="flex flex-col items-center gap-0.5">
                                                     <span className={`w-5 h-5 rounded-full border flex items-center justify-center text-[8px] transition-all ${pongNN.outputs[o]>(o===0?pongNN.outputs[1]:pongNN.outputs[0])?'bg-rose-400 border-rose-400 shadow-[0_0_8px_rgba(244,63,94,0.6)] text-white':'bg-slate-900 border-slate-700 text-muted'}`}>{label}</span>
                                                     <span className="text-[6px] text-muted font-mono">{(pongNN.outputs[o]*100).toFixed(0)}%</span>
@@ -1840,24 +1977,24 @@ export default function DevArcade() {
                                                             </div>
                                                         ))}
                                                     </div>
-                                                ) : <span className="text-[9px] text-slate-600">—</span>}
+                                                ) : <span className="text-[9px] text-slate-600">-</span>}
                                             </div>
                                         </div>
                                     ))}
                                 </div>
 
                                 <div className="text-[9px] text-muted space-y-0.5 border-t border-slate-800 pt-2">
-                                    <p><span className="text-cyan-400">A/D</span> move · <span className="text-cyan-400">W</span> rotate · <span className="text-cyan-400">S</span> soft drop</p>
-                                    <p><span className="text-cyan-400">Space</span> hard drop · <span className="text-cyan-400">C</span> hold piece</p>
+                                    <p><span className="text-cyan-400">A/D</span> move / <span className="text-cyan-400">W</span> rotate / <span className="text-cyan-400">S</span> soft drop</p>
+                                    <p><span className="text-cyan-400">Space</span> hard drop / <span className="text-cyan-400">C</span> hold piece</p>
                                 </div>
                                 <div className="pt-1">
                                     {!gitIsOver ? (
-                                        <button onClick={()=>setGitIsRunning(v=>!v)}
+                                        <button onClick={handleGitStartPause}
                                             className={`w-full font-bold text-xs py-3 rounded-full transition flex items-center justify-center gap-1.5 ${gitIsRunning?'bg-amber-500 hover:bg-amber-400 text-black':'bg-accent text-black'}`}>
                                             <i className={`fa-solid ${gitIsRunning?'fa-pause':'fa-play'}`}/> {gitIsRunning?t('devArcade.btnPause'):t('devArcade.btnStart')}
                                         </button>
                                     ) : (
-                                        <button onClick={initGitGame}
+                                        <button onClick={handleGitStartPause}
                                             className="w-full font-bold text-xs bg-rose-500 hover:bg-rose-400 text-black py-3 rounded-full transition flex items-center justify-center gap-1.5">
                                             <i className="fa-solid fa-rotate-left"/> {t('devArcade.btnRestart')}
                                         </button>
@@ -1865,9 +2002,16 @@ export default function DevArcade() {
                                 </div>
 
                                 {/* Mobile controls */}
-                                <div className="grid grid-cols-4 gap-2 pt-1">
-                                    {[{icon:'fa-chevron-left',fn:()=>moveGitPiece(-1,0)},{icon:'fa-rotate-right',fn:rotateGitPiece},{icon:'fa-chevron-right',fn:()=>moveGitPiece(1,0)},{icon:'fa-chevron-down',fn:()=>moveGitPiece(0,1)}].map((b,i)=>(
-                                        <button key={i} onClick={b.fn} className="h-10 border border-slate-800 rounded-lg active:bg-slate-800 flex items-center justify-center text-secondary text-sm bg-slate-950/50">
+                                <div className="grid grid-cols-6 gap-2 pt-1">
+                                    {[
+                                        {icon:'fa-chevron-left',label:'Left',fn:()=>moveGitPiece(-1,0)},
+                                        {icon:'fa-rotate-right',label:'Rotate',fn:rotateGitPiece},
+                                        {icon:'fa-chevron-right',label:'Right',fn:()=>moveGitPiece(1,0)},
+                                        {icon:'fa-chevron-down',label:'Soft drop',fn:()=>moveGitPiece(0,1)},
+                                        {icon:'fa-angles-down',label:'Hard drop',fn:hardDropGitPiece},
+                                        {icon:'fa-box-archive',label:'Hold',fn:gitHold},
+                                    ].map((b,i)=>(
+                                        <button key={i} title={b.label} onClick={b.fn} className="h-10 border border-slate-800 rounded-lg active:bg-slate-800 flex items-center justify-center text-secondary text-sm bg-slate-950/50">
                                             <i className={`fa-solid ${b.icon}`}/>
                                         </button>
                                     ))}
@@ -1887,7 +2031,7 @@ export default function DevArcade() {
                                         <div className="absolute inset-0 bg-slate-950/90 flex flex-col items-center justify-center text-center p-4 border border-rose-500/30 rounded-2xl pointer-events-none">
                                             <i className="fa-solid fa-bug text-3xl text-rose-500 mb-2"/>
                                             <span className="text-xs uppercase font-black text-rose-500 block mb-1">MERGE CONFLICT DETECTED!</span>
-                                            <span className="text-sm text-primary">Score: {gitScore} · Lines: {gitMergedLines}</span>
+                                            <span className="text-sm text-primary">Score: {gitScore} / Lines: {gitMergedLines}</span>
                                         </div>
                                     )}
                                 </div>
@@ -1932,22 +2076,22 @@ export default function DevArcade() {
                                     <div className="flex-1 border border-slate-800 rounded-xl p-2.5 bg-slate-950/40 text-center">
                                         <span className="text-[10px] font-bold text-muted uppercase block mb-1">Lives</span>
                                         <div className="flex justify-center gap-1">
-                                            {[0,1,2].map(i=><span key={i} className={`text-sm ${i<bugLives?'text-emerald-400':'text-slate-700'}`}>♥</span>)}
+                                            {[0,1,2].map(i=><i key={i} className={`fa-solid fa-heart text-sm ${i<bugLives?'text-emerald-400':'text-slate-700'}`}/>)}
                                         </div>
                                     </div>
                                 </div>
                                 <div className="text-[9px] text-muted border-t border-slate-800 pt-2 space-y-0.5">
-                                    <p><span className="text-cyan-400">A/D or ←/→</span> move · <span className="text-cyan-400">Space or W/↑</span> fire</p>
+                                    <p><span className="text-cyan-400">A/D or arrows</span> move / <span className="text-cyan-400">Space or W</span> fire</p>
                                     <p>Every 5th wave is a <span className="text-rose-400 font-bold">KERNEL_PANIC boss</span>!</p>
                                 </div>
                                 <div className="pt-1">
                                     {!bugIsOver ? (
-                                        <button onClick={()=>setBugIsRunning(v=>!v)}
+                                        <button onClick={handleBugStartPause}
                                             className={`w-full font-bold text-xs py-3 rounded-full transition flex items-center justify-center gap-1.5 ${bugIsRunning?'bg-amber-500 hover:bg-amber-400 text-black':'bg-accent text-black'}`}>
                                             <i className={`fa-solid ${bugIsRunning?'fa-pause':'fa-play'}`}/> {bugIsRunning?t('devArcade.btnPause'):t('devArcade.btnStart')}
                                         </button>
                                     ) : (
-                                        <button onClick={initBugGame}
+                                        <button onClick={handleBugStartPause}
                                             className="w-full font-bold text-xs bg-rose-500 hover:bg-rose-400 text-black py-3 rounded-full transition flex items-center justify-center gap-1.5">
                                             <i className="fa-solid fa-rotate-left"/> {t('devArcade.btnRestart')}
                                         </button>
@@ -1968,7 +2112,7 @@ export default function DevArcade() {
                                         <div className="absolute inset-0 bg-slate-950/90 flex flex-col items-center justify-center text-center p-4 border border-rose-500/30 rounded-2xl pointer-events-none">
                                             <i className="fa-solid fa-skull-crossbones text-4xl text-rose-500 mb-2"/>
                                             <span className="text-sm uppercase font-black text-rose-500 block mb-1">COMPILER CRASHED!</span>
-                                            <span className="text-xs text-primary">Bugs patched: {bugsDefeated} · Wave: {bugWave}</span>
+                                            <span className="text-xs text-primary">Bugs patched: {bugsDefeated} / Wave: {bugWave}</span>
                                         </div>
                                     )}
                                 </div>
@@ -2018,7 +2162,7 @@ export default function DevArcade() {
                                 </div>
                                 {typerCombo > 1 && (
                                     <div className={`text-center text-xs font-black py-1.5 rounded-lg border transition ${typerCombo>=5?'border-yellow-400 text-yellow-400 bg-yellow-400/10':'border-cyan-600 text-cyan-400 bg-cyan-400/10'}`}>
-                                        <i className="fa-solid fa-fire mr-1"/> ×{typerCombo} Combo Bonus {typerCombo>=5?'🔥':''}
+                                        <i className="fa-solid fa-fire mr-1"/> x{typerCombo} Combo Bonus
                                     </div>
                                 )}
                                 <div className="space-y-1.5">
@@ -2033,12 +2177,12 @@ export default function DevArcade() {
                                 </div>
                                 <div className="pt-1">
                                     {!typerIsOver ? (
-                                        <button onClick={()=>setTyperIsRunning(v=>!v)}
+                                        <button onClick={handleTyperStartPause}
                                             className={`w-full font-bold text-xs py-3 rounded-full transition flex items-center justify-center gap-1.5 ${typerIsRunning?'bg-amber-500 hover:bg-amber-400 text-black':'bg-accent text-black'}`}>
                                             <i className={`fa-solid ${typerIsRunning?'fa-pause':'fa-play'}`}/> {typerIsRunning?t('devArcade.btnPause'):t('devArcade.btnStart')}
                                         </button>
                                     ) : (
-                                        <button onClick={initTyperGame}
+                                        <button onClick={handleTyperStartPause}
                                             className="w-full font-bold text-xs bg-rose-500 hover:bg-rose-400 text-black py-3 rounded-full transition flex items-center justify-center gap-1.5">
                                             <i className="fa-solid fa-rotate-left"/> {t('devArcade.btnRestart')}
                                         </button>
@@ -2072,7 +2216,7 @@ export default function DevArcade() {
                                         <div className="absolute inset-0 bg-slate-950/90 flex flex-col items-center justify-center text-center p-4 border border-rose-500/30 rounded-2xl pointer-events-none">
                                             <i className="fa-solid fa-fire text-3xl text-rose-500 mb-2"/>
                                             <span className="text-xs uppercase font-black text-rose-500 block mb-1">STACK OVERFLOW!</span>
-                                            <span className="text-[10px] text-primary">WPM: {typerWpm} · Accuracy: {typerAccuracy}%</span>
+                                            <span className="text-[10px] text-primary">WPM: {typerWpm} / Accuracy: {typerAccuracy}%</span>
                                         </div>
                                     )}
                                 </div>
@@ -2086,7 +2230,7 @@ export default function DevArcade() {
                                         disabled={!typerIsRunning || typerIsOver}
                                         value={typerInput}
                                         onChange={handleTyperInputChange}
-                                        placeholder={typerIsRunning ? "Type the falling command…" : "Start game to play"}
+                                        placeholder={typerIsRunning ? "Type the falling command..." : "Start game to play"}
                                         autoComplete="off"
                                         autoCorrect="off"
                                         spellCheck={false}
@@ -2095,8 +2239,8 @@ export default function DevArcade() {
                                     {typerIsRunning && typerInput && (
                                         <div className="text-[9px] font-mono text-slate-500 px-1">
                                             {typerCommandsRef.current.filter(c=>c.text.startsWith(typerInput.trim())).length > 0 ?
-                                                <span className="text-cyan-400">✓ Matching a command…</span> :
-                                                <span className="text-rose-400">No match yet — keep typing</span>
+                                                <span className="text-cyan-400">Matching a command...</span> :
+                                                <span className="text-rose-400">No match yet - keep typing</span>
                                             }
                                         </div>
                                     )}
