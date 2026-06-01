@@ -19,7 +19,7 @@ export default function Telemetry() {
     const [logs, setLogs] = useState([]);
     const [stats, setStats] = useState({ clicks: 0, cvDownloads: 0, chat: 0, aiTrain: 0 });
 
-    const fpsRef = useRef({ frames: 0, lastTime: performance.now() });
+    const fpsRef = useRef({ frames: 0, lastTime: 0 });
     const logCounter = useRef(0);
     const isRtl = language === 'ar';
 
@@ -32,15 +32,23 @@ export default function Telemetry() {
 
     // Initialize telemetry event listeners & performance calculations
     useEffect(() => {
+        const deferredTimers = [];
+        const defer = (callback) => {
+            const timerId = window.setTimeout(callback, 0);
+            deferredTimers.push(timerId);
+        };
+
         // 1. Calculate Time to First Byte (TTFB)
         if (typeof window !== 'undefined' && window.performance) {
             const navTiming = performance.getEntriesByType('navigation')[0];
             if (navTiming) {
                 const ttfbVal = Math.round(navTiming.responseStart - navTiming.requestStart);
-                setTtfb(ttfbVal > 0 ? ttfbVal : 95);
-                addLog('SYSTEM', `TTFB calculated: ${ttfbVal > 0 ? ttfbVal : 95}ms`);
+                defer(() => {
+                    setTtfb(ttfbVal > 0 ? ttfbVal : 95);
+                    addLog('SYSTEM', `TTFB calculated: ${ttfbVal > 0 ? ttfbVal : 95}ms`);
+                });
             } else {
-                setTtfb(98);
+                defer(() => setTtfb(98));
             }
         }
 
@@ -68,7 +76,7 @@ export default function Telemetry() {
             });
             lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
         } catch {
-            setLcp(1.15);
+            defer(() => setLcp(1.15));
         }
 
         // 4. PerformanceObserver for FID (First Input Delay)
@@ -83,7 +91,7 @@ export default function Telemetry() {
             });
             fidObserver.observe({ type: 'first-input', buffered: true });
         } catch {
-            setFid(12);
+            defer(() => setFid(12));
         }
 
         // 5. PerformanceObserver for CLS (Cumulative Layout Shift)
@@ -100,11 +108,12 @@ export default function Telemetry() {
             });
             clsObserver.observe({ type: 'layout-shift', buffered: true });
         } catch {
-            setCls(0.015);
+            defer(() => setCls(0.015));
         }
 
         // 6. RequestAnimationFrame Framerate loop (FPS)
         let animationFrameId;
+        fpsRef.current.lastTime = performance.now();
         const calculateFps = () => {
             const now = performance.now();
             fpsRef.current.frames++;
@@ -139,14 +148,16 @@ export default function Telemetry() {
         const loadedDownloads = parseInt(localStorage.getItem('telemetry_cv_downloads')) || 0;
         const loadedChat = parseInt(localStorage.getItem('telemetry_chat_messages')) || 0;
         const loadedAITrain = parseInt(localStorage.getItem('telemetry_ai_trainings')) || 0;
-        setStats({ clicks: loadedClicks, cvDownloads: loadedDownloads, chat: loadedChat, aiTrain: loadedAITrain });
-
-        addLog('SYSTEM', 'Telemetry services fully initialized.');
+        defer(() => {
+            setStats({ clicks: loadedClicks, cvDownloads: loadedDownloads, chat: loadedChat, aiTrain: loadedAITrain });
+            addLog('SYSTEM', 'Telemetry services fully initialized.');
+        });
 
         return () => {
             window.removeEventListener('click', handleClick);
             cancelAnimationFrame(animationFrameId);
             clearInterval(memoryInterval);
+            deferredTimers.forEach(timerId => window.clearTimeout(timerId));
         };
     }, []);
 

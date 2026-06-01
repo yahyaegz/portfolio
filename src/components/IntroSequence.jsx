@@ -101,7 +101,7 @@ export default function IntroSequence({ onComplete }) {
                                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                                 transition={{ duration: 0.5 }}
                             >
-                                Full-Stack Software Engineer
+                                Full-Stack Developer / DevOps Learner
                             </motion.p>
                         )}
                     </AnimatePresence>

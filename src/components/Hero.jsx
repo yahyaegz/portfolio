@@ -171,7 +171,7 @@ export default function Hero() {
                         <motion.img
                             className="relative z-10 w-56 sm:w-72 md:w-96 lg:w-[28rem] rounded-full shadow-2xl border-4 border-accent/30 hover:border-accent/60 transition object-cover"
                             src={profile.avatar}
-                            alt={`${profile.name} — Full-Stack Software Engineer`}
+                            alt={`${profile.name} — Full-Stack Developer and DevOps Learner`}
                             loading="lazy"
                             animate={{ y: [0, -10, 0] }}
                             transition={{ duration: 4, repeat: Infinity }}

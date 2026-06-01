@@ -4,6 +4,16 @@ import { experience, education, skills, contactInfo } from '../data';
 import { useLanguage } from '../context/LanguageContext';
 import SplitTextReveal from './SplitTextReveal';
 
+const getCategoryItems = (category) => {
+    if (category.groups?.length) {
+        return category.groups.flatMap(group =>
+            group.items.map(item => ({ ...item, group: group.label }))
+        );
+    }
+
+    return category.items;
+};
+
 export default function InteractiveCV() {
     const { t, language } = useLanguage();
     const [activeTab, setActiveTab] = useState('timeline');
@@ -246,8 +256,9 @@ export default function InteractiveCV() {
                                 {/* Skills Categorized Lists */}
                                 <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                                     {skills.map((category) => {
+                                        const categoryItems = getCategoryItems(category);
                                         // Filter child items based on search query
-                                        const filteredItems = category.items.filter(item =>
+                                        const filteredItems = categoryItems.filter(item =>
                                             item.title.toLowerCase().includes(skillSearch.toLowerCase())
                                         );
 
@@ -276,6 +287,11 @@ export default function InteractiveCV() {
                                                                     <i className={item.brand ? `fa-brands fa-${item.icon}` : `fa fa-${item.icon || 'code'}`} />
                                                                 </span>
                                                                 <span className="text-secondary font-medium">{item.title}</span>
+                                                                {item.group && (
+                                                                    <span className="hidden sm:inline rounded-full border border-accent/20 px-2 py-0.5 text-[9px] font-bold uppercase text-muted">
+                                                                        {item.group}
+                                                                    </span>
+                                                                )}
                                                             </div>
                                                             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 opacity-60" />
                                                         </motion.div>
@@ -315,7 +331,7 @@ export default function InteractiveCV() {
                                     {/* Resume Header */}
                                     <div className="text-center space-y-1.5 border-b pb-5" style={{ borderColor: 'var(--border-color)' }}>
                                         <h3 className="text-xl md:text-2xl font-black tracking-wide text-primary">YAHYA EL GZOULI</h3>
-                                        <p className="text-accent font-bold tracking-wider text-xs md:text-sm uppercase">Full-Stack Software Engineer | 4th Year Computer Engineering Student</p>
+                                        <p className="text-accent font-bold tracking-wider text-xs md:text-sm uppercase">Full-Stack Developer | Computer Engineering Student | DevOps Learner</p>
                                         <p className="text-secondary text-xs">Oujda, Morocco | {contactInfo.email} | +212 654495827</p>
                                     </div>
 
@@ -326,7 +342,7 @@ export default function InteractiveCV() {
                                             Professional Summary
                                         </h4>
                                         <p className="text-secondary text-xs md:text-sm leading-relaxed font-medium">
-                                            Computer Engineering student and Full-Stack developer focused on building modern and scalable web applications. Interested in SaaS platforms, high-performance backend architectures, and applications integrating artificial intelligence.
+                                            Full-Stack Developer and Computer Engineering student focused on building modern web applications and learning real-world DevOps workflows, including CI/CD automation, containerized deployment, code quality analysis, and monitoring.
                                         </p>
                                     </div>
 

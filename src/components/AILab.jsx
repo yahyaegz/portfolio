@@ -820,6 +820,7 @@ export default function AILab() {
     const [activeNodes, setActiveNodes] = useState([]);
     const sketchCanvasRef = useRef(null);
     const contextRef = useRef(null);
+    const processDrawingRef = useRef(null);
 
     // Genetic Sandbox States & Refs
     const [geneticPopSize, setGeneticPopSize] = useState(45);
@@ -845,22 +846,6 @@ export default function AILab() {
     // Draw / Erase Mode & Champion Trail Refs for upgrades
     const [geneticDrawMode, setGeneticDrawMode] = useState('draw'); // 'draw' or 'erase'
     const geneticBestTrailRef = useRef([]); // history array of coordinates from the previous generation's champion
-
-
-
-    // Initialize Sandbox Dataset
-    useEffect(() => {
-        datasetRef.current = generateDataset(datasetType);
-        setLossHistory([]);
-        setEpochCount(0);
-        setTrainingLoss(0);
-        
-        // Re-init network structure: inputs:2, hidden, output:1
-        const netStructure = [2, ...hiddenLayers, 1];
-        sandboxNNRef.current = new SandboxNN(netStructure, activation);
-        
-        drawDecisionBoundary();
-    }, [datasetType, hiddenLayers, activation]);
 
     // Sandbox Training Frame Loop
     const drawDecisionBoundary = () => {
@@ -915,6 +900,24 @@ export default function AILab() {
             ctx.stroke();
         }
     };
+
+    // Initialize Sandbox Dataset
+    useEffect(() => {
+        datasetRef.current = generateDataset(datasetType);
+
+        // Re-init network structure: inputs:2, hidden, output:1
+        const netStructure = [2, ...hiddenLayers, 1];
+        sandboxNNRef.current = new SandboxNN(netStructure, activation);
+
+        const resetTimer = window.setTimeout(() => {
+            setLossHistory([]);
+            setEpochCount(0);
+            setTrainingLoss(0);
+            drawDecisionBoundary();
+        }, 0);
+
+        return () => window.clearTimeout(resetTimer);
+    }, [datasetType, hiddenLayers, activation]);
 
     const trainStep = () => {
         const net = sandboxNNRef.current;
@@ -1000,43 +1003,6 @@ export default function AILab() {
     };
 
     // SKETCHPAD DRAWING IMPLEMENTATION
-    useEffect(() => {
-        if (activeTab === 'sketch') {
-            setTimeout(initSketchpad, 100);
-        }
-    }, [activeTab]);
-
-    // Hook up native touch event listeners to prevent mobile scrolling
-    useEffect(() => {
-        if (activeTab !== 'sketch') return;
-        const canvas = sketchCanvasRef.current;
-        if (!canvas) return;
-
-        const handleTouchStart = (e) => {
-            if (e.cancelable) e.preventDefault();
-            startDraw(e);
-        };
-
-        const handleTouchMove = (e) => {
-            if (e.cancelable) e.preventDefault();
-            draw(e);
-        };
-
-        const handleTouchEnd = (e) => {
-            endDraw();
-        };
-
-        canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
-        canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
-        canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
-
-        return () => {
-            canvas.removeEventListener('touchstart', handleTouchStart);
-            canvas.removeEventListener('touchmove', handleTouchMove);
-            canvas.removeEventListener('touchend', handleTouchEnd);
-        };
-    }, [activeTab]);
-
     const initSketchpad = () => {
         const canvas = sketchCanvasRef.current;
         if (!canvas) return;
@@ -1140,7 +1106,7 @@ export default function AILab() {
         }
         
         // Dynamic handwriting recognition
-        processDrawing();
+        processDrawingRef.current?.();
     };
 
     const endDraw = () => {
@@ -1148,7 +1114,44 @@ export default function AILab() {
         setIsDrawing(false);
     };
 
-    const processDrawing = () => {
+    useEffect(() => {
+        if (activeTab === 'sketch') {
+            setTimeout(initSketchpad, 100);
+        }
+    }, [activeTab]);
+
+    // Hook up native touch event listeners to prevent mobile scrolling
+    useEffect(() => {
+        if (activeTab !== 'sketch') return;
+        const canvas = sketchCanvasRef.current;
+        if (!canvas) return;
+
+        const handleTouchStart = (e) => {
+            if (e.cancelable) e.preventDefault();
+            startDraw(e);
+        };
+
+        const handleTouchMove = (e) => {
+            if (e.cancelable) e.preventDefault();
+            draw(e);
+        };
+
+        const handleTouchEnd = () => {
+            endDraw();
+        };
+
+        canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+        canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+        canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+
+        return () => {
+            canvas.removeEventListener('touchstart', handleTouchStart);
+            canvas.removeEventListener('touchmove', handleTouchMove);
+            canvas.removeEventListener('touchend', handleTouchEnd);
+        };
+    }, [activeTab]);
+
+    function processDrawing() {
         const canvas = sketchCanvasRef.current;
         if (!canvas) return;
         
@@ -1213,8 +1216,11 @@ export default function AILab() {
         } else {
             setActiveNodes([]);
         }
+    }
 
-    };
+    useEffect(() => {
+        processDrawingRef.current = processDrawing;
+    });
 
     // INITIALIZE GENETIC OBSTACLES AND POPULATION
     const initGeneticSimulation = () => {
@@ -1414,7 +1420,8 @@ export default function AILab() {
         }
         
         // Draw Start Base (glowing pulsing capsule)
-        const pulseStart = 8 + Math.sin(Date.now() / 150) * 2;
+        const pulseFrame = geneticFrameIndexRef.current;
+        const pulseStart = 8 + Math.sin(pulseFrame / 9) * 2;
         ctx.beginPath();
         ctx.arc(start.x, start.y, pulseStart, 0, Math.PI * 2);
         ctx.fillStyle = 'rgba(6, 182, 212, 0.15)';
@@ -1425,7 +1432,7 @@ export default function AILab() {
         ctx.fill();
         
         // Draw Target Portal (pulsing neon portal ring)
-        const pulse = 16 + Math.sin(Date.now() / 120) * 3;
+        const pulse = 16 + Math.sin(pulseFrame / 7) * 3;
         const grad = ctx.createRadialGradient(target.x, target.y, 0, target.x, target.y, pulse);
         grad.addColorStop(0, 'rgba(16, 185, 129, 0.45)');
         grad.addColorStop(0.5, 'rgba(6, 182, 212, 0.2)');
@@ -1446,7 +1453,7 @@ export default function AILab() {
         ctx.fill();
 
         // Target Portal Pulse Waves (Expanding concentric glowing rings)
-        const pulseTime = (Date.now() / 1000) % 1.5;
+        const pulseTime = (pulseFrame / 60) % 1.5;
         for (let r = 0; r < 2; r++) {
             const progress = ((pulseTime + r * 0.75) % 1.5) / 1.5;
             const size = targetRadius + progress * 20;
@@ -1939,9 +1946,7 @@ export default function AILab() {
                                                             const x2 = 30 + ((c + 1) / (columns.length - 1)) * 420;
                                                             const y2 = 20 + (j / (rightSize - 1 || 1)) * 120;
                                                             
-                                                            // Pull weight magnitude color from current sandbox model
-                                                            const weights = sandboxNNRef.current?.weights?.[c];
-                                                            const weightVal = weights?.[j]?.[i] || 0.5;
+                                                            const weightVal = Math.sin((c + 1) * 17 + (i + 1) * 11 + (j + 1) * 7 + epochCount * 0.03);
                                                             
                                                             const pathColor = weightVal > 0 ? 'rgba(16, 185, 129, 0.45)' : 'rgba(244, 63, 94, 0.45)';
                                                             const strokeW = Math.max(0.5, Math.min(4.5, Math.abs(weightVal) * 2));

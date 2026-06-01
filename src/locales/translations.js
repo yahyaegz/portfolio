@@ -21,9 +21,9 @@ export const translations = {
         hero: {
             welcome: 'Welcome to my portfolio',
             title: 'Hi, I\'m',
-            subtitle: 'Full-Stack Software Engineer | 4th Year Computer Engineering Student',
+            subtitle: 'Full-Stack Developer | Computer Engineering Student | DevOps Learner',
             location: 'Oujda, Morocco | Age: 23 | +212 654495827',
-            summary: 'Computer Engineering student and Full-Stack developer focused on building modern and scalable web applications. Interested in SaaS platforms, high-performance backend architectures, and applications integrating artificial intelligence.',
+            summary: 'Full-Stack Developer and Computer Engineering student focused on building modern web applications and learning real-world DevOps workflows, including CI/CD automation, containerized deployment, code quality analysis, and monitoring.',
             cta: 'Get In Touch',
             downloadCV: 'Download CV',
         },
@@ -56,6 +56,7 @@ export const translations = {
             databases: 'Databases',
             tools: 'Tools & Cloud',
             ml: 'Machine Learning & AI',
+            devops: 'DevOps / CI/CD / Monitoring',
             languages: 'Languages',
         },
         education: {
@@ -111,9 +112,10 @@ export const translations = {
                 { title: 'AIR BABOUCHE E-Commerce Platform', description: 'Full-stack e-commerce platform with secure authentication, product management, and payment integration. Built with React, Node.js, and MySQL.' },
                 { title: 'Portfolio Website', description: 'Modern portfolio website showcasing projects, skills, and professional experience. Built with React and Tailwind CSS, deployed on Vercel.', link: 'https://y7ya.vercel.app/' },
                 { title: "Women's Day Tribute", description: "An animated React celebration page honoring inspiring women around the world. Built to celebrate International Women's Day – March 8 💜 This project creates a beautiful interactive experience with animations, particles, inspirational quotes, and famous women showcases.", link: 'https://international-womens-day-chi.vercel.app/' },
+                { title: 'Advanced DevOps CI/CD & Code Quality Platform', description: 'A complete local DevOps lab project demonstrating CI/CD automation, containerized deployment, code quality analysis, reverse proxy configuration, monitoring, and deployment automation.' },
             ],
         },
-        topSkills: ['Full-Stack Development', 'RESTful API Design', 'Database Optimization'],
+        topSkills: ['Full-Stack Development', 'RESTful API Design', 'DevOps / CI/CD Workflows'],
         languageCards: [
             { language: 'Arabic', level: 'Native' },
             { language: 'English', level: 'Conversational' },

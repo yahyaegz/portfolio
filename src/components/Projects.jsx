@@ -12,10 +12,40 @@ const itemVariants = {
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
 };
 
+const ProjectVisual = ({ project }) => {
+    const [imageFailed, setImageFailed] = useState(false);
+
+    if (project.image && !imageFailed) {
+        return (
+            <img
+                src={project.image}
+                alt={`${project.title} preview`}
+                className="h-full w-full object-cover"
+                loading="lazy"
+                onError={() => setImageFailed(true)}
+            />
+        );
+    }
+
+    return (
+        <motion.i
+            className={`${project.brand ? `fa-brands fa-${project.icon}` : `fa fa-${project.icon}`} text-6xl text-accent opacity-80 group-hover:opacity-100`}
+            animate={{ rotate: [0, 10, -10, 0] }}
+            transition={{ duration: 4, repeat: Infinity }}
+        />
+    );
+};
+
 const ProjectCard = ({ p, translatedItem, onOpenCaseStudy }) => {
     const { t } = useLanguage();
     const title = translatedItem?.title || p.title;
     const description = translatedItem?.description || p.description;
+    const primaryAction = p.link && p.link !== '#'
+        ? { href: p.link, label: 'Live Demo', icon: 'fa-arrow-right' }
+        : p.githubUrl
+            ? { href: p.githubUrl, label: 'GitHub', icon: 'fa-brands fa-github' }
+            : null;
+
     return (
         <TiltCard
             as={motion.article}
@@ -26,11 +56,7 @@ const ProjectCard = ({ p, translatedItem, onOpenCaseStudy }) => {
                 className="h-40 sm:h-44 md:h-48 bg-gradient-to-br from-accent/20 to-cyan-400/20 flex items-center justify-center relative overflow-hidden"
                 whileHover={{ scale: 1.05 }}
             >
-                <motion.i
-                    className={`${p.brand ? `fa-brands fa-${p.icon}` : `fa fa-${p.icon}`} text-6xl text-accent opacity-80 group-hover:opacity-100`}
-                    animate={{ rotate: [0, 10, -10, 0] }}
-                    transition={{ duration: 4, repeat: Infinity }}
-                />
+                <ProjectVisual project={p} />
                 <motion.div
                     className="absolute inset-0 bg-gradient-to-t from-black/40 dark:from-black/60 to-transparent"
                     initial={{ opacity: 0 }}
@@ -60,6 +86,13 @@ const ProjectCard = ({ p, translatedItem, onOpenCaseStudy }) => {
                     </div>
                 </div>
 
+                {p.localNote && (
+                    <p className="mb-3 rounded-lg border border-accent/20 bg-accent/5 px-3 py-2 text-xs font-semibold text-secondary">
+                        <i className="fa fa-server text-accent mr-2" />
+                        {p.localNote}
+                    </p>
+                )}
+
                 <div className="flex items-center justify-between gap-4 mt-auto pt-2 border-t" style={{ borderColor: 'var(--border-color)' }}>
                     <motion.button
                         onClick={() => onOpenCaseStudy(p)}
@@ -71,20 +104,24 @@ const ProjectCard = ({ p, translatedItem, onOpenCaseStudy }) => {
                         <span>{t('caseStudy.readCaseStudy')}</span>
                     </motion.button>
 
-                    {p.link !== '#' && (
+                    {primaryAction && (
                         <motion.a
-                            href={p.link}
+                            href={primaryAction.href}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-secondary hover:text-accent transition"
                             whileHover={{ x: 3 }}
                         >
-                            <span>Live Demo</span>
-                            <motion.i
-                                className="fa fa-arrow-right text-[10px]"
-                                animate={{ x: [0, 2, 0] }}
-                                transition={{ duration: 1.5, repeat: Infinity }}
-                            />
+                            <span>{primaryAction.label}</span>
+                            {primaryAction.icon.startsWith('fa-brands') ? (
+                                <i className={`${primaryAction.icon} text-sm`} />
+                            ) : (
+                                <motion.i
+                                    className={`fa ${primaryAction.icon} text-[10px]`}
+                                    animate={{ x: [0, 2, 0] }}
+                                    transition={{ duration: 1.5, repeat: Infinity }}
+                                />
+                            )}
                         </motion.a>
                     )}
                 </div>

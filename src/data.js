@@ -2,7 +2,7 @@ import heroImg from './assets/main.jpg';
 
 export const profile = {
     name: 'Yahya El Gzouli',
-    title: 'Full-Stack Software Engineer | 4th Year Computer Engineering Student',
+    title: 'Full-Stack Developer | Computer Engineering Student | DevOps Learner',
     subtitle: 'Oujda, Morocco | Age: 23 | +212 654495827',
     avatar: heroImg,
     social: {
@@ -11,13 +11,13 @@ export const profile = {
         twitter: 'https://x.com/YahyaEgz?t=1w_Suv18laykjv_2GtumTQ&s=09',
         instagram: 'https://www.instagram.com/shadowy7ya',
     },
-    summary: `Computer Engineering student and Full-Stack developer focused on building modern and scalable web applications. Interested in SaaS platforms, high-performance backend architectures, and applications integrating artificial intelligence.`,
+    summary: `Full-Stack Developer and Computer Engineering student focused on building modern web applications and learning real-world DevOps workflows, including CI/CD automation, containerized deployment, code quality analysis, and monitoring.`,
 };
 
 export const topSkills = [
     'Full-Stack Development',
     'RESTful API Design',
-    'Database Optimization',
+    'DevOps / CI/CD Workflows',
 ];
 
 export const coreCompetencies = [
@@ -33,6 +33,9 @@ export const coreCompetencies = [
     'Deep Learning & Neural Networks',
     'Data Analysis & Visualization',
     'Natural Language Processing',
+    'Containerized Deployment',
+    'CI/CD Automation',
+    'Monitoring & Observability',
 ];
 
 export const certifications = [
@@ -308,6 +311,46 @@ export const skills = [
             { icon: 'code', title: 'Natural Language Processing' },
         ]
     },
+    {
+        category: 'DevOps / CI/CD / Monitoring',
+        groups: [
+            {
+                label: 'DevOps & CI/CD',
+                items: [
+                    { icon: 'docker', title: 'Docker', brand: true },
+                    { icon: 'docker', title: 'Docker Compose', brand: true },
+                    { icon: 'jenkins', title: 'Jenkins', brand: true },
+                    { icon: 'code-branch', title: 'CI/CD Pipelines' },
+                    { icon: 'github', title: 'Git / GitHub', brand: true },
+                    { icon: 'server', title: 'Ansible' },
+                ],
+            },
+            {
+                label: 'Code Quality',
+                items: [
+                    { icon: 'magnifying-glass-chart', title: 'SonarQube' },
+                    { icon: 'code', title: 'Sonar Scanner' },
+                ],
+            },
+            {
+                label: 'Monitoring',
+                items: [
+                    { icon: 'chart-line', title: 'Prometheus' },
+                    { icon: 'gauge-high', title: 'Grafana' },
+                    { icon: 'microchip', title: 'Node Exporter' },
+                ],
+            },
+            {
+                label: 'Infrastructure',
+                items: [
+                    { icon: 'network-wired', title: 'NGINX Reverse Proxy' },
+                    { icon: 'linux', title: 'Linux / Ubuntu', brand: true },
+                    { icon: 'database', title: 'PostgreSQL' },
+                    { icon: 'desktop', title: 'VMware / Local DevOps Lab' },
+                ],
+            },
+        ],
+    },
 ];
 
 export const education = [
@@ -380,6 +423,36 @@ export const projects = [
         tech: ['React', 'Framer Motion', 'Vite', 'Animations'],
         link: 'https://international-womens-day-chi.vercel.app/',
         icon: 'heart',
+        type: 'project',
+    },
+    {
+        title: 'Advanced DevOps CI/CD & Code Quality Platform',
+        description: 'A complete local DevOps lab project demonstrating CI/CD automation, containerized deployment, code quality analysis, reverse proxy configuration, monitoring, and deployment automation.',
+        longDescription: 'Built a full-stack task manager with React, Node.js, Express, and PostgreSQL, then containerized it with Docker and Docker Compose. Added NGINX as a reverse proxy, Jenkins for CI/CD, SonarQube for code quality analysis, Ansible for deployment automation, and Prometheus/Grafana with Node Exporter for monitoring.',
+        tech: ['React', 'Vite', 'Node.js', 'Express.js', 'PostgreSQL', 'Docker', 'Docker Compose', 'NGINX', 'Jenkins', 'SonarQube', 'Ansible', 'Prometheus', 'Grafana', 'Linux'],
+        link: '#',
+        githubUrl: 'https://github.com/yahyaegz/advanced-devops-sonarqube',
+        localNote: 'Local DevOps lab project running inside a VMware Ubuntu environment.',
+        image: '/projects/advanced-devops/jenkins-pipeline.png',
+        screenshots: [
+            { title: 'Jenkins successful pipeline', src: '/projects/advanced-devops/jenkins-pipeline.png' },
+            { title: 'SonarQube dashboard', src: '/projects/advanced-devops/sonarqube-dashboard.png' },
+            { title: 'Docker containers status', src: '/projects/advanced-devops/grafana-dashboard.png' },
+        ],
+        keyFeatures: [
+            'React frontend and Node.js backend API',
+            'PostgreSQL database with initialization script',
+            'NGINX reverse proxy',
+            'Docker Compose multi-container stack',
+            'Jenkins CI/CD pipeline',
+            'Backend test and frontend build stages',
+            'SonarQube code quality analysis',
+            'Docker image build and deployment',
+            'Prometheus and Grafana monitoring',
+            'Ansible deployment automation',
+            'Health check after deployment',
+        ],
+        icon: 'diagram-project',
         type: 'project',
     },
 ];

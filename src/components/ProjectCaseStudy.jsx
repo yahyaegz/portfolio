@@ -43,6 +43,16 @@ const CASE_STUDY_DATA = {
                 { label: "Page Weight & Bundle Size", value: "< 140 KB" },
                 { label: "Social Media Share telemetries", value: "+800" }
             ]
+        },
+        "Advanced DevOps CI/CD & Code Quality Platform": {
+            problem: "Many full-stack projects stop at application code and miss the operational workflow around shipping, checking quality, routing traffic, and observing runtime health. This project was built as a local DevOps lab to practice those real-world delivery steps end to end.",
+            role: "Full-stack and DevOps implementer. Built the task manager app, containerized the services, configured Jenkins pipeline stages, connected SonarQube analysis, added NGINX routing, automated deployment with Ansible, and wired monitoring with Prometheus, Grafana, and Node Exporter.",
+            architecture: "React and Vite power the frontend, Node.js and Express provide the API layer, and PostgreSQL stores task data. Docker Compose coordinates the app, database, reverse proxy, CI/CD, code quality, and monitoring services inside a VMware Ubuntu lab environment.",
+            metrics: [
+                { label: "Pipeline Automation", value: "Jenkins" },
+                { label: "Code Quality Gate", value: "SonarQube" },
+                { label: "Monitoring Stack", value: "Grafana" }
+            ]
         }
     },
     ar: {
@@ -130,6 +140,35 @@ const CASE_STUDY_DATA = {
         }
     }
 };
+
+function ScreenshotSlot({ screenshot }) {
+    const [imageFailed, setImageFailed] = useState(false);
+
+    return (
+        <div className="rounded-xl border border-accent/20 bg-slate-950/60 overflow-hidden">
+            <div className="aspect-video flex items-center justify-center bg-gradient-to-br from-accent/10 to-cyan-400/10">
+                {screenshot.src && !imageFailed ? (
+                    <img
+                        src={screenshot.src}
+                        alt={screenshot.title}
+                        className="h-full w-full object-cover"
+                        loading="lazy"
+                        onError={() => setImageFailed(true)}
+                    />
+                ) : (
+                    <div className="flex flex-col items-center justify-center gap-2 px-4 text-center">
+                        <i className="fa fa-image text-2xl text-accent/70" />
+                        <span className="text-[11px] font-semibold text-secondary">{screenshot.src}</span>
+                    </div>
+                )}
+            </div>
+            <div className="border-t border-accent/10 px-3 py-2">
+                <p className="text-xs font-bold text-accent">{screenshot.title}</p>
+                <p className="text-[10px] text-muted break-all">{screenshot.src}</p>
+            </div>
+        </div>
+    );
+}
 
 export default function ProjectCaseStudy({ isOpen, onClose, project }) {
     const { t, language } = useLanguage();
@@ -276,6 +315,36 @@ export default function ProjectCaseStudy({ isOpen, onClose, project }) {
                                                     {study.role}
                                                 </p>
                                             </div>
+
+                                            {(project.longDescription || project.localNote || project.keyFeatures?.length > 0) && (
+                                                <div className="card-bg border rounded-2xl p-5 space-y-4">
+                                                    <h3 className="text-base font-bold text-accent uppercase tracking-wider flex items-center gap-2">
+                                                        <span className="w-1.5 h-4 bg-accent rounded-full inline-block" />
+                                                        Project Scope
+                                                    </h3>
+                                                    {project.longDescription && (
+                                                        <p className="text-secondary text-sm md:text-base leading-relaxed">
+                                                            {project.longDescription}
+                                                        </p>
+                                                    )}
+                                                    {project.localNote && (
+                                                        <p className="rounded-lg border border-accent/20 bg-accent/5 px-3 py-2 text-xs font-semibold text-secondary">
+                                                            <i className="fa fa-server text-accent mr-2" />
+                                                            {project.localNote}
+                                                        </p>
+                                                    )}
+                                                    {project.keyFeatures?.length > 0 && (
+                                                        <div className="grid gap-2 sm:grid-cols-2">
+                                                            {project.keyFeatures.map((feature) => (
+                                                                <div key={feature} className="flex items-start gap-2 text-xs text-secondary">
+                                                                    <i className="fa fa-check-circle text-accent mt-0.5" />
+                                                                    <span>{feature}</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
                                     )}
 
@@ -306,6 +375,20 @@ export default function ProjectCaseStudy({ isOpen, onClose, project }) {
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            {project.screenshots?.length > 0 && (
+                                                <div className="card-bg border rounded-2xl p-5 space-y-4">
+                                                    <h3 className="text-base font-bold text-accent uppercase tracking-wider flex items-center gap-2">
+                                                        <span className="w-1.5 h-4 bg-cyan-400 rounded-full inline-block" />
+                                                        Project Screenshots
+                                                    </h3>
+                                                    <div className="grid gap-4 sm:grid-cols-2">
+                                                        {project.screenshots.map((screenshot) => (
+                                                            <ScreenshotSlot key={screenshot.src} screenshot={screenshot} />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
 
@@ -388,7 +471,7 @@ export default function ProjectCaseStudy({ isOpen, onClose, project }) {
                             </motion.a>
                         )}
                         <motion.a
-                            href="https://github.com/yahyaegz"
+                            href={project.githubUrl || 'https://github.com/yahyaegz'}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex-1 min-w-[140px] text-center inline-flex items-center justify-center gap-2 rounded-full border-2 border-accent/40 text-accent font-semibold py-3 hover:bg-accent/10 transition duration-300"

@@ -90,15 +90,27 @@ function cleanForSpeech(text) {
         .slice(0, 900);
 }
 
+function formatSkillCategory(category) {
+    if (category.groups?.length) {
+        return `${category.category}: ${category.groups
+            .map(group => `${group.label}: ${group.items.map(item => item.title).join(', ')}`)
+            .join('; ')}`;
+    }
+
+    return `${category.category}: ${category.items.map(item => item.title).join(', ')}`;
+}
+
 function buildWebsiteKnowledge() {
     const skillsSummary = skills
-        .map(category => `${category.category}: ${category.items.map(item => item.title).join(', ')}`)
+        .map(formatSkillCategory)
         .join('\n');
     const projectsSummary = projects
         .map(project => [
             `${project.title}: ${project.description}`,
             `Tech: ${project.tech.join(', ')}`,
             project.link && project.link !== '#' ? `Link: ${project.link}` : null,
+            project.githubUrl ? `GitHub: ${project.githubUrl}` : null,
+            project.localNote || null,
         ].filter(Boolean).join(' | '))
         .join('\n');
     const experienceSummary = experience
@@ -148,13 +160,13 @@ Summary: ${profile.summary}
 POSITIONING
 Top skills: ${topSkills.join(', ')}
 Core competencies: ${coreCompetencies.join(', ')}
-Open to: opportunities, freelance projects, collaboration, full-stack work, backend/API work, AI/ML integrations, and SaaS/product work.
-Favorite technologies: React for frontend, Node.js and ASP.NET Core for backend, Python for AI/ML.
+Open to: opportunities, freelance projects, collaboration, full-stack work, backend/API work, AI/ML integrations, DevOps learning projects, and SaaS/product work.
+Favorite technologies: React for frontend, Node.js and ASP.NET Core for backend, Python for AI/ML, and Docker/Jenkins/SonarQube/Prometheus/Grafana for DevOps practice.
 
 WEBSITE SECTIONS
 Home: introduction, profile photo, contact CTA, CV download, social links.
 Services: full-stack development, database design and optimization, secure authentication, machine learning solutions, data analytics, neural networks and deep learning.
-Skills: grouped technical stack across programming, frontend, backend, databases, cloud/tools, and AI/ML.
+Skills: grouped technical stack across programming, frontend, backend, databases, cloud/tools, AI/ML, and DevOps/CI/CD/monitoring.
 Projects: portfolio case studies and external project links when available.
 Education: EHEI Oujda, preparatory classes, baccalaureate.
 Experience: Codveda Technologies and AIR BABOUCHE.

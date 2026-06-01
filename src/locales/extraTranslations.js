@@ -9,7 +9,7 @@ export const extraTranslations = {
             title: "CURRENTLY OPEN TO",
             status: "Available for Opportunities",
             rolesLabel: "Target Roles",
-            roles: "Full-Stack Software Engineer, Backend Architect, AI/ML Integrations",
+            roles: "Full-Stack Developer, Backend/API Work, AI/ML Integrations, DevOps/CI/CD Learning Projects",
             locationLabel: "Location & Work Preference",
             location: "Remote (Worldwide) / Hybrid (Morocco)",
             responseLabel: "Guaranteed Response",
