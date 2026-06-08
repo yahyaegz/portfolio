@@ -151,6 +151,7 @@ export default function Header() {
         { href: '#home', id: 'home', label: t('nav.home') },
         { href: '#services', id: 'services', label: t('nav.services') },
         { href: '#skills', id: 'skills', label: t('nav.skills') },
+        { href: '#code-canvas', id: 'code-canvas', label: 'Code Canvas' },
         { href: '#projects', id: 'projects', label: t('nav.projects') },
         { href: '#ai-lab', id: 'ai-lab', label: t('nav.aiLab') },
         { href: '#algo-observatory', id: 'algo-observatory', label: 'Observatory' },
