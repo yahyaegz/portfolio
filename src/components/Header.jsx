@@ -168,8 +168,8 @@ export default function Header() {
         <header
             className={`fixed z-50 transition-all duration-500 ${
                 scrolled 
-                    ? 'top-0 left-0 w-full lg:top-4 lg:left-1/2 lg:-translate-x-1/2 lg:w-[96%] lg:max-w-7xl lg:rounded-full backdrop-blur-xl shadow-lg shadow-black/10' 
-                    : 'top-0 left-0 w-full lg:top-4 lg:left-1/2 lg:-translate-x-1/2 lg:w-[96%] lg:max-w-7xl lg:rounded-full backdrop-blur-md'
+                    ? 'top-0 left-0 w-full lg:top-4 lg:left-1/2 lg:-translate-x-1/2 lg:w-[98%] lg:max-w-[1600px] lg:rounded-full backdrop-blur-xl shadow-lg shadow-black/10' 
+                    : 'top-0 left-0 w-full lg:top-4 lg:left-1/2 lg:-translate-x-1/2 lg:w-[98%] lg:max-w-[1600px] lg:rounded-full backdrop-blur-md'
             }`}
             style={{ 
                 backgroundColor: scrolled ? 'color-mix(in srgb, var(--bg-primary) 85%, transparent)' : 'color-mix(in srgb, var(--bg-primary) 40%, transparent)',
@@ -212,8 +212,8 @@ export default function Header() {
                     </motion.button>
                 </div>
 
-                <nav className="hidden xl:block flex-1 px-4" role="navigation" aria-label="Main navigation">
-                    <div className="flex flex-wrap items-center justify-center gap-y-2 gap-x-0.5 xl:gap-x-1 2xl:gap-x-2">
+                <nav className="hidden xl:block" role="navigation" aria-label="Main navigation">
+                    <div className="flex items-center gap-0.5 xl:gap-1 2xl:gap-2">
                         {navItems.map(item => (
                             <motion.a
                                 key={item.href}
