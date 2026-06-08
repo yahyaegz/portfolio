@@ -1,4 +1,6 @@
 import React from 'react';
+import Lazy3DBackground from './Lazy3DBackground';
+import CertificationsBackground from './CertificationsBackground';
 import { motion } from 'framer-motion';
 import { certifications } from '../data';
 import { useLanguage } from '../context/LanguageContext';

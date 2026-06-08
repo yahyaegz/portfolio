@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import Lazy3DBackground from './Lazy3DBackground';
+import ContactBackground from './ContactBackground';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import toast from 'react-hot-toast';

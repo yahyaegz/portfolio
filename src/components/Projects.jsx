@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import Lazy3DBackground from './Lazy3DBackground';
+import ProjectsBackground from './ProjectsBackground';
 import { motion } from 'framer-motion';
 import { projects } from '../data';
 import { useLanguage } from '../context/LanguageContext';
