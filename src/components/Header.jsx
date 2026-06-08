@@ -177,9 +177,8 @@ export default function Header() {
                 borderWidth: scrolled ? '1px' : '0px'
             }}
             dir={isRTL ? 'rtl' : 'ltr'}
-            role="banner"
-        >
-            <div className="mx-auto flex w-full items-center justify-between px-4 sm:px-6 py-2.5 lg:px-6">
+            >
+            <div className="mx-auto flex w-full items-center justify-between px-4 sm:px-6 py-3 lg:px-6 lg:py-4">
                 <motion.a 
                     href="#home" 
                     className="text-2xl font-extrabold tracking-tight flex items-center gap-2 text-accent shrink-0" 
@@ -213,8 +212,8 @@ export default function Header() {
                     </motion.button>
                 </div>
 
-                <nav className="hidden xl:block" role="navigation" aria-label="Main navigation">
-                    <div className="flex items-center gap-0.5 xl:gap-1 2xl:gap-2">
+                <nav className="hidden xl:block flex-1 px-4" role="navigation" aria-label="Main navigation">
+                    <div className="flex flex-wrap items-center justify-center gap-y-2 gap-x-0.5 xl:gap-x-1 2xl:gap-x-2">
                         {navItems.map(item => (
                             <motion.a
                                 key={item.href}
