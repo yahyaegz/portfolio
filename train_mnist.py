@@ -10,14 +10,37 @@ print("Fetching MNIST dataset (70,000 samples)...")
 mnist = fetch_openml('mnist_784', version=1, parser='auto')
 X, y = mnist.data.to_numpy(), mnist.target.to_numpy().astype(int)
 
-# Use ALL 70,000 samples
-print(f"Total samples: {len(X)}")
+print(f"Total original samples: {len(X)}")
 
 # Normalise pixels to [0, 1]
 X = X / 255.0
 
-print(f"Training deep MLP (784 -> 256 -> 128 -> 10) on {len(X)} samples with ReLU + Adam...")
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=42)
+print("Augmenting data (random shifts to improve robustness)...")
+import scipy.ndimage
+np.random.seed(42)
+
+X_aug = []
+y_aug = []
+
+for img, label in zip(X, y):
+    # Keep original
+    X_aug.append(img)
+    y_aug.append(label)
+    
+    # Add one shifted version (up to +/- 2 pixels in x and y)
+    dy, dx = np.random.randint(-2, 3, size=2)
+    if dy != 0 or dx != 0:
+        shifted = scipy.ndimage.shift(img.reshape(28, 28), [dy, dx], cval=0, mode="constant").flatten()
+        X_aug.append(shifted)
+        y_aug.append(label)
+
+X_aug = np.array(X_aug)
+y_aug = np.array(y_aug)
+
+print(f"Total samples after augmentation: {len(X_aug)}")
+
+print(f"Training deep MLP (784 -> 256 -> 128 -> 10) on {len(X_aug)} samples with ReLU + Adam...")
+X_train, X_test, y_train, y_test = train_test_split(X_aug, y_aug, test_size=0.1, random_state=42)
 
 # Train a highly accurate deep MLP classifier using ReLU activations
 # ReLU converges much faster and achieves higher accuracy than sigmoid
