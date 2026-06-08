@@ -607,34 +607,58 @@ const RAW_TEMPLATES = [
 
 class MNISTPretrainedMLP {
     constructor(weights) {
-        this.w1 = weights.w1; // (64, 784)
-        this.b1 = weights.b1; // (64,)
-        this.w2 = weights.w2; // (10, 64)
-        this.b2 = weights.b2; // (10,)
-        this.inputSize = 784;
-        this.hiddenSize = 64;
-        this.outputSize = 10;
+        // Support new multi-layer format { architecture, layers: [{w, b}] }
+        // as well as old legacy format { w1, b1, w2, b2 }
+        if (weights.layers) {
+            this.layers = weights.layers; // [{w:(out,in), b:(out,)}]
+            this.architecture = weights.architecture || 'relu';
+        } else {
+            // Legacy sigmoid 2-layer format
+            this.layers = [
+                { w: weights.w1, b: weights.b1 },
+                { w: weights.w2, b: weights.b2 },
+            ];
+            this.architecture = 'sigmoid';
+        }
     }
-    sigmoid(x) {
-        return 1.0 / (1.0 + Math.exp(-Math.max(-15, Math.min(15, x))));
+
+    relu(x) { return x > 0 ? x : 0; }
+    sigmoid(x) { return 1.0 / (1.0 + Math.exp(-Math.max(-15, Math.min(15, x)))); }
+
+    // Softmax over raw logits for a stable, calibrated output
+    softmax(arr) {
+        const maxVal = Math.max(...arr);
+        const exps = arr.map(v => Math.exp(Math.min(v - maxVal, 80)));
+        const sum = exps.reduce((a, b) => a + b, 0);
+        return exps.map(v => v / sum);
     }
+
     forward(inputs) {
-        const h = Array(this.hiddenSize).fill(0);
-        for (let j = 0; j < this.hiddenSize; j++) {
-            let sum = this.b1[j];
-            for (let i = 0; i < this.inputSize; i++) {
-                sum += inputs[i] * this.w1[j][i];
+        let current = inputs;
+        const isRelu = this.architecture === 'relu';
+
+        for (let li = 0; li < this.layers.length; li++) {
+            const { w, b } = this.layers[li];
+            const isLastLayer = li === this.layers.length - 1;
+            const next = Array(w.length).fill(0);
+
+            for (let j = 0; j < w.length; j++) {
+                let sum = b[j];
+                for (let i = 0; i < w[j].length; i++) {
+                    sum += current[i] * w[j][i];
+                }
+                if (isLastLayer) {
+                    // Raw logit — will apply softmax after
+                    next[j] = sum;
+                } else {
+                    next[j] = isRelu ? this.relu(sum) : this.sigmoid(sum);
+                }
             }
-            h[j] = this.sigmoid(sum);
+            current = next;
         }
-        const out = Array(this.outputSize).fill(0);
-        for (let k = 0; k < this.outputSize; k++) {
-            let sum = this.b2[k];
-            for (let j = 0; j < this.hiddenSize; j++) {
-                sum += h[j] * this.w2[k][j];
-            }
-            out[k] = this.sigmoid(sum);
-        }
+
+        // Apply softmax on final logits for proper probability distribution
+        const out = this.softmax(current);
         return { out };
     }
 }
@@ -1201,17 +1225,13 @@ export default function AILab() {
         }
         
         // 4. Run forward propagation through our pre-trained high-accuracy MNIST neural network!
+        // The model's forward() already returns proper softmax probabilities.
         const { out } = pretrainedMNISTModel.forward(inputs);
         
-        // Normalize confidences using softmax so they are smooth and add up to 100%
-        // Softmax with temperature scaling (e.g. 7.0) ensures clean classification decisions
-        const sumExp = out.reduce((s, v) => s + Math.exp(v * 7.0), 0);
-        const probs = out.map(v => Math.exp(v * 7.0) / sumExp);
+        setPredictions(out);
         
-        setPredictions(probs);
-        
-        const winningIndex = probs.indexOf(Math.max(...probs));
-        if (Math.max(...probs) > 0.2) {
+        const winningIndex = out.indexOf(Math.max(...out));
+        if (Math.max(...out) > 0.15) {
             setActiveNodes([winningIndex]);
         } else {
             setActiveNodes([]);

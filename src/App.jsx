@@ -12,10 +12,13 @@ const IntroSequence = lazy(() => import('./components/IntroSequence'));
 const ScrollWarpDivider = lazy(() => import('./components/ScrollWarpDivider'));
 const Services = lazy(() => import('./components/Services'));
 const Skills = lazy(() => import('./components/Skills'));
+const CodeCanvas = lazy(() => import('./components/CodeCanvas'));
 const Projects = lazy(() => import('./components/Projects'));
 const AILab = lazy(() => import('./components/AILab'));
+const AlgorithmObservatory = lazy(() => import('./components/AlgorithmObservatory'));
 const InteractiveCV = lazy(() => import('./components/InteractiveCV'));
 const DevArcade = lazy(() => import('./components/DevArcade'));
+const DevOpsMissionControl = lazy(() => import('./components/DevOpsMissionControl'));
 const Certifications = lazy(() => import('./components/Certifications'));
 const CallToAction = lazy(() => import('./components/CallToAction'));
 const Contact = lazy(() => import('./components/Contact'));
@@ -74,16 +77,22 @@ export default function App() {
                 <Suspense fallback={<SkeletonLoader />}>
                     <ScrollWarpDivider />
                     <Services />
-                    <ScrollWarpDivider flip />
+                    <ScrollWarpDivider />
                     <Skills />
+                    <ScrollWarpDivider flip />
+                    <CodeCanvas />
                     <ScrollWarpDivider />
                     <Projects />
                     <ScrollWarpDivider flip />
                     <AILab />
                     <ScrollWarpDivider />
-                    <InteractiveCV />
+                    <AlgorithmObservatory />
                     <ScrollWarpDivider flip />
+                    <InteractiveCV />
+                    <ScrollWarpDivider />
                     <DevArcade />
+                    <ScrollWarpDivider flip />
+                    <DevOpsMissionControl />
                     <ScrollWarpDivider />
                     <Certifications />
                     <ScrollWarpDivider />
