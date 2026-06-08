@@ -35,8 +35,8 @@ const OutrunSun = () => {
 
 export default function RetroBackground() {
     return (
-        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none" style={{ backgroundColor: '#050710' }}>
-            <>
+        <>
+
             <PerspectiveCamera makeDefault position={[0, 2, 10]} fov={60} />
             
                 <color attach="background" args={['#050710']} />
@@ -49,18 +49,7 @@ export default function RetroBackground() {
                 {/* Ambient glow */}
                 <ambientLight intensity={0.5} />
                 <pointLight position={[0, 5, -50]} intensity={2} color="#ff2a6d" />
-            </>
             
-            {/* Scanline overlay effect */}
-            <div 
-                className="absolute inset-0 pointer-events-none opacity-30 mix-blend-overlay"
-                style={{
-                    backgroundImage: 'url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9InRyYW5zcGFyZW50Ii8+PHJlY3Qgd2lkdGg9IjQiIGhlaWdodD0iMSIgZmlsbD0icmdiYSgwLCAwLCAwLCAwLjcpIi8+PC9zdmc+")',
-                    backgroundSize: '4px 4px'
-                }}
-            />
-            {/* Bottom horizon glow */}
-            <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-[#ff007f]/10 to-transparent pointer-events-none mix-blend-screen" />
-        </div>
+        </>
     );
 }
