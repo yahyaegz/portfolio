@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import SplitTextReveal from './SplitTextReveal';
 import RetroBackground from './RetroBackground';
+import Lazy3DBackground from './Lazy3DBackground';
 
 // ─── Shared Utility ───────────────────────────────────────────────────────────
 const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
@@ -1625,7 +1626,7 @@ export default function DevArcade() {
 
     return (
         <section id="dev-arcade" className="section-dark relative overflow-hidden" aria-labelledby="arcade-heading">
-            <RetroBackground />
+            <Lazy3DBackground><RetroBackground /></Lazy3DBackground>
             <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 md:py-20 relative z-10">
 
                 {/* Header */}

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { profile } from '../data';
 import { useLanguage } from '../context/LanguageContext';
 import CurrentlyOpenTo from './CurrentlyOpenTo';
+import Lazy3DBackground from './Lazy3DBackground';
 
 const ParticleGlobe = lazy(() => import('./ParticleGlobe'));
 
@@ -32,7 +33,7 @@ export default function Hero() {
             <div className="absolute inset-0 z-0 hero-mesh" aria-hidden="true" />
 
             <Suspense fallback={null}>
-                <ParticleGlobe />
+                <Lazy3DBackground className="z-0"><ParticleGlobe /></Lazy3DBackground>
             </Suspense>
 
             <motion.div

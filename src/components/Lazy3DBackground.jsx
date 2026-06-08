@@ -3,8 +3,8 @@ import { useInView } from 'framer-motion';
 
 export default function Lazy3DBackground({ children, className = '' }) {
     const ref = useRef(null);
-    // Use a large margin so it mounts slightly before scrolling into view to avoid pop-in
-    const isInView = useInView(ref, { margin: '600px 0px 600px 0px' });
+    // Use a negative margin to ensure the canvas ONLY mounts when it takes up a significant portion of the screen
+    const isInView = useInView(ref, { margin: '-25% 0px -25% 0px' });
     const [shouldRender, setShouldRender] = useState(false);
 
     useEffect(() => {
