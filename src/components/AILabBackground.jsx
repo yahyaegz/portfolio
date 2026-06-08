@@ -1,3 +1,4 @@
+import WebGLDisposer from './WebGLDisposer';
 import React, { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -56,6 +57,7 @@ const NeuralNetwork = () => {
 export default function AILabBackground() {
     return (
         <Canvas camera={{ position: [0, 0, 15], fov: 60 }} gl={{ antialias: true }}>
+            <WebGLDisposer />
             <color attach="background" args={['#03050a']} />
             <fog attach="fog" args={['#03050a', 10, 25]} />
             <NeuralNetwork />

@@ -1,3 +1,4 @@
+import WebGLDisposer from './WebGLDisposer';
 import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 
@@ -20,6 +21,7 @@ const DigitalRoad = () => {
 export default function InteractiveCVBackground() {
     return (
         <Canvas camera={{ position: [0, 2, 10], fov: 60 }} gl={{ antialias: true }}>
+            <WebGLDisposer />
             <color attach="background" args={['#040914']} />
             <fog attach="fog" args={['#040914', 5, 25]} />
             <DigitalRoad />

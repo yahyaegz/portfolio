@@ -1,3 +1,4 @@
+import WebGLDisposer from './WebGLDisposer';
 import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Stars, Trail } from '@react-three/drei';
@@ -36,6 +37,7 @@ export default function RetroBackground() {
     return (
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none" style={{ backgroundColor: '#050710' }}>
             <Canvas camera={{ position: [0, 2, 10], fov: 60 }} gl={{ antialias: true }}>
+            <WebGLDisposer />
                 <color attach="background" args={['#050710']} />
                 <fog attach="fog" args={['#050710', 20, 80]} />
                 

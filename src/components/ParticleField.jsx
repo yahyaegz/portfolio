@@ -1,3 +1,4 @@
+import WebGLDisposer from './WebGLDisposer';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { AdditiveBlending, Color, MathUtils } from 'three';
@@ -230,6 +231,7 @@ export default function ParticleField() {
                 gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
                 style={{ background: 'transparent' }}
             >
+                <WebGLDisposer />
                 <FieldRig animated compact={compact} motionScale={motionScale} />
             </Canvas>
         </div>

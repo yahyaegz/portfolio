@@ -1,3 +1,4 @@
+import WebGLDisposer from './WebGLDisposer';
 import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Float } from '@react-three/drei';
@@ -22,6 +23,7 @@ const Shape = ({ position, color, scale }) => {
 export default function ServicesBackground() {
     return (
         <Canvas camera={{ position: [0, 0, 10], fov: 50 }} gl={{ antialias: true }}>
+            <WebGLDisposer />
             <color attach="background" args={['#050810']} />
             <ambientLight intensity={0.5} />
             <pointLight position={[10, 10, 10]} intensity={1} />

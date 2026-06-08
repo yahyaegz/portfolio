@@ -1,3 +1,4 @@
+import WebGLDisposer from './WebGLDisposer';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { AdditiveBlending, Color, MathUtils } from 'three';
@@ -298,6 +299,7 @@ export default function ParticleGlobe() {
                 gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
                 style={{ background: 'transparent' }}
             >
+            <WebGLDisposer />
                 <GlobeRig animated compact={compact} motionScale={motionScale} />
             </Canvas>
         </div>

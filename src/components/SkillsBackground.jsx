@@ -1,3 +1,4 @@
+import WebGLDisposer from './WebGLDisposer';
 import React, { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -50,6 +51,7 @@ const ParticleGalaxy = () => {
 export default function SkillsBackground() {
     return (
         <Canvas camera={{ position: [0, 2, 8], fov: 60 }} gl={{ antialias: true }}>
+            <WebGLDisposer />
             <color attach="background" args={['#050810']} />
             <ParticleGalaxy />
             <fog attach="fog" args={['#050810', 4, 14]} />

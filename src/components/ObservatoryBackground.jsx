@@ -1,3 +1,4 @@
+import WebGLDisposer from './WebGLDisposer';
 import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -47,6 +48,7 @@ const OrbitingSpheres = () => {
 export default function ObservatoryBackground() {
     return (
         <Canvas camera={{ position: [0, 2, 10], fov: 60 }} gl={{ antialias: true }}>
+            <WebGLDisposer />
             <color attach="background" args={['#050810']} />
             <fog attach="fog" args={['#050810', 5, 20]} />
             <OrbitingSpheres />

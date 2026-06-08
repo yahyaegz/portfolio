@@ -1,3 +1,4 @@
+import WebGLDisposer from './WebGLDisposer';
 import React, { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 
@@ -43,6 +44,7 @@ const DataBlocks = () => {
 export default function CodeCanvasBackground() {
     return (
         <Canvas camera={{ position: [0, 0, 10], fov: 60 }}>
+            <WebGLDisposer />
             <color attach="background" args={['#040914']} />
             <fog attach="fog" args={['#040914', 5, 18]} />
             <DataBlocks />

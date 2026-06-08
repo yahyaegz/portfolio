@@ -1,3 +1,4 @@
+import WebGLDisposer from './WebGLDisposer';
 import React, { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -55,6 +56,7 @@ const Waveform = () => {
 export default function ContactBackground() {
     return (
         <Canvas camera={{ position: [0, 2, 10], fov: 60 }} gl={{ antialias: true }}>
+            <WebGLDisposer />
             <color attach="background" args={['#050810']} />
             <fog attach="fog" args={['#050810', 5, 18]} />
             <Waveform />
