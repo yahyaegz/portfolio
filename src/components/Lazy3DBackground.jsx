@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useInView } from 'framer-motion';
+import { View } from '@react-three/drei';
 
 export default function Lazy3DBackground({ children, className = '' }) {
     const ref = useRef(null);
@@ -18,7 +19,7 @@ export default function Lazy3DBackground({ children, className = '' }) {
 
     return (
         <div ref={ref} className={`absolute inset-0 pointer-events-none -z-10 overflow-hidden ${className}`}>
-            {shouldRender && children}
+            {shouldRender && <View className="w-full h-full absolute inset-0">{children}</View>}
         </div>
     );
 }
