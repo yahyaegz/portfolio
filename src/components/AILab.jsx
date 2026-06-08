@@ -192,10 +192,25 @@ function normalizeMatrix28x28(matrix) {
     let minRow = 28, maxRow = 0, minCol = 28, maxCol = 0;
     let hasStroke = false;
     
+    // Normalize to [0, 1] first so bounding box threshold is robust
+    let maxVal = 0;
+    for (let r = 0; r < 28; r++) {
+        for (let c = 0; c < 28; c++) {
+            if (matrix[r][c] > maxVal) maxVal = matrix[r][c];
+        }
+    }
+    if (maxVal > 0) {
+        for (let r = 0; r < 28; r++) {
+            for (let c = 0; c < 28; c++) {
+                matrix[r][c] /= maxVal;
+            }
+        }
+    }
+    
     // 1. Find Bounding Box
     for (let r = 0; r < 28; r++) {
         for (let c = 0; c < 28; c++) {
-            if (matrix[r][c] > 0.05) {
+            if (matrix[r][c] > 0.1) {
                 if (r < minRow) minRow = r;
                 if (r > maxRow) maxRow = r;
                 if (c < minCol) minCol = c;
