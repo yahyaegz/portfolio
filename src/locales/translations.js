@@ -74,7 +74,19 @@ export const translations = {
             titleSpan: 'Experience',
             subtitle: 'Real-world experience building solutions and collaborating with talented teams.',
             visitCompany: 'Visit Company',
+            viewCertificate: 'View Certificate',
             items: [
+                {
+                    role: 'Software Engineer / Full-Stack Developer (Freelance)',
+                    location: 'Remote',
+                    summary: 'Designed and built a responsive e-commerce website on Wix with a high-end "dark luxury" visual identity for a Moroccan artisanal leather brand based in London. Managed full store architecture, SEO optimization, and brand content strategy.',
+                    highlights: [
+                        'Designed and structured a responsive e-commerce site on Wix with a high-end "dark luxury" visual identity',
+                        'Configured store architecture: product categories, payment gateways, and shipping settings',
+                        'Optimized SEO with proper heading hierarchy (H1, H2, H3), keyword optimization, meta descriptions, and alt texts',
+                        'Crafted brand content showcasing Moroccan craftsmanship and London heritage, and configured the domain name',
+                    ],
+                },
                 {
                     role: 'Full-Stack Development Intern',
                     location: 'Remote',
@@ -109,6 +121,7 @@ export const translations = {
             techStack: 'TECH STACK',
             items: [
                 { title: 'Cliniko - AI Healthcare SaaS Platform', description: 'SaaS platform for clinic management including patient records, appointment scheduling and AI-powered intelligent search. Built with Next.js, PostgreSQL, and AI integration.' },
+                { title: 'Cactus Leather London — E-Commerce Website', description: 'Responsive e-commerce website built on Wix with a high-end "dark luxury" visual identity for a Moroccan artisanal leather brand based in London. Includes full store architecture, SEO optimization, and brand content strategy.' },
                 { title: 'AIR BABOUCHE E-Commerce Platform', description: 'Full-stack e-commerce platform with secure authentication, product management, and payment integration. Built with React, Node.js, and MySQL.' },
                 { title: 'Portfolio Website', description: 'Modern portfolio website showcasing projects, skills, and professional experience. Built with React and Tailwind CSS, deployed on Vercel.', link: 'https://y7ya.vercel.app/' },
                 { title: "Women's Day Tribute", description: "An animated React celebration page honoring inspiring women around the world. Built to celebrate International Women's Day – March 8 💜 This project creates a beautiful interactive experience with animations, particles, inspirational quotes, and famous women showcases.", link: 'https://international-womens-day-chi.vercel.app/' },
@@ -312,11 +325,33 @@ export const translations = {
             titleSpan: 'المهنية',
             subtitle: 'خبرة واقعية في بناء الحلول والتعاون مع فرق عمل موهوبة.',
             visitCompany: 'زيارة الشركة',
+            viewCertificate: 'عرض الشهادة',
             items: [
+                {
+                    role: 'مهندس برمجيات / مطور Full-Stack (مستقل)',
+                    location: 'عن بعد',
+                    summary: 'تصميم وبناء موقع تجارة إلكترونية متجاوب على Wix بهوية بصرية فاخرة "dark luxury" لعلامة تجارية مغربية حرفية متخصصة في الجلود ومقرها لندن. إدارة بنية المتجر الكاملة وتحسين محركات البحث واستراتيجية محتوى العلامة التجارية.',
+                    highlights: [
+                        'تصميم وهيكلة موقع تجارة إلكترونية متجاوب على Wix بهوية بصرية فاخرة "dark luxury"',
+                        'تكوين بنية المتجر: فئات المنتجات وبوابات الدفع وإعدادات الشحن',
+                        'تحسين محركات البحث مع تسلسل هرمي صحيح للعناوين (H1, H2, H3) وتحسين الكلمات المفتاحية والأوصاف التعريفية والنصوص البديلة',
+                        'صياغة محتوى العلامة التجارية بما يُبرز الحرف المغربية والإرث اللندني، وتكوين اسم النطاق',
+                    ],
+                },
                 {
                     role: 'متدرب تطوير Full-Stack',
                     location: 'عن بعد',
                     summary: 'تم اختياري كمتدرب لتطوير Full-Stack في Codveda Technologies، للعمل على مهام تطوير الويب الشاملة في العالم الحقيقي بما في ذلك بناء واجهات REST APIs، وتطوير واجهات الـ Frontend، وتكامل قواعد البيانات، وتنفيذ أنظمة المصادقة.',
+                    highlights: [
+                        'العمل على مهام تطوير ويب Full-Stack حقيقية',
+                        'تطوير مكونات الواجهة الأمامية والخلفية',
+                        'دمج واجهات البرمجة التطبيقية وتحسين أداء التطبيق',
+                        'بناء تطبيقات ويب قابلة للتوسع وسهلة الاستخدام',
+                        'التعاون عن بعد مع تسليم مهام المشروع ضمن المواعيد النهائية',
+                    ],
+                },
+                {
+                    role: 'متدرب تطوير Full-Stack',
                     highlights: [
                         'العمل على مهام تطوير ويب Full-Stack حقيقية',
                         'تطوير مكونات الواجهة الأمامية والخلفية',
@@ -359,6 +394,7 @@ export const translations = {
             techStack: 'التقنيات المستخدمة',
             items: [
                 { title: 'Cliniko - منصة SaaS للرعاية الصحية بالذكاء الاصطناعي', description: 'منصة SaaS لإدارة العيادات تشمل سجلات المرضى وجدولة المواعيد والبحث الذكي المدعوم بالذكاء الاصطناعي. مبنية بـ Next.js و PostgreSQL وتكامل الذكاء الاصطناعي.' },
+                { title: 'Cactus Leather London — موقع تجارة إلكترونية', description: 'موقع تجارة إلكترونية متجاوب مبني على Wix بهوية بصرية فاخرة "dark luxury" لعلامة تجارية مغربية حرفية متخصصة في الجلود ومقرها لندن. يشمل بنية المتجر الكاملة وتحسين محركات البحث واستراتيجية محتوى العلامة التجارية.' },
                 { title: 'منصة AIR BABOUCHE للتجارة الإلكترونية', description: 'منصة تجارة إلكترونية Full-Stack مع مصادقة آمنة وإدارة المنتجات وتكامل الدفع. مبنية بـ React و Node.js و MySQL.' },
                 { title: 'موقع Portfolio', description: 'موقع Portfolio حديث يعرض المشاريع والمهارات والخبرة المهنية. مبني بـ React و Tailwind CSS، منشور على Vercel.', link: 'https://y7ya.vercel.app/' },
                 { title: 'تحية ليوم المرأة', description: 'صفحة احتفالية متحركة بـ React تكرم النساء الملهمات حول العالم. بنيت للاحتفال بيوم المرأة العالمي – 8 مارس 💜 تجربة تفاعلية جميلة مع الرسوم المتحركة والجزيئات والاقتباسات الملهمة.', link: 'https://international-womens-day-chi.vercel.app/' },
@@ -561,11 +597,33 @@ export const translations = {
             titleSpan: 'Professionnelle',
             subtitle: 'Expérience concrète dans la création de solutions et la collaboration avec des équipes talentueuses.',
             visitCompany: 'Visiter l\'Entreprise',
+            viewCertificate: 'Voir le Certificat',
             items: [
+                {
+                    role: 'Ingénieur Logiciel / Développeur Full-Stack (Freelance)',
+                    location: 'À distance',
+                    summary: 'Conception et développement d\'un site e-commerce responsive sur Wix avec une identité visuelle "dark luxury" haut de gamme pour une marque marocaine de maroquinerie artisanale basée à Londres. Gestion complète de l\'architecture de la boutique, de l\'optimisation SEO et de la stratégie de contenu de marque.',
+                    highlights: [
+                        'Conception et structuration d\'un site e-commerce responsive sur Wix avec une identité visuelle "dark luxury" haut de gamme',
+                        'Configuration de l\'architecture de la boutique : catégories de produits, passerelles de paiement et paramètres de livraison',
+                        'Optimisation du référencement naturel (SEO) : hiérarchie de balises (H1, H2, H3), mots-clés, descriptions meta et textes alternatifs',
+                        'Rédaction du contenu de marque valorisant l\'artisanat marocain et l\'héritage londonien, et configuration du nom de domaine',
+                    ],
+                },
                 {
                     role: 'Stagiaire en Développement Full-Stack',
                     location: 'À distance',
                     summary: 'Sélectionné en tant que stagiaire en développement Full-Stack chez Codveda Technologies, travaillant sur des tâches de développement web en conditions réelles, notamment la création d\'API REST, le développement d\'interfaces frontend, l\'intégration de bases de données et la mise en œuvre de systèmes d\'authentification.',
+                    highlights: [
+                        'Travail sur des tâches de développement web Full-Stack réelles',
+                        'Développement de composants front-end et back-end',
+                        'Intégration d\'API et optimisation des performances des applications',
+                        'Construction d\'applications web évolutives et conviviales',
+                        'Collaboration à distance tout en respectant les délais des projets',
+                    ],
+                },
+                {
+                    role: 'Stagiaire en Développement Full-Stack',
                     highlights: [
                         'Travail sur des tâches de développement web Full-Stack réelles',
                         'Développement de composants front-end et back-end',
@@ -608,6 +666,7 @@ export const translations = {
             techStack: 'TECHNOLOGIES',
             items: [
                 { title: 'Cliniko - Plateforme SaaS de Santé IA', description: 'Plateforme SaaS pour la gestion de cliniques comprenant les dossiers des patients, la planification des rendez-vous et la recherche intelligente alimentée par l\'IA. Construite avec Next.js, PostgreSQL et l\'intégration de l\'IA.' },
+                { title: 'Cactus Leather London — Site E-Commerce', description: 'Site e-commerce responsive conçu sur Wix avec une identité visuelle "dark luxury" haut de gamme pour une marque marocaine de maroquinerie artisanale basée à Londres. Comprend l\'architecture complète de la boutique, l\'optimisation SEO et la stratégie de contenu de marque.' },
                 { title: 'Plateforme E-Commerce AIR BABOUCHE', description: 'Plateforme e-commerce Full-Stack avec authentification sécurisée, gestion des produits et intégration de paiement. Construite avec React, Node.js et MySQL.' },
                 { title: 'Site Portfolio', description: 'Site portfolio moderne présentant projets, compétences et expérience professionnelle. Construit avec React et Tailwind CSS, déployé sur Vercel.', link: 'https://y7ya.vercel.app/' },
                 { title: 'Hommage à la Journée de la Femme', description: 'Une page de célébration animée en React honorant les femmes inspirantes du monde entier. Créée pour célébrer la Journée internationale de la femme – 8 mars 💜 Une expérience interactive avec des animations, des particules et des citations inspirantes.', link: 'https://international-womens-day-chi.vercel.app/' },
@@ -810,11 +869,33 @@ export const translations = {
             titleSpan: 'Profesional',
             subtitle: 'Experiencia real construyendo soluciones y colaborando con equipos talentosos.',
             visitCompany: 'Visitar Empresa',
+            viewCertificate: 'Ver Certificado',
             items: [
+                {
+                    role: 'Ingeniero de Software / Desarrollador Full-Stack (Freelance)',
+                    location: 'Remoto',
+                    summary: 'Diseño y desarrollo de un sitio e-commerce responsivo en Wix con una identidad visual "dark luxury" de alta gama para una marca marroquí de marroquinería artesanal con sede en Londres. Gestión completa de la arquitectura de la tienda, optimización SEO y estrategia de contenido de marca.',
+                    highlights: [
+                        'Diseño y estructuración de un sitio e-commerce responsivo en Wix con identidad visual "dark luxury" de alta gama',
+                        'Configuración de la arquitectura de la tienda: categorías de productos, pasarelas de pago y configuración de envíos',
+                        'Optimización SEO con jerarquía de encabezados (H1, H2, H3), palabras clave, meta descripciones y textos alternativos',
+                        'Redacción de contenido de marca destacando la artesanía marroquí y el patrimonio londinense, y configuración del nombre de dominio',
+                    ],
+                },
                 {
                     role: 'Pasante de Desarrollo Full-Stack',
                     location: 'Remoto',
                     summary: 'Seleccionado como pasante de desarrollo Full-Stack en Codveda Technologies, trabajando en tareas de desarrollo web del mundo real, incluyendo la creación de API REST, desarrollo de interfaces frontend, integración de bases de datos e implementación de sistemas de autenticación.',
+                    highlights: [
+                        'Trabajo en tareas de desarrollo web Full-Stack del mundo real',
+                        'Desarrollo de componentes front-end y back-end',
+                        'Integración de API y optimización del rendimiento de las aplicaciones',
+                        'Construcción de aplicaciones web escalables y fáciles de usar',
+                        'Colaboración remota cumpliendo con los plazos del proyecto',
+                    ],
+                },
+                {
+                    role: 'Pasante de Desarrollo Full-Stack',
                     highlights: [
                         'Trabajo en tareas de desarrollo web Full-Stack del mundo real',
                         'Desarrollo de componentes front-end y back-end',
@@ -857,6 +938,7 @@ export const translations = {
             techStack: 'TECNOLOGÍAS',
             items: [
                 { title: 'Cliniko - Plataforma SaaS de Salud con IA', description: 'Plataforma SaaS para la gestión de clínicas que incluye historias clínicas, programación de citas y búsqueda inteligente impulsada por IA. Construida con Next.js, PostgreSQL e integración de IA.' },
+                { title: 'Cactus Leather London — Sitio E-Commerce', description: 'Sitio e-commerce responsivo desarrollado en Wix con identidad visual "dark luxury" de alta gama para una marca marroquí de marroquinería artesanal con sede en Londres. Incluye arquitectura completa de la tienda, optimización SEO y estrategia de contenido de marca.' },
                 { title: 'Plataforma E-Commerce AIR BABOUCHE', description: 'Plataforma e-commerce Full-Stack con autenticación segura, gestión de productos e integración de pagos. Construida con React, Node.js y MySQL.' },
                 { title: 'Sitio Web Portfolio', description: 'Sitio portfolio moderno que muestra proyectos, habilidades y experiencia profesional. Construido con React y Tailwind CSS, desplegado en Vercel.', link: 'https://y7ya.vercel.app/' },
                 { title: 'Tributo al Día de la Mujer', description: 'Una página de celebración animada en React que rinde homenaje a mujeres inspiradoras de todo el mundo. Creada para celebrar el Día Internacional de la Mujer – 8 de marzo 💜 Una experiencia interactiva con animaciones, partículas y citas inspiradoras.', link: 'https://international-womens-day-chi.vercel.app/' },

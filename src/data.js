@@ -361,6 +361,21 @@ export const education = [
 
 export const experience = [
     {
+        company: 'Cactus Leather London',
+        role: 'Software Engineer / Full-Stack Developer (Freelance)',
+        period: '2026',
+        location: 'Remote',
+        link: 'https://www.cactusleatherlondon.com/',
+        certificateUrl: '/cactus_leather_certificate.pdf',
+        summary: 'Designed and built a responsive e-commerce website on Wix with a high-end "dark luxury" visual identity for a Moroccan artisanal leather brand based in London. Managed full store architecture, SEO optimization, and brand content strategy.',
+        highlights: [
+            'Designed and structured a responsive e-commerce site on Wix with a high-end "dark luxury" visual identity',
+            'Configured store architecture: product categories, payment gateways, and shipping settings',
+            'Optimized SEO with proper heading hierarchy (H1, H2, H3), keyword optimization, meta descriptions, and alt texts',
+            'Crafted brand content showcasing Moroccan craftsmanship and London heritage, and configured the domain name',
+        ],
+    },
+    {
         company: 'Codveda Technologies',
         role: 'Full-Stack Development Intern',
         period: 'Apr 2026 – May 2026',
@@ -399,6 +414,14 @@ export const projects = [
         tech: ['Next.js', 'React', 'Node.js', 'PostgreSQL', 'Tailwind', 'REST API', 'JWT', 'AI'],
         link: '#',
         icon: 'hospital',
+        type: 'project',
+    },
+    {
+        title: 'Cactus Leather London — E-Commerce Website',
+        description: 'Responsive e-commerce website built on Wix with a high-end "dark luxury" visual identity for a Moroccan artisanal leather brand based in London. Includes full store architecture, SEO optimization, and brand content strategy.',
+        tech: ['Wix', 'E-Commerce', 'SEO', 'Branding', 'Responsive Design', 'UX/UI'],
+        link: 'https://www.cactusleatherlondon.com/',
+        icon: 'store',
         type: 'project',
     },
     {

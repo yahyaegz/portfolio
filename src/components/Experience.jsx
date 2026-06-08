@@ -51,15 +51,29 @@ export default function Experience() {
                                     ))}
                                 </ul>
                             )}
-                            {e.link && e.link !== '#' && (
-                                <a
-                                    className="inline-flex items-center gap-2 text-accent hover:underline transition font-semibold text-sm"
-                                    href={e.link}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    <i className="fa fa-link" /> {t('experience.visitCompany')}
-                                </a>
+                            {(e.link && e.link !== '#' || e.certificateUrl) && (
+                                <div className="flex flex-wrap gap-4">
+                                    {e.link && e.link !== '#' && (
+                                        <a
+                                            className="inline-flex items-center gap-2 text-accent hover:underline transition font-semibold text-sm"
+                                            href={e.link}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            <i className="fa fa-link" /> {t('experience.visitCompany')}
+                                        </a>
+                                    )}
+                                    {e.certificateUrl && (
+                                        <a
+                                            className="inline-flex items-center gap-2 text-accent hover:underline transition font-semibold text-sm"
+                                            href={e.certificateUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            <i className="fa fa-file-certificate" /> {t('experience.viewCertificate') || 'View Certificate'}
+                                        </a>
+                                    )}
+                                </div>
                             )}
                         </TiltCard>
                     ))}

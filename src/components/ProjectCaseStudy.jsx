@@ -4,6 +4,16 @@ import { useLanguage } from '../context/LanguageContext';
 
 const CASE_STUDY_DATA = {
     en: {
+        "Cactus Leather London — E-Commerce Website": {
+            problem: "Cactus Leather London — a Moroccan artisanal brand selling real leather bags, wallets, belts, jackets, rucksacks, and handcrafted accessories from London — had no digital storefront that matched the premium positioning of its products. The brand needed a high-end 'dark luxury' e-commerce experience that communicated Moroccan craftsmanship and London heritage, while being fully operational with payment, shipping, SEO, and domain configuration from day one.",
+            role: "Sole Software Engineer & Full-Stack Developer responsible for the entire project lifecycle: UX design, visual identity, store architecture, SEO strategy, brand copywriting, and technical configuration. Delivered a signed Work Completion Certificate by client Ayoub Badda (Manager) on 06/06/2026.",
+            architecture: "Wix was selected as the platform for its balance of design flexibility and built-in e-commerce infrastructure. The store was structured around curated product collections (bags, wallets, belts, jackets, rucksacks, sling bags, messenger bags, tobacco pouches). A custom 'dark luxury' visual system was designed with brand-consistent colors, typography, spacing and visual hierarchy. SEO was implemented with a proper H1/H2/H3 heading structure, keyword-optimized meta titles and descriptions, and image alt texts. Payment gateway and shipping settings were configured directly on Wix, and the domain cactusleatherlondon.com was connected and verified.",
+            metrics: [
+                { label: "Scope Deliverables Completed", value: "9 / 9" },
+                { label: "SEO Sections Optimized", value: "100%" },
+                { label: "Certificate Signed", value: "06 / 06 / 2026" }
+            ]
+        },
         "Cliniko - AI Healthcare SaaS Platform": {
             problem: "Healthcare clinics often struggle with fragmented management systems, slow patient record retrieval, and high administrative overhead. Cliniko was built to unify scheduling, records management, and AI-powered clinical semantic search under a single secure HIPAA-compliant workspace.",
             role: "Lead Full-Stack Developer responsible for core SaaS tenant separation, database indexing for fast record retrieval, and integrating semantic AI embeddings via OpenAI API to facilitate intelligent clinical search and instant diagnosis helper workflows.",
@@ -56,6 +66,16 @@ const CASE_STUDY_DATA = {
         }
     },
     ar: {
+        "Cactus Leather London — E-Commerce Website": {
+            problem: "كانت علامة Cactus Leather London التجارية — وهي علامة مغربية حرفية تبيع حقائب وأحذية وأحزمة وسترات وحقائب ظهر وإكسسوارات جلدية يدوية من لندن — تفتقر إلى متجر رقمي يعكس مكانتها الفاخرة. احتاجت العلامة إلى تجربة تسوق إلكترونية راقية بأسلوب 'dark luxury' تُبرز الحرافة المغربية والإرث اللندني، مع تهيئة كاملة للدفع والشحن والسيو ونطاق الموقع من اليوم الأول.",
+            role: "مهندس البرمجيات الوحيد والمطور الشامل المسؤول عن كامل دورة حياة المشروع: تصميم تجربة المستخدم، الهوية البصرية، هندسة المتجر، استراتيجية السيو، كتابة محتوى العلامة التجارية، والتهيئة التقنية الكاملة. تم التوقيع على شهادة إتمام العمل من قِبل العميل أيوب بدة (المدير) بتاريخ 06/06/2026.",
+            architecture: "تم اختيار Wix كمنصة لتوازنها بين مرونة التصميم والبنية التحتية المدمجة للتجارة الإلكترونية. هُيِّكِل المتجر حول مجموعات منتجات منسقة (حقائب، محافظ، أحزمة، سترات، حقائب ظهر، حقائب أكتاف، حقائب ساعي البريد، وحقائب التبغ). صُمِّم نظام بصري 'dark luxury' مخصص بألوان وخطوط ومسافات وتسلسل بصري متسق مع هوية العلامة. نُفِّذ السيو بهيكل عناوين H1/H2/H3 صحيح، وعناوين ميتا وأوصاف محسّنة بالكلمات المفتاحية، ونصوص بديلة للصور. تم ضبط بوابة الدفع وإعدادات الشحن مباشرة على Wix، وتم ربح نطاق cactusleatherlondon.com والتحقق منه.",
+            metrics: [
+                { label: "المهام المنجزة", value: "9 / 9" },
+                { label: "أقسام السيو المُحسَّنة", value: "100%" },
+                { label: "تاريخ توقيع الشهادة", value: "06 / 06 / 2026" }
+            ]
+        },
         "Cliniko - AI Healthcare SaaS Platform": {
             problem: "غالباً ما تواجه العيادات الطبية صعوبة في التعامل مع أنظمة الإدارة المجزأة، وبطء استرجاع السجلات الصحية، وارتفاع التكاليف الإدارية. تم بناء منصة Cliniko لتوحيد الجدولة، وإدارة السجلات، والبحث الذكي المدعوم بالذكاء الاصطناعي في مساحة عمل واحدة آمنة ومتوافقة مع معايير HIPAA.",
             role: "مطور Full-Stack الرائد المسؤول عن الفصل الأساسي للمستأجرين في منصة SaaS، وتحسين الفهرسة في قواعد البيانات لاسترجاع السجلات بسرعة، وتكامل تضمينات AI الدلالية عبر واجهة OpenAI لتسهيل البحث العيادي الذكي والمساعدة الفورية في التشخيص.",
@@ -98,6 +118,16 @@ const CASE_STUDY_DATA = {
         }
     },
     fr: {
+        "Cactus Leather London — E-Commerce Website": {
+            problem: "Cactus Leather London — une marque marocaine artisanale vendant des sacs, portefeuilles, ceintures, vestes, sacs à dos et accessoires en cuir véritable depuis Londres — ne disposait d'aucun espace de vente numérique à la hauteur de son positionnement haut de gamme. La marque avait besoin d'une expérience e-commerce 'dark luxury' reflétant l'artisanat marocain et l'héritage londonien, avec une configuration complète dès le premier jour : paiement, livraison, SEO et domaine.",
+            role: "Unique ingénieur logiciel et développeur full-stack, responsable de l'intégralité du cycle de vie du projet : UX design, identité visuelle, architecture de la boutique, stratégie SEO, rédaction du contenu de marque et configuration technique. Le certificat de complétion a été signé par le client Ayoub Badda (Directeur) le 06/06/2026.",
+            architecture: "Wix a été retenu pour son équilibre entre flexibilité de design et infrastructure e-commerce intégrée. La boutique a été structurée autour de collections de produits curatées (sacs, portefeuilles, ceintures, vestes, sacs à dos, sacs bandoulière, sacoches, pochettes à tabac). Un système visuel 'dark luxury' sur mesure a été conçu avec des couleurs, typographies, espacements et une hiérarchie visuelle cohérents avec la marque. Le SEO a été optimisé avec une hiérarchie de balises H1/H2/H3, des titres et descriptions meta optimisés par mots-clés, et des textes alternatifs pour les images. La passerelle de paiement et les paramètres de livraison ont été configurés sur Wix, et le domaine cactusleatherlondon.com a été connecté et vérifié.",
+            metrics: [
+                { label: "Livrables complétés", value: "9 / 9" },
+                { label: "Sections SEO optimisées", value: "100%" },
+                { label: "Certificat signé le", value: "06 / 06 / 2026" }
+            ]
+        },
         "Cliniko - AI Healthcare SaaS Platform": {
             problem: "Les cliniques médicales luttent souvent avec des systèmes fragmentés, la lenteur d'accès aux dossiers et des coûts administratifs élevés. Cliniko a été conçu pour unifier la planification, les dossiers et la recherche sémantique intelligente basée sur l'IA dans un espace sécurisé conforme à HIPAA.",
             role: "Développeur Full-Stack principal. Responsable de la séparation multi-tenant du SaaS, de l'indexation de la base de données PostgreSQL pour un accès rapide, et de l'intégration des embeddings IA d'OpenAI pour faciliter la recherche clinique intelligente.",
