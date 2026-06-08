@@ -432,10 +432,10 @@ export default function CodeCanvas() {
                 </div>
 
                 {/* Tab content */}
-                <AnimatePresence mode="wait">
+                <div className="tab-content">
                     {/* ── FLOW FIELD ── */}
                     {activeTab === 'flowfield' && (
-                        <motion.div key="flowfield" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                        <div className="animate-fade-in">
                             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                                 {/* Controls */}
                                 <div className="lg:col-span-4 space-y-4">
@@ -493,12 +493,12 @@ export default function CodeCanvas() {
                                     </div>
                                 </div>
                             </div>
-                        </motion.div>
+                        </div>
                     )}
 
                     {/* ── FRACTAL TREE ── */}
                     {activeTab === 'fractal' && (
-                        <motion.div key="fractal" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                        <div className="animate-fade-in">
                             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                                 <div className="lg:col-span-4 space-y-4">
                                     <div className="card-bg border rounded-2xl p-5 space-y-4">
@@ -531,12 +531,12 @@ export default function CodeCanvas() {
                                     </div>
                                 </div>
                             </div>
-                        </motion.div>
+                        </div>
                     )}
 
                     {/* ── WAVEFORM ── */}
                     {activeTab === 'waveform' && (
-                        <motion.div key="waveform" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                        <div className="animate-fade-in">
                             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                                 <div className="lg:col-span-4 space-y-4">
                                     <div className="card-bg border rounded-2xl p-5 space-y-4">
@@ -593,9 +593,9 @@ export default function CodeCanvas() {
                                     </div>
                                 </div>
                             </div>
-                        </motion.div>
+                        </div>
                     )}
-                </AnimatePresence>
+                </div>
             </div>
         </section>
     );
