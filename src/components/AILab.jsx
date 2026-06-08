@@ -1030,14 +1030,17 @@ export default function AILab() {
     const initSketchpad = () => {
         const canvas = sketchCanvasRef.current;
         if (!canvas) return;
-        canvas.width = 240;
-        canvas.height = 240;
+        // 280x280 = exact 10× of 28x28 — clean integer downscale, no rounding artifacts
+        canvas.width = 280;
+        canvas.height = 280;
 
         const ctx = canvas.getContext('2d');
         if (ctx) {
             ctx.lineCap = 'round';
-            ctx.lineWidth = 14;
-            ctx.strokeStyle = '#ffffff'; // draw in white on transparent/black
+            ctx.lineJoin = 'round';
+            // 22px brush on 280px canvas ≈ 2.2 cells in 28×28 → matches MNIST stroke width
+            ctx.lineWidth = 22;
+            ctx.strokeStyle = '#ffffff';
             contextRef.current = ctx;
         }
 
@@ -1050,11 +1053,12 @@ export default function AILab() {
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
-        ctx.fillStyle = '#090d16'; // background fill
+        ctx.fillStyle = '#090d16';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
         ctx.lineCap = 'round';
-        ctx.lineWidth = 14;
+        ctx.lineJoin = 'round';
+        ctx.lineWidth = 22;
         ctx.strokeStyle = '#ffffff';
         
         setPredictions(Array(10).fill(0));
@@ -1100,7 +1104,8 @@ export default function AILab() {
         const ctx = canvas.getContext('2d');
         if (ctx) {
             ctx.lineCap = 'round';
-            ctx.lineWidth = 14;
+            ctx.lineJoin = 'round';
+            ctx.lineWidth = 22;
             ctx.strokeStyle = '#ffffff';
             ctx.beginPath();
             ctx.moveTo(x, y);
@@ -1123,7 +1128,8 @@ export default function AILab() {
         const ctx = contextRef.current || canvas.getContext('2d');
         if (ctx) {
             ctx.lineCap = 'round';
-            ctx.lineWidth = 14;
+            ctx.lineJoin = 'round';
+            ctx.lineWidth = 22;
             ctx.strokeStyle = '#ffffff';
             ctx.lineTo(x, y);
             ctx.stroke();
@@ -1179,57 +1185,98 @@ export default function AILab() {
         const canvas = sketchCanvasRef.current;
         if (!canvas) return;
         
+        const W = canvas.width;  // 280
+        const H = canvas.height; // 280
         const ctx = canvas.getContext('2d');
-        // Grabs 240x240 image pixels
-        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        
-        // 1. 28x28 normalized matrix downscaler
-        const grid28x28 = Array(28).fill(0).map(() => Array(28).fill(0));
-        const cellW = canvas.width / 28;
-        const cellH = canvas.height / 28;
-        
-        for (let r = 0; r < 28; r++) {
-            for (let c = 0; c < 28; c++) {
-                let cellSum = 0;
-                let sampleCount = 0;
-                
-                const startX = Math.floor(c * cellW);
-                const startY = Math.floor(r * cellH);
-                
-                for (let sy = startY; sy < startY + cellH; sy += 2) {
-                    for (let sx = startX; sx < startX + cellW; sx += 2) {
-                        const pixelIdx = (sy * canvas.width + sx) * 4;
-                        const redVal = imgData.data[pixelIdx];
-                        cellSum += redVal || 0;
-                        sampleCount++;
+        const imgData = ctx.getImageData(0, 0, W, H);
+        const raw = imgData.data; // RGBA flat array
+
+        // ── Step 1: Extract grayscale float array (0–1) from the red channel ──
+        const gray = new Float32Array(W * H);
+        for (let i = 0; i < W * H; i++) {
+            gray[i] = raw[i * 4] / 255.0;
+        }
+
+        // ── Step 2: Gaussian blur (σ≈1.5, 5×5 kernel) to mimic MNIST smoothness ──
+        // MNIST digits are written with pen on paper then photographed + anti-aliased.
+        // Hard browser canvas edges cause domain shift → blur fixes this.
+        const kernel = [
+            0.0030, 0.0133, 0.0219, 0.0133, 0.0030,
+            0.0133, 0.0596, 0.0983, 0.0596, 0.0133,
+            0.0219, 0.0983, 0.1621, 0.0983, 0.0219,
+            0.0133, 0.0596, 0.0983, 0.0596, 0.0133,
+            0.0030, 0.0133, 0.0219, 0.0133, 0.0030,
+        ];
+        const blurred = new Float32Array(W * H);
+        for (let ry = 0; ry < H; ry++) {
+            for (let rx = 0; rx < W; rx++) {
+                let v = 0;
+                for (let ky = -2; ky <= 2; ky++) {
+                    for (let kx = -2; kx <= 2; kx++) {
+                        const sy = Math.min(H - 1, Math.max(0, ry + ky));
+                        const sx = Math.min(W - 1, Math.max(0, rx + kx));
+                        v += gray[sy * W + sx] * kernel[(ky + 2) * 5 + (kx + 2)];
                     }
                 }
-                
-                const valNorm = (cellSum / (sampleCount || 1)) / 255.0;
-                grid28x28[r][c] = valNorm > 0.08 ? valNorm : 0.0;
+                blurred[ry * W + rx] = v;
             }
         }
 
-        // 2. Center and scale the 28x28 grid to a standard 18x18 bounding box inside 28x28
-        const norm28x28 = normalizeMatrix28x28(grid28x28);
-        
-        // 3. Flatten the normalized 28x28 matrix to 784 inputs for the deep MNIST model
+        // ── Step 3: Downsample to 28×28 by averaging all pixels in each 10×10 cell ──
+        // 280/28 = exactly 10 → no rounding errors, perfect coverage
+        const cellSize = W / 28; // = 10
+        const grid28x28 = Array(28).fill(0).map(() => Array(28).fill(0));
+        for (let r = 0; r < 28; r++) {
+            for (let c = 0; c < 28; c++) {
+                let sum = 0;
+                const startY = r * cellSize;
+                const startX = c * cellSize;
+                for (let py = startY; py < startY + cellSize; py++) {
+                    for (let px = startX; px < startX + cellSize; px++) {
+                        sum += blurred[py * W + px];
+                    }
+                }
+                grid28x28[r][c] = sum / (cellSize * cellSize);
+            }
+        }
+
+        // ── Step 4: 3×3 mean smoothing pass on the 28×28 grid (light, like MNIST) ──
+        const smooth28 = Array(28).fill(0).map(() => Array(28).fill(0));
+        for (let r = 0; r < 28; r++) {
+            for (let c = 0; c < 28; c++) {
+                let s = 0, cnt = 0;
+                for (let dr = -1; dr <= 1; dr++) {
+                    for (let dc = -1; dc <= 1; dc++) {
+                        const nr = r + dr, nc = c + dc;
+                        if (nr >= 0 && nr < 28 && nc >= 0 && nc < 28) {
+                            s += grid28x28[nr][nc];
+                            cnt++;
+                        }
+                    }
+                }
+                smooth28[r][c] = s / cnt;
+            }
+        }
+
+        // ── Step 5: Center and scale bounding box to 18×18 inside 28×28 (MNIST standard) ──
+        const norm28x28 = normalizeMatrix28x28(smooth28);
+
+        // ── Step 6: Flatten to 784-dim input vector ──
         const inputs = norm28x28.flat();
-        
-        // Check if there is any drawing mass
+
+        // Require a minimum ink mass
         const totalMass = inputs.reduce((s, v) => s + v, 0);
-        if (totalMass < 0.1) {
+        if (totalMass < 0.5) {
             setPredictions(Array(10).fill(0));
             setActiveNodes([]);
             return;
         }
-        
-        // 4. Run forward propagation through our pre-trained high-accuracy MNIST neural network!
-        // The model's forward() already returns proper softmax probabilities.
+
+        // ── Step 7: Forward pass through the pre-trained MNIST network ──
         const { out } = pretrainedMNISTModel.forward(inputs);
-        
+
         setPredictions(out);
-        
+
         const winningIndex = out.indexOf(Math.max(...out));
         if (Math.max(...out) > 0.15) {
             setActiveNodes([winningIndex]);
