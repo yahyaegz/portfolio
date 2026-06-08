@@ -2123,6 +2123,10 @@ export default function AILab() {
                                         onMouseMove={draw}
                                         onMouseUp={endDraw}
                                         onMouseLeave={endDraw}
+                                    onTouchStart={startDraw}
+                                    onTouchMove={draw}
+                                    onTouchEnd={endDraw}
+                                    onTouchCancel={endDraw}
                                         className="cursor-crosshair bg-slate-950 block"
                                     />
                                     {predictions.reduce((s, v) => s + v, 0) === 0 && (
