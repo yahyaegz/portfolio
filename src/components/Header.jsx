@@ -165,24 +165,35 @@ export default function Header() {
 
     return (
         <header
-            className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ${
-                scrolled ? 'backdrop-blur-xl shadow-lg shadow-black/5' : ''
+            className={`fixed z-50 transition-all duration-500 ${
+                scrolled 
+                    ? 'top-0 left-0 w-full lg:top-4 lg:left-1/2 lg:-translate-x-1/2 lg:w-[96%] lg:max-w-7xl lg:rounded-full backdrop-blur-xl shadow-lg shadow-black/10' 
+                    : 'top-0 left-0 w-full lg:top-4 lg:left-1/2 lg:-translate-x-1/2 lg:w-[96%] lg:max-w-7xl lg:rounded-full backdrop-blur-md'
             }`}
-            style={{ backgroundColor: scrolled ? 'color-mix(in srgb, var(--bg-primary) 90%, transparent)' : 'var(--bg-primary)' }}
+            style={{ 
+                backgroundColor: scrolled ? 'color-mix(in srgb, var(--bg-primary) 85%, transparent)' : 'color-mix(in srgb, var(--bg-primary) 40%, transparent)',
+                borderColor: scrolled ? 'var(--border-color)' : 'transparent',
+                borderWidth: scrolled ? '1px' : '0px'
+            }}
             dir={isRTL ? 'rtl' : 'ltr'}
             role="banner"
         >
-            <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 py-3">
-                <motion.a href="#home" className="text-2xl font-extrabold text-accent shrink-0" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    yahya
+            <div className="mx-auto flex w-full items-center justify-between px-4 sm:px-6 py-2.5 lg:px-6">
+                <motion.a 
+                    href="#home" 
+                    className="text-2xl font-extrabold tracking-tight flex items-center gap-2 text-accent shrink-0" 
+                    whileHover={{ scale: 1.05 }} 
+                    whileTap={{ scale: 0.95 }}
+                >
+                    <span className="bg-gradient-to-r from-accent to-cyan-500 bg-clip-text text-transparent">yahya</span>
                 </motion.a>
 
-                <div className="flex items-center gap-2 lg:hidden">
+                <div className="flex items-center gap-2 xl:hidden">
                     <ThemeToggle className="h-9 w-9 justify-center" />
                     <LanguageDropdown mobile langDropdown={langDropdown} setLangDropdown={setLangDropdown} langRef={langRef} />
                     <motion.button
                         ref={hamburgerRef}
-                        className="grid h-9 w-9 place-items-center rounded-full border border-accent/60 text-accent text-lg hover:bg-accent/10 transition"
+                        className="grid h-9 w-9 place-items-center rounded-full border border-accent/30 bg-accent/5 text-accent text-lg hover:bg-accent/15 transition-colors"
                         aria-label={t('header.toggleNavigation')}
                         aria-expanded={open}
                         onClick={() => { setOpen(prev => !prev); setLangDropdown(false); }}
@@ -201,51 +212,45 @@ export default function Header() {
                     </motion.button>
                 </div>
 
-                <nav className="hidden lg:block" role="navigation" aria-label="Main navigation">
-                    <div className="flex items-center gap-1 xl:gap-2">
+                <nav className="hidden xl:block" role="navigation" aria-label="Main navigation">
+                    <div className="flex items-center gap-0.5 xl:gap-1 2xl:gap-2">
                         {navItems.map(item => (
                             <motion.a
                                 key={item.href}
                                 href={item.href}
-                                className={`relative whitespace-nowrap rounded-md px-2.5 pb-3 pt-1.5 text-sm font-medium transition-colors ${
+                                className={`relative rounded-full px-2.5 2xl:px-3 py-1.5 text-[13px] 2xl:text-sm font-semibold transition-colors ${
                                     activeSection === item.id
                                         ? 'text-accent'
-                                        : 'text-secondary hover:text-accent hover:bg-accent/10'
+                                        : 'text-secondary hover:text-primary'
                                 }`}
                                 aria-current={activeSection === item.id ? 'page' : undefined}
-                                whileHover={{ y: -2 }}
+                                whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                             >
-                                {item.label}
-                                <span
-                                    style={{
-                                        position: 'absolute',
-                                        bottom: 0,
-                                        left: '10%',
-                                        width: '80%',
-                                        height: '2px',
-                                        borderRadius: '9999px',
-                                        backgroundColor: 'var(--accent, #10b981)',
-                                        transform: activeSection === item.id ? 'scaleX(1)' : 'scaleX(0)',
-                                        opacity: activeSection === item.id ? 1 : 0,
-                                        transition: 'transform 0.3s ease, opacity 0.3s ease',
-                                    }}
-                                />
+                                {activeSection === item.id && (
+                                    <motion.span
+                                        layoutId="active-nav-pill"
+                                        className="absolute inset-0 rounded-full bg-accent/10 border border-accent/20"
+                                        initial={false}
+                                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                                    />
+                                )}
+                                <span className="relative z-10">{item.label}</span>
                             </motion.a>
                         ))}
-                        <div className={isRTL ? 'flex items-center gap-2 mr-3 pr-3 border-r' : 'flex items-center gap-2 ml-3 pl-3 border-l'} style={{ borderColor: 'var(--border-color)' }}>
+                        <div className={`flex items-center gap-2 ${isRTL ? 'mr-2 pr-2 border-r' : 'ml-2 pl-2 border-l'}`} style={{ borderColor: 'var(--border-color)' }}>
                             <motion.a
                                 href="/yahya_el_gzouli_cv_en.pdf"
                                 download
-                                className="flex items-center gap-1.5 rounded-full border border-accent bg-accent/10 px-3 py-1 text-xs font-semibold text-accent hover:bg-accent hover:text-black transition"
-                                whileHover={{ scale: 1.05 }}
+                                className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-accent to-emerald-400 px-3 py-1.5 text-[13px] font-bold text-white shadow-lg shadow-accent/20 hover:shadow-accent/40 transition-all"
+                                whileHover={{ scale: 1.05, y: -1 }}
                                 whileTap={{ scale: 0.95 }}
                                 aria-label={t('hero.downloadCV')}
                             >
                                 <i className="fa fa-download" />
                                 <span>CV</span>
                             </motion.a>
-                            <ThemeToggle showLabel className="px-3 py-1 text-xs font-semibold" />
+                            <ThemeToggle showLabel={false} className="h-8 w-8 justify-center" />
                             <LanguageDropdown langDropdown={langDropdown} setLangDropdown={setLangDropdown} langRef={langRef} />
                         </div>
                     </div>
@@ -254,7 +259,7 @@ export default function Header() {
                 <AnimatePresence>
                     {open && (
                         <motion.div
-                            className="fixed inset-0 top-[57px] z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+                            className="fixed inset-0 top-[60px] lg:top-0 z-40 bg-black/60 backdrop-blur-sm xl:hidden"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
@@ -268,12 +273,12 @@ export default function Header() {
                     ref={navRef}
                     role="navigation"
                     aria-label="Mobile navigation"
-                    className={`fixed top-[57px] z-50 h-[calc(100dvh-57px)] w-64 backdrop-blur-md transition-transform duration-300 ease-in-out lg:hidden ${
+                    className={`fixed top-[60px] lg:top-0 z-50 h-[calc(100dvh-60px)] lg:h-[100dvh] w-72 backdrop-blur-xl shadow-2xl transition-transform duration-300 ease-in-out xl:hidden ${
                         isRTL ? 'right-0 border-l' : 'left-0 border-r'
                     } ${open ? 'translate-x-0' : (isRTL ? 'translate-x-full' : '-translate-x-full')}`}
-                    style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
+                    style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}
                 >
-                    <div className="flex flex-col gap-1 p-4 overflow-y-auto h-full">
+                    <div className="flex flex-col gap-1 p-6 overflow-y-auto h-full">
                         {navItems.map((item, i) => (
                             <motion.a
                                 key={item.href}
@@ -286,31 +291,37 @@ export default function Header() {
                                         if (el) el.scrollIntoView({ behavior: 'smooth' });
                                     }, 150);
                                 }}
-                                className={`relative rounded-lg px-4 py-3 text-base font-medium transition-colors ${
+                                className={`relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all ${
                                     activeSection === item.id
-                                        ? 'text-accent bg-accent/10 border-l-2 border-accent'
-                                        : 'text-secondary hover:text-accent hover:bg-accent/10'
+                                        ? 'text-accent bg-accent/10 border border-accent/20 shadow-sm'
+                                        : 'text-secondary hover:text-primary hover:bg-white/5'
                                 }`}
                                 aria-current={activeSection === item.id ? 'page' : undefined}
                                 initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
                                 animate={open ? { opacity: 1, x: 0 } : {}}
-                                transition={{ delay: i * 0.05 }}
+                                transition={{ delay: i * 0.03 + 0.1 }}
                             >
+                                {activeSection === item.id && <span className={`absolute ${isRTL ? 'right-0 rounded-l-full' : 'left-0 rounded-r-full'} top-1/2 -translate-y-1/2 w-1 h-1/2 bg-accent`} />}
                                 {item.label}
                             </motion.a>
                         ))}
-                        <motion.a
-                            href="/yahya_el_gzouli_cv_en.pdf"
-                            download
-                            onClick={() => setOpen(false)}
-                            className="rounded-lg px-4 py-3 text-base font-medium text-accent flex items-center gap-2 hover:bg-accent/10 transition-colors"
-                            initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
-                            animate={open ? { opacity: 1, x: 0 } : {}}
-                            transition={{ delay: navItems.length * 0.05 }}
+                        <motion.div 
+                            className="mt-6 pt-6 border-t"
+                            style={{ borderColor: 'var(--border-color)' }}
+                            initial={{ opacity: 0 }}
+                            animate={open ? { opacity: 1 } : {}}
+                            transition={{ delay: navItems.length * 0.03 + 0.2 }}
                         >
-                            <i className="fa fa-download" />
-                            {t('hero.downloadCV')}
-                        </motion.a>
+                            <a
+                                href="/yahya_el_gzouli_cv_en.pdf"
+                                download
+                                onClick={() => setOpen(false)}
+                                className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-accent to-emerald-400 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-accent/20 hover:shadow-accent/40 transition-all"
+                            >
+                                <i className="fa fa-download" />
+                                {t('hero.downloadCV')}
+                            </a>
+                        </motion.div>
                     </div>
                 </nav>
             </div>

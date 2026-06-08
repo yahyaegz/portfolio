@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import SplitTextReveal from './SplitTextReveal';
+import AlgoKMeans from './AlgoKMeans';
+import AlgoHuffman from './AlgoHuffman';
+import AlgoGameOfLife from './AlgoGameOfLife';
 
 // ─── Sorting Step Generators ──────────────────────────────────────────────────
 
@@ -1236,6 +1239,9 @@ function PathfindingVisualizer() {
 const TABS = [
   { key: 'sorting', label: '⟨ Sorting ⟩', icon: '▦' },
   { key: 'pathfinding', label: '⟨ Pathfinding ⟩', icon: '◈' },
+  { key: 'kmeans', label: '⟨ K-Means ⟩', icon: '⚄' },
+  { key: 'huffman', label: '⟨ Huffman ⟩', icon: '🗜' },
+  { key: 'gameoflife', label: '⟨ Life ⟩', icon: '🦠' },
 ];
 
 export default function AlgorithmObservatory() {
@@ -1312,7 +1318,11 @@ export default function AlgorithmObservatory() {
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3 }}
           >
-            {activeTab === 'sorting' ? <SortingVisualizer /> : <PathfindingVisualizer />}
+            {activeTab === 'sorting' && <SortingVisualizer />}
+            {activeTab === 'pathfinding' && <PathfindingVisualizer />}
+            {activeTab === 'kmeans' && <AlgoKMeans />}
+            {activeTab === 'huffman' && <AlgoHuffman />}
+            {activeTab === 'gameoflife' && <AlgoGameOfLife />}
           </motion.div>
         </AnimatePresence>
       </div>
