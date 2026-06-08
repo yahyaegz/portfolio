@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Lazy3DBackground from './Lazy3DBackground';
-import AILabBackground from './AILabBackground';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import SplitTextReveal from './SplitTextReveal';
@@ -1236,36 +1234,9 @@ export default function AILab() {
         
         const W = canvas.width;  // 280
         const H = canvas.height; // 280
-        const ctx = contextRef.current || canvas.getContext('2d');
-        if (!ctx) return;
-        
-        let imgData;
-        try {
-            imgData = ctx.getImageData(0, 0, W, H);
-        } catch (e) {
-            console.error("Canvas read error (likely Fingerprinting Protection):", e);
-            setPredictions(Array(10).fill(0));
-            setActiveNodes([]);
-            // Could display an alert here if desired
-            return;
-        }
+        const ctx = canvas.getContext('2d');
+        const imgData = ctx.getImageData(0, 0, W, H);
         const raw = imgData.data; // RGBA flat array
-
-        // Check if raw is completely blank despite drawing (Brave shield behavior)
-        let hasAnyPixel = false;
-        for (let i = 0; i < raw.length; i += 4) {
-            if (raw[i] > 15 || raw[i+1] > 15 || raw[i+2] > 15) {
-                hasAnyPixel = true;
-                break;
-            }
-        }
-        
-        if (!hasAnyPixel) {
-            // The canvas is visually blank to the JS engine (blocked by browser privacy)
-            setPredictions(Array(10).fill(0));
-            setActiveNodes([]);
-            return;
-        }
 
         // ── Step 1: Extract grayscale float array (0–1) from the red channel ──
         // The canvas background is #090d16, so the Red channel is 9.
@@ -1277,6 +1248,8 @@ export default function AILab() {
         }
 
         // ── Step 2: Gaussian blur (σ≈1.5, 5×5 kernel) to mimic MNIST smoothness ──
+        // MNIST digits are written with pen on paper then photographed + anti-aliased.
+        // Hard browser canvas edges cause domain shift → blur fixes this.
         const kernel = [
             0.0030, 0.0133, 0.0219, 0.0133, 0.0030,
             0.0133, 0.0596, 0.0983, 0.0596, 0.0133,
@@ -1300,6 +1273,7 @@ export default function AILab() {
         }
 
         // ── Step 3: Downsample to 28×28 by averaging all pixels in each 10×10 cell ──
+        // 280/28 = exactly 10 → no rounding errors, perfect coverage
         const cellSize = W / 28; // = 10
         const grid28x28 = Array(28).fill(0).map(() => Array(28).fill(0));
         for (let r = 0; r < 28; r++) {
@@ -1787,9 +1761,8 @@ export default function AILab() {
 
 
     return (
-        <section id="ai-lab" className="section-dark relative overflow-hidden" aria-labelledby="ai-heading">
-            <Lazy3DBackground><AILabBackground /></Lazy3DBackground>
-            <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 md:py-20 relative z-10">
+        <section id="ai-lab" className="section-dark" aria-labelledby="ai-heading">
+            <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 md:py-20">
                 
                 {/* Title */}
                 <motion.div
@@ -2150,10 +2123,6 @@ export default function AILab() {
                                         onMouseMove={draw}
                                         onMouseUp={endDraw}
                                         onMouseLeave={endDraw}
-                                    onTouchStart={startDraw}
-                                    onTouchMove={draw}
-                                    onTouchEnd={endDraw}
-                                    onTouchCancel={endDraw}
                                         className="cursor-crosshair bg-slate-950 block"
                                     />
                                     {predictions.reduce((s, v) => s + v, 0) === 0 && (

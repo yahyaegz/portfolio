@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import Lazy3DBackground from './Lazy3DBackground';
-import ObservatoryBackground from './ObservatoryBackground';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import SplitTextReveal from './SplitTextReveal';
@@ -1258,9 +1256,8 @@ export default function AlgorithmObservatory() {
   const [activeTab, setActiveTab] = useState('sorting');
 
   return (
-    <section id="algo-observatory" className="section-dark py-12 md:py-20 relative overflow-hidden">
-            <Lazy3DBackground><ObservatoryBackground /></Lazy3DBackground>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <section id="algo-observatory" className="section-dark py-12 md:py-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}

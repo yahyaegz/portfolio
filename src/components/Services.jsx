@@ -1,6 +1,4 @@
 import React from 'react';
-import Lazy3DBackground from './Lazy3DBackground';
-import ServicesBackground from './ServicesBackground';
 import { motion } from 'framer-motion';
 import { services } from '../data';
 import { useLanguage } from '../context/LanguageContext';
@@ -18,9 +16,8 @@ const cardVariants = {
 export default function Services() {
     const { t } = useLanguage();
     return (
-        <section id="services" className="section-alt relative overflow-hidden" aria-labelledby="services-heading">
-            <Lazy3DBackground><ServicesBackground /></Lazy3DBackground>
-            <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 md:py-20 relative z-10">
+        <section id="services" className="section-alt" aria-labelledby="services-heading">
+            <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 md:py-20">
                 <motion.div
                     className="text-center mb-8 md:mb-16"
                     initial="hidden"

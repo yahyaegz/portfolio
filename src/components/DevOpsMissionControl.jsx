@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import Lazy3DBackground from './Lazy3DBackground';
-import DevOpsBackground from './DevOpsBackground';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import SplitTextReveal from './SplitTextReveal';
@@ -707,9 +705,8 @@ export default function DevOpsMissionControl() {
     }));
 
     return (
-        <section id="devops-control" className="section-alt py-12 md:py-20 relative overflow-hidden">
-            <Lazy3DBackground><DevOpsBackground /></Lazy3DBackground>
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
+        <section id="devops-control" className="section-alt py-12 md:py-20">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6">
 
                 {/* ── Section Header ── */}
                 <motion.div

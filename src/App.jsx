@@ -1,7 +1,5 @@
 import React, { Suspense, lazy, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
-import { Canvas } from '@react-three/fiber';
-import { View } from '@react-three/drei';
 import SkeletonLoader from './components/SkeletonLoader';
 
 const Header = lazy(() => import('./components/Header'));
@@ -106,17 +104,6 @@ export default function App() {
             <Suspense fallback={null}>
                 <Footer />
             </Suspense>
-
-            {/* Global WebGL Canvas for all 3D backgrounds */}
-            <Canvas
-                className="pointer-events-none"
-                style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: -50 }}
-                eventSource={document.getElementById('root')}
-                gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
-                dpr={[1, 1.5]}
-            >
-                <View.Port />
-            </Canvas>
         </div>
     );
 }

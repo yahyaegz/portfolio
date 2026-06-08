@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import SplitTextReveal from './SplitTextReveal';
 import RetroBackground from './RetroBackground';
-import Lazy3DBackground from './Lazy3DBackground';
 
 // ─── Shared Utility ───────────────────────────────────────────────────────────
 const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
@@ -1626,17 +1625,7 @@ export default function DevArcade() {
 
     return (
         <section id="dev-arcade" className="section-dark relative overflow-hidden" aria-labelledby="arcade-heading">
-            <Lazy3DBackground><RetroBackground /></Lazy3DBackground>
-            {/* Scanline overlay effect */}
-            <div 
-                className="absolute inset-0 pointer-events-none opacity-30 mix-blend-overlay z-0"
-                style={{
-                    backgroundImage: 'url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9InRyYW5zcGFyZW50Ii8+PHJlY3Qgd2lkdGg9IjQiIGhlaWdodD0iMSIgZmlsbD0icmdiYSgwLCAwLCAwLCAwLjcpIi8+PC9zdmc+")',
-                    backgroundSize: '4px 4px'
-                }}
-            />
-            {/* Bottom horizon glow */}
-            <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-[#ff007f]/10 to-transparent pointer-events-none mix-blend-screen z-0" />
+            <RetroBackground />
             <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 md:py-20 relative z-10">
 
                 {/* Header */}

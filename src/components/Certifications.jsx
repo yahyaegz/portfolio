@@ -1,6 +1,4 @@
 import React from 'react';
-import Lazy3DBackground from './Lazy3DBackground';
-import CertificationsBackground from './CertificationsBackground';
 import { motion } from 'framer-motion';
 import { certifications } from '../data';
 import { useLanguage } from '../context/LanguageContext';
@@ -10,9 +8,8 @@ import AnimatedCounter from './AnimatedCounter';
 export default function Certifications() {
     const { t } = useLanguage();
     return (
-        <section id="certifications" className="section-dark relative overflow-hidden">
-            <Lazy3DBackground><CertificationsBackground /></Lazy3DBackground>
-            <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 md:py-20 relative z-10">
+        <section id="certifications" className="section-dark">
+            <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 md:py-20">
                 <motion.div
                     className="text-center mb-8 md:mb-16"
                     initial={{ opacity: 0, y: -20 }}

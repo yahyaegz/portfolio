@@ -1,6 +1,4 @@
 import React from 'react';
-import Lazy3DBackground from './Lazy3DBackground';
-import SkillsBackground from './SkillsBackground';
 import { motion } from 'framer-motion';
 import { skills, topSkills, languages } from '../data';
 import { useLanguage } from '../context/LanguageContext';
@@ -43,9 +41,8 @@ export default function Skills() {
     const translatedTopSkills = t('topSkills');
     const translatedLanguageCards = t('languageCards');
     return (
-        <section id="skills" className="section-dark relative overflow-hidden" aria-labelledby="skills-heading">
-            <Lazy3DBackground><SkillsBackground /></Lazy3DBackground>
-            <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 md:py-20 relative z-10">
+        <section id="skills" className="section-dark" aria-labelledby="skills-heading">
+            <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 md:py-20">
                 <motion.div
                     className="text-center mb-8 md:mb-16"
                     initial="hidden"

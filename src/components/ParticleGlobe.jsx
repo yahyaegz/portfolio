@@ -1,7 +1,5 @@
-
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useFrame } from '@react-three/fiber';
-import { PerspectiveCamera } from '@react-three/drei';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { AdditiveBlending, Color, MathUtils } from 'three';
 
 function seededRandom(seed) {
@@ -292,9 +290,16 @@ export default function ParticleGlobe() {
     }, []);
 
     return (
-        <group>
-            <PerspectiveCamera makeDefault position={[0, 0, compact ? 5.7 : 5.2]} fov={compact ? 48 : 43} />
-            <GlobeRig animated compact={compact} motionScale={motionScale} />
-        </group>
+        <div className="absolute inset-0 z-0 pointer-events-none opacity-75" aria-hidden="true">
+            <Canvas
+                frameloop="always"
+                camera={{ position: [0, 0, compact ? 5.7 : 5.2], fov: compact ? 48 : 43 }}
+                dpr={compact ? [1, 1.2] : [1, 1.7]}
+                gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
+                style={{ background: 'transparent' }}
+            >
+                <GlobeRig animated compact={compact} motionScale={motionScale} />
+            </Canvas>
+        </div>
     );
 }

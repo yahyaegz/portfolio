@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import Lazy3DBackground from './Lazy3DBackground';
-import ContactBackground from './ContactBackground';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -71,9 +69,8 @@ export default function Contact() {
     };
 
     return (
-        <section id="contact" className="section-alt relative overflow-hidden" aria-labelledby="contact-heading">
-            <Lazy3DBackground><ContactBackground /></Lazy3DBackground>
-            <div className="mx-auto max-w-4xl px-4 sm:px-6 py-12 md:py-16 relative z-10">
+        <section id="contact" className="section-alt" aria-labelledby="contact-heading">
+            <div className="mx-auto max-w-4xl px-4 sm:px-6 py-12 md:py-16">
                 <motion.div
                     className="text-center mb-8 md:mb-12"
                     initial="hidden"

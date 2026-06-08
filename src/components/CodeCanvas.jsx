@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import Lazy3DBackground from './Lazy3DBackground';
-import CodeCanvasBackground from './CodeCanvasBackground';
 import { motion, AnimatePresence } from 'framer-motion';
 import SplitTextReveal from './SplitTextReveal';
 
@@ -390,9 +388,8 @@ export default function CodeCanvas() {
     const beatFreq = Math.abs(wvFreq1 - wvFreq2);
 
     return (
-        <section id="code-canvas" className="section-dark py-12 md:py-20 relative overflow-hidden">
-            <Lazy3DBackground><CodeCanvasBackground /></Lazy3DBackground>
-            <div className="max-w-6xl mx-auto px-4 relative z-10">
+        <section id="code-canvas" className="section-dark py-12 md:py-20">
+            <div className="max-w-6xl mx-auto px-4">
                 {/* Header */}
                 <motion.div
                     className="text-center mb-10"

@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useFrame } from '@react-three/fiber';
-import { View, PerspectiveCamera } from '@react-three/drei';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { AdditiveBlending, Color, MathUtils } from 'three';
 
 function seededRandom(seed) {
@@ -224,10 +223,15 @@ export default function ParticleField() {
 
     return (
         <div className="fixed inset-0 z-0 pointer-events-none opacity-70" aria-hidden="true">
-            <View className="w-full h-full absolute inset-0">
-                <PerspectiveCamera makeDefault position={[0, 0, compact ? 8 : 7]} fov={compact ? 58 : 52} />
+            <Canvas
+                frameloop="always"
+                camera={{ position: [0, 0, compact ? 8 : 7], fov: compact ? 58 : 52 }}
+                dpr={compact ? [1, 1.2] : [1, 1.6]}
+                gl={{ alpha: true, antialias: true, powerPreference: 'high-performance' }}
+                style={{ background: 'transparent' }}
+            >
                 <FieldRig animated compact={compact} motionScale={motionScale} />
-            </View>
+            </Canvas>
         </div>
     );
 }

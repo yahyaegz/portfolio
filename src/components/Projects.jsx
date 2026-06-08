@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import Lazy3DBackground from './Lazy3DBackground';
-import ProjectsBackground from './ProjectsBackground';
 import { motion } from 'framer-motion';
 import { projects } from '../data';
 import { useLanguage } from '../context/LanguageContext';
@@ -145,9 +143,8 @@ export default function Projects() {
     };
 
     return (
-        <section id="projects" className="section-alt relative overflow-hidden" aria-labelledby="projects-heading">
-            <Lazy3DBackground><ProjectsBackground /></Lazy3DBackground>
-            <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 md:py-16 relative z-10">
+        <section id="projects" className="section-alt" aria-labelledby="projects-heading">
+            <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 md:py-16">
                 <motion.div
                     className="text-center mb-8 md:mb-12"
                     initial="hidden"
