@@ -182,14 +182,12 @@ export default function CodeCanvas() {
         if (activeTab !== 'flowfield') { cancelAnimationFrame(ffRafRef.current); return; }
         const canvas = ffCanvasRef.current;
         if (!canvas) return;
-        canvas.width  = canvas.offsetWidth  || 600;
-        canvas.height = canvas.offsetHeight || 400;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#06080f';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        const ctx = canvas.getContext('2d', { alpha: false });
         if (!ffInitDone.current) initFlowField(canvas);
 
         const loop = () => {
+            if (canvas.offsetWidth > 0 && canvas.width !== canvas.offsetWidth) canvas.width = canvas.offsetWidth;
+            if (canvas.offsetHeight > 0 && canvas.height !== canvas.offsetHeight) canvas.height = canvas.offsetHeight;
             const W = canvas.width, H = canvas.height;
             const p = ffParams.current;
             const colors = PALETTES[p.palette] || PALETTES.emerald;
@@ -248,11 +246,11 @@ export default function CodeCanvas() {
         if (activeTab !== 'fractal') { cancelAnimationFrame(ftRafRef.current); return; }
         const canvas = ftCanvasRef.current;
         if (!canvas) return;
-        canvas.width  = canvas.offsetWidth  || 600;
-        canvas.height = canvas.offsetHeight || 450;
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { alpha: false });
 
         const loop = () => {
+            if (canvas.offsetWidth > 0 && canvas.width !== canvas.offsetWidth) canvas.width = canvas.offsetWidth;
+            if (canvas.offsetHeight > 0 && canvas.height !== canvas.offsetHeight) canvas.height = canvas.offsetHeight;
             const W = canvas.width, H = canvas.height;
             const p = ftParams.current;
             ftPhaseRef.current += 0.015;
@@ -282,11 +280,11 @@ export default function CodeCanvas() {
         if (activeTab !== 'waveform') { cancelAnimationFrame(wvRafRef.current); return; }
         const canvas = wvCanvasRef.current;
         if (!canvas) return;
-        canvas.width  = canvas.offsetWidth  || 600;
-        canvas.height = canvas.offsetHeight || 350;
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { alpha: false });
 
         const loop = () => {
+            if (canvas.offsetWidth > 0 && canvas.width !== canvas.offsetWidth) canvas.width = canvas.offsetWidth;
+            if (canvas.offsetHeight > 0 && canvas.height !== canvas.offsetHeight) canvas.height = canvas.offsetHeight;
             const W = canvas.width, H = canvas.height;
             const p = wvParams.current;
             wvTimeRef.current += 0.02 * p.speed;
