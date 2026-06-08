@@ -1275,29 +1275,21 @@ export default function AILab() {
             }
         }
 
-        // ── Step 4: 3×3 mean smoothing pass on the 28×28 grid (light, like MNIST) ──
-        const smooth28 = Array(28).fill(0).map(() => Array(28).fill(0));
-        for (let r = 0; r < 28; r++) {
-            for (let c = 0; c < 28; c++) {
-                let s = 0, cnt = 0;
-                for (let dr = -1; dr <= 1; dr++) {
-                    for (let dc = -1; dc <= 1; dc++) {
-                        const nr = r + dr, nc = c + dc;
-                        if (nr >= 0 && nr < 28 && nc >= 0 && nc < 28) {
-                            s += grid28x28[nr][nc];
-                            cnt++;
-                        }
-                    }
-                }
-                smooth28[r][c] = s / cnt;
+        // ── Step 4: Center and scale bounding box to 20x20 inside 28x28 (MNIST standard) ──
+        const norm28x28 = normalizeMatrix28x28(grid28x28);
+
+        // ── Step 5: Flatten to 784-dim input vector and normalize intensity ──
+        const inputs = norm28x28.flat();
+        
+        let maxVal = 0;
+        for (let i = 0; i < inputs.length; i++) {
+            if (inputs[i] > maxVal) maxVal = inputs[i];
+        }
+        if (maxVal > 0) {
+            for (let i = 0; i < inputs.length; i++) {
+                inputs[i] /= maxVal;
             }
         }
-
-        // ── Step 5: Center and scale bounding box to 18×18 inside 28×28 (MNIST standard) ──
-        const norm28x28 = normalizeMatrix28x28(smooth28);
-
-        // ── Step 6: Flatten to 784-dim input vector ──
-        const inputs = norm28x28.flat();
 
         // Require a minimum ink mass
         const totalMass = inputs.reduce((s, v) => s + v, 0);
