@@ -7,9 +7,11 @@ export default function WebGLDisposer() {
     useEffect(() => {
         return () => {
             if (gl) {
-                const ext = gl.getExtension('WEBGL_lose_context');
-                if (ext) {
-                    ext.loseContext();
+                // state.gl is the THREE.WebGLRenderer, so we need .getContext()
+                const context = gl.getContext();
+                if (context) {
+                    const ext = context.getExtension('WEBGL_lose_context');
+                    if (ext) ext.loseContext();
                 }
             }
         };
