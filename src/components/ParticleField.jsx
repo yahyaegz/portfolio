@@ -1,4 +1,3 @@
-import WebGLDisposer from './WebGLDisposer';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { AdditiveBlending, Color, MathUtils } from 'three';

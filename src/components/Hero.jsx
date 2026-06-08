@@ -33,7 +33,7 @@ export default function Hero() {
             <div className="absolute inset-0 z-0 hero-mesh" aria-hidden="true" />
 
             <Suspense fallback={null}>
-                <Lazy3DBackground className="z-0"><ParticleGlobe /></Lazy3DBackground>
+                <Lazy3DBackground className="z-0 opacity-75"><ParticleGlobe /></Lazy3DBackground>
             </Suspense>
 
             <motion.div

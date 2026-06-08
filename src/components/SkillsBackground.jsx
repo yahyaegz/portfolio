@@ -1,6 +1,7 @@
-import WebGLDisposer from './WebGLDisposer';
+import { PerspectiveCamera } from '@react-three/drei';
+
 import React, { useRef, useMemo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
 const ParticleGalaxy = () => {
@@ -50,11 +51,12 @@ const ParticleGalaxy = () => {
 
 export default function SkillsBackground() {
     return (
-        <Canvas camera={{ position: [0, 2, 8], fov: 60 }} gl={{ antialias: true }}>
-            <WebGLDisposer />
+        <>
+            <PerspectiveCamera makeDefault position={[0, 2, 8]} fov={60} />
+            
             <color attach="background" args={['#050810']} />
             <ParticleGalaxy />
             <fog attach="fog" args={['#050810', 4, 14]} />
-        </Canvas>
+        </>
     );
 }

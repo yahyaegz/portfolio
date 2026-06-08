@@ -1,6 +1,7 @@
-import WebGLDisposer from './WebGLDisposer';
+import { PerspectiveCamera } from '@react-three/drei';
+
 import React, { useRef } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 
 const IsometricGrid = () => {
     const groupRef = useRef();
@@ -28,12 +29,13 @@ const IsometricGrid = () => {
 
 export default function ProjectsBackground() {
     return (
-        <Canvas camera={{ position: [0, 5, 15], fov: 40 }} gl={{ antialias: true }}>
-            <WebGLDisposer />
+        <>
+            <PerspectiveCamera makeDefault position={[0, 5, 15]} fov={40} />
+            
             <color attach="background" args={['#050810']} />
             <ambientLight intensity={0.5} />
             <pointLight position={[10, 10, 10]} intensity={1} color="#06b6d4" />
             <IsometricGrid />
-        </Canvas>
+        </>
     );
 }

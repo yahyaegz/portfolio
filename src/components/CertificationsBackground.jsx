@@ -1,6 +1,7 @@
-import WebGLDisposer from './WebGLDisposer';
+import { PerspectiveCamera } from '@react-three/drei';
+
 import React, { useRef, useMemo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 
 const FloatingStars = () => {
     const groupRef = useRef();
@@ -42,13 +43,14 @@ const FloatingStars = () => {
 
 export default function CertificationsBackground() {
     return (
-        <Canvas camera={{ position: [0, 0, 10], fov: 60 }}>
-            <WebGLDisposer />
+        <>
+            <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={60} />
+            
             <color attach="background" args={['#050810']} />
             <fog attach="fog" args={['#050810', 5, 15]} />
             <ambientLight intensity={0.5} />
             <pointLight position={[10, 10, 10]} intensity={1} color="#facc15" />
             <FloatingStars />
-        </Canvas>
+        </>
     );
 }

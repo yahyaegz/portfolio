@@ -1,7 +1,7 @@
-import WebGLDisposer from './WebGLDisposer';
+
 import React, { useRef } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Stars, Trail } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
+import { Stars, Trail, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 
 const TerrainGrid = () => {
@@ -36,8 +36,9 @@ const OutrunSun = () => {
 export default function RetroBackground() {
     return (
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none" style={{ backgroundColor: '#050710' }}>
-            <Canvas camera={{ position: [0, 2, 10], fov: 60 }} gl={{ antialias: true }}>
-            <WebGLDisposer />
+            <>
+            <PerspectiveCamera makeDefault position={[0, 2, 10]} fov={60} />
+            
                 <color attach="background" args={['#050710']} />
                 <fog attach="fog" args={['#050710', 20, 80]} />
                 
@@ -48,7 +49,7 @@ export default function RetroBackground() {
                 {/* Ambient glow */}
                 <ambientLight intensity={0.5} />
                 <pointLight position={[0, 5, -50]} intensity={2} color="#ff2a6d" />
-            </Canvas>
+            </>
             
             {/* Scanline overlay effect */}
             <div 

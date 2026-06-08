@@ -1,6 +1,7 @@
-import WebGLDisposer from './WebGLDisposer';
+import { PerspectiveCamera } from '@react-three/drei';
+
 import React, { useRef, useMemo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 
 const DataBlocks = () => {
     const groupRef = useRef();
@@ -43,11 +44,12 @@ const DataBlocks = () => {
 
 export default function CodeCanvasBackground() {
     return (
-        <Canvas camera={{ position: [0, 0, 10], fov: 60 }}>
-            <WebGLDisposer />
+        <>
+            <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={60} />
+            
             <color attach="background" args={['#040914']} />
             <fog attach="fog" args={['#040914', 5, 18]} />
             <DataBlocks />
-        </Canvas>
+        </>
     );
 }

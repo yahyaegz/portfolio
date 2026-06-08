@@ -1,6 +1,7 @@
-import WebGLDisposer from './WebGLDisposer';
+import { PerspectiveCamera } from '@react-three/drei';
+
 import React, { useRef } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 
 const DigitalRoad = () => {
     const gridRef = useRef();
@@ -20,13 +21,14 @@ const DigitalRoad = () => {
 
 export default function InteractiveCVBackground() {
     return (
-        <Canvas camera={{ position: [0, 2, 10], fov: 60 }} gl={{ antialias: true }}>
-            <WebGLDisposer />
+        <>
+            <PerspectiveCamera makeDefault position={[0, 2, 10]} fov={60} />
+            
             <color attach="background" args={['#040914']} />
             <fog attach="fog" args={['#040914', 5, 25]} />
             <DigitalRoad />
             <ambientLight intensity={0.5} />
             <pointLight position={[0, 5, 0]} intensity={1} color="#10b981" />
-        </Canvas>
+        </>
     );
 }

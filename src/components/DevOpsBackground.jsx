@@ -1,6 +1,7 @@
-import WebGLDisposer from './WebGLDisposer';
+import { PerspectiveCamera } from '@react-three/drei';
+
 import React, { useRef } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
 const RadarScanner = () => {
@@ -29,11 +30,12 @@ const RadarScanner = () => {
 
 export default function DevOpsBackground() {
     return (
-        <Canvas camera={{ position: [0, 0, 5], fov: 60 }} gl={{ antialias: true }}>
-            <WebGLDisposer />
+        <>
+            <PerspectiveCamera makeDefault position={[0, 0, 5]} fov={60} />
+            
             <color attach="background" args={['#020617']} />
             <fog attach="fog" args={['#020617', 5, 20]} />
             <RadarScanner />
-        </Canvas>
+        </>
     );
 }

@@ -1,6 +1,7 @@
-import WebGLDisposer from './WebGLDisposer';
+import { PerspectiveCamera } from '@react-three/drei';
+
 import React, { useRef, useMemo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
 const NeuralNetwork = () => {
@@ -56,11 +57,12 @@ const NeuralNetwork = () => {
 
 export default function AILabBackground() {
     return (
-        <Canvas camera={{ position: [0, 0, 15], fov: 60 }} gl={{ antialias: true }}>
-            <WebGLDisposer />
+        <>
+            <PerspectiveCamera makeDefault position={[0, 0, 15]} fov={60} />
+            
             <color attach="background" args={['#03050a']} />
             <fog attach="fog" args={['#03050a', 10, 25]} />
             <NeuralNetwork />
-        </Canvas>
+        </>
     );
 }
