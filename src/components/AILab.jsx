@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import Lazy3DBackground from './Lazy3DBackground';
+import AILabBackground from './AILabBackground';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import SplitTextReveal from './SplitTextReveal';
@@ -1234,8 +1236,16 @@ export default function AILab() {
         
         const W = canvas.width;  // 280
         const H = canvas.height; // 280
-        const ctx = canvas.getContext('2d');
-        const imgData = ctx.getImageData(0, 0, W, H);
+        const ctx = contextRef.current || canvas.getContext('2d');
+        if (!ctx) return;
+        
+        let imgData;
+        try {
+            imgData = ctx.getImageData(0, 0, W, H);
+        } catch (e) {
+            console.error(e);
+            return;
+        }
         const raw = imgData.data; // RGBA flat array
 
         // ── Step 1: Extract grayscale float array (0–1) from the red channel ──
@@ -1761,8 +1771,9 @@ export default function AILab() {
 
 
     return (
-        <section id="ai-lab" className="section-dark" aria-labelledby="ai-heading">
-            <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 md:py-20">
+        <section id="ai-lab" className="section-dark relative overflow-hidden" aria-labelledby="ai-heading">
+            <Lazy3DBackground><AILabBackground /></Lazy3DBackground>
+            <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 md:py-20 relative z-10">
                 
                 {/* Title */}
                 <motion.div

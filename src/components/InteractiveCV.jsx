@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import Lazy3DBackground from './Lazy3DBackground';
+import InteractiveCVBackground from './InteractiveCVBackground';
 import { motion, AnimatePresence } from 'framer-motion';
 import { experience, education, skills, contactInfo } from '../data';
 import { useLanguage } from '../context/LanguageContext';
@@ -68,8 +70,9 @@ export default function InteractiveCV() {
     });
 
     return (
-        <section id="resume-hub" className="section-alt" aria-labelledby="cv-heading">
-            <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 md:py-20">
+        <section id="resume-hub" className="section-alt relative overflow-hidden" aria-labelledby="cv-heading">
+            <Lazy3DBackground><InteractiveCVBackground /></Lazy3DBackground>
+            <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 md:py-20 relative z-10">
                 
                 {/* Header Title */}
                 <motion.div
