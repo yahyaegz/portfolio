@@ -5,6 +5,10 @@ import SplitTextReveal from './SplitTextReveal';
 import AlgoKMeans from './AlgoKMeans';
 import AlgoHuffman from './AlgoHuffman';
 import AlgoGameOfLife from './AlgoGameOfLife';
+import AlgoKNN from './AlgoKNN';
+import AlgoDBSCAN from './AlgoDBSCAN';
+import AlgoLogisticRegression from './AlgoLogisticRegression';
+import AlgoSVM from './AlgoSVM';
 
 // ─── Sorting Step Generators ──────────────────────────────────────────────────
 
@@ -1240,6 +1244,10 @@ const TABS = [
   { key: 'sorting', label: '⟨ Sorting ⟩', icon: '▦' },
   { key: 'pathfinding', label: '⟨ Pathfinding ⟩', icon: '◈' },
   { key: 'kmeans', label: '⟨ K-Means ⟩', icon: '⚄' },
+  { key: 'knn', label: '⟨ KNN ⟩', icon: '🎯' },
+  { key: 'dbscan', label: '⟨ DBSCAN ⟩', icon: '🌌' },
+  { key: 'logreg', label: '⟨ LogReg ⟩', icon: '📈' },
+  { key: 'svm', label: '⟨ SVM ⟩', icon: '✂' },
   { key: 'huffman', label: '⟨ Huffman ⟩', icon: '🗜' },
   { key: 'gameoflife', label: '⟨ Life ⟩', icon: '🦠' },
 ];
@@ -1290,7 +1298,7 @@ export default function AlgorithmObservatory() {
           className="flex justify-center mb-8"
         >
           <div
-            className="inline-flex gap-2 p-1.5 rounded-full"
+            className="inline-flex flex-wrap justify-center gap-2 p-1.5 rounded-[2rem]"
             style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)' }}
           >
             {TABS.map(tab => (
@@ -1321,6 +1329,10 @@ export default function AlgorithmObservatory() {
             {activeTab === 'sorting' && <SortingVisualizer />}
             {activeTab === 'pathfinding' && <PathfindingVisualizer />}
             {activeTab === 'kmeans' && <AlgoKMeans />}
+            {activeTab === 'knn' && <AlgoKNN />}
+            {activeTab === 'dbscan' && <AlgoDBSCAN />}
+            {activeTab === 'logreg' && <AlgoLogisticRegression />}
+            {activeTab === 'svm' && <AlgoSVM />}
             {activeTab === 'huffman' && <AlgoHuffman />}
             {activeTab === 'gameoflife' && <AlgoGameOfLife />}
           </motion.div>
