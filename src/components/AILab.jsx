@@ -1224,9 +1224,12 @@ export default function AILab() {
         const raw = imgData.data; // RGBA flat array
 
         // ── Step 1: Extract grayscale float array (0–1) from the red channel ──
+        // The canvas background is #090d16, so the Red channel is 9.
+        // We subtract the background so pure background is exactly 0.0, and normalize by (255 - 9).
         const gray = new Float32Array(W * H);
         for (let i = 0; i < W * H; i++) {
-            gray[i] = raw[i * 4] / 255.0;
+            const rVal = raw[i * 4];
+            gray[i] = Math.max(0, (rVal - 9) / 246.0);
         }
 
         // ── Step 2: Gaussian blur (σ≈1.5, 5×5 kernel) to mimic MNIST smoothness ──
