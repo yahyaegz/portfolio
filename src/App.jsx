@@ -1,5 +1,6 @@
 import React, { Suspense, lazy, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import SkeletonLoader from './components/SkeletonLoader';
 
 const Header = lazy(() => import('./components/Header'));
@@ -31,7 +32,8 @@ export default function App() {
     );
 
     return (
-        <div className="section-dark min-h-screen flex flex-col overflow-x-hidden w-full relative">
+        <>
+            <div className="section-dark min-h-screen flex flex-col overflow-x-hidden w-full relative">
             <Suspense fallback={null}>
                 <IntroSequence onComplete={() => setIntroDone(true)} />
             </Suspense>
@@ -105,5 +107,7 @@ export default function App() {
                 <Footer />
             </Suspense>
         </div>
+        <SpeedInsights />
+        </>
     );
 }
