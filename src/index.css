@@ -75,12 +75,14 @@ html:not(.dark) {
     color: var(--text-primary);
     position: relative;
     overflow: hidden;
+    z-index: 0;
 }
 .section-alt {
     background-color: var(--bg-secondary);
     color: var(--text-primary);
     position: relative;
     overflow: hidden;
+    z-index: 0;
 }
 
 .card-bg {

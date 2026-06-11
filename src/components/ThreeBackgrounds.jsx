@@ -202,7 +202,7 @@ export function ThreeBackgroundRenderer({ type, colorName }) {
     }, []);
 
     return (
-        <div ref={containerRef} className="absolute inset-0 z-0 pointer-events-none" style={{ backgroundColor: '#050710' }}>
+        <div ref={containerRef} className="absolute inset-0 -z-10 pointer-events-none" style={{ backgroundColor: '#050710' }}>
             {isVisible && (
                 <Canvas camera={{ position: [0, 0, 15], fov: 60 }} dpr={[1, 1.5]} gl={{ alpha: false, powerPreference: 'high-performance' }}>
                     {type === 'cybergrid' && <CyberGrid color={color} />}
