@@ -7,6 +7,7 @@ import { useLanguage } from '../context/LanguageContext';
 import SplitTextReveal from './SplitTextReveal';
 import { slideRight } from '../utils/animationVariants';
 import CurrentlyOpenTo from './CurrentlyOpenTo';
+import SectionBackground from './SectionBackground';
 
 export default function Contact() {
     const [loading, setLoading] = useState(false);
@@ -70,6 +71,7 @@ export default function Contact() {
 
     return (
         <section id="contact" className="section-alt" aria-labelledby="contact-heading">
+            <SectionBackground variant="contact" />
             <div className="mx-auto max-w-4xl px-4 sm:px-6 py-12 md:py-16">
                 <motion.div
                     className="text-center mb-8 md:mb-12"

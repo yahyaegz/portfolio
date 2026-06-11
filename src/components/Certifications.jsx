@@ -4,11 +4,13 @@ import { certifications } from '../data';
 import { useLanguage } from '../context/LanguageContext';
 import SplitTextReveal from './SplitTextReveal';
 import AnimatedCounter from './AnimatedCounter';
+import SectionBackground from './SectionBackground';
 
 export default function Certifications() {
     const { t } = useLanguage();
     return (
         <section id="certifications" className="section-dark">
+            <SectionBackground variant="certifications" />
             <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 md:py-20">
                 <motion.div
                     className="text-center mb-8 md:mb-16"

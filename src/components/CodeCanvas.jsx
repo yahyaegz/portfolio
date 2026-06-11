@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import SplitTextReveal from './SplitTextReveal';
+import SectionBackground from './SectionBackground';
 
 // ─── Colour Palettes ──────────────────────────────────────────────────────────
 const PALETTES = {
@@ -389,6 +390,7 @@ export default function CodeCanvas() {
 
     return (
         <section id="code-canvas" className="section-dark py-12 md:py-20">
+            <SectionBackground variant="code" />
             <div className="max-w-6xl mx-auto px-4">
                 {/* Header */}
                 <motion.div

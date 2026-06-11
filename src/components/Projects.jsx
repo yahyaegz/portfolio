@@ -6,6 +6,7 @@ import { staggerContainer, scaleUp } from '../utils/animationVariants';
 import SplitTextReveal from './SplitTextReveal';
 import TiltCard from './TiltCard';
 import ProjectCaseStudy from './ProjectCaseStudy';
+import SectionBackground from './SectionBackground';
 
 const itemVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -144,6 +145,7 @@ export default function Projects() {
 
     return (
         <section id="projects" className="section-alt" aria-labelledby="projects-heading">
+            <SectionBackground variant="projects" />
             <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 md:py-16">
                 <motion.div
                     className="text-center mb-8 md:mb-12"

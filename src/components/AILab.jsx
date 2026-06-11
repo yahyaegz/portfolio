@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import SplitTextReveal from './SplitTextReveal';
+import SectionBackground from './SectionBackground';
 import mnistWeights from '../data/mnist_weights.json';
 
 // Custom lightweight Feedforward Neural Network for Sandbox (2D classification)
@@ -1762,6 +1763,7 @@ export default function AILab() {
 
     return (
         <section id="ai-lab" className="section-dark" aria-labelledby="ai-heading">
+            <SectionBackground variant="ai-lab" />
             <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 md:py-20">
                 
                 {/* Title */}

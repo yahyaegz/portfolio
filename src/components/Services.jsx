@@ -5,6 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { slideRight, staggerContainer } from '../utils/animationVariants';
 import SplitTextReveal from './SplitTextReveal';
 import TiltCard from './TiltCard';
+import SectionBackground from './SectionBackground';
 
 const serviceKeys = ['fullstack', 'database', 'security', 'ml', 'analytics', 'neural'];
 
@@ -17,6 +18,7 @@ export default function Services() {
     const { t } = useLanguage();
     return (
         <section id="services" className="section-alt" aria-labelledby="services-heading">
+            <SectionBackground variant="services" />
             <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 md:py-20">
                 <motion.div
                     className="text-center mb-8 md:mb-16"

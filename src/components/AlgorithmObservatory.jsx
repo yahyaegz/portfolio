@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import SplitTextReveal from './SplitTextReveal';
+import SectionBackground from './SectionBackground';
 import AlgoKMeans from './AlgoKMeans';
 import AlgoHuffman from './AlgoHuffman';
 import AlgoGameOfLife from './AlgoGameOfLife';
@@ -1257,6 +1258,7 @@ export default function AlgorithmObservatory() {
 
   return (
     <section id="algo-observatory" className="section-dark py-12 md:py-20">
+      <SectionBackground variant="algorithms" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div

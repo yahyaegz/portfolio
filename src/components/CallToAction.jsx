@@ -5,6 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { fadeUp } from '../utils/animationVariants';
 import AnimatedCounter from './AnimatedCounter';
 import SplitTextReveal from './SplitTextReveal';
+import SectionBackground from './SectionBackground';
 
 export default function CallToAction() {
     const { t } = useLanguage();
@@ -20,6 +21,7 @@ export default function CallToAction() {
 
     return (
         <section className="section-alt relative overflow-hidden border-y py-16 md:py-20" style={{ borderColor: 'var(--border-color)' }}>
+            <SectionBackground variant="cta" />
             <div className="mx-auto max-w-5xl px-4 sm:px-6">
                 {/* CTA */}
                 <motion.div

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { experience, education, skills, contactInfo } from '../data';
 import { useLanguage } from '../context/LanguageContext';
 import SplitTextReveal from './SplitTextReveal';
+import SectionBackground from './SectionBackground';
 
 const getCategoryItems = (category) => {
     if (category.groups?.length) {
@@ -69,6 +70,7 @@ export default function InteractiveCV() {
 
     return (
         <section id="resume-hub" className="section-alt" aria-labelledby="cv-heading">
+            <SectionBackground variant="cv" />
             <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 md:py-20">
                 
                 {/* Header Title */}

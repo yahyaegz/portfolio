@@ -73,10 +73,14 @@ html:not(.dark) {
 .section-dark {
     background-color: var(--bg-primary);
     color: var(--text-primary);
+    position: relative;
+    overflow: hidden;
 }
 .section-alt {
     background-color: var(--bg-secondary);
     color: var(--text-primary);
+    position: relative;
+    overflow: hidden;
 }
 
 .card-bg {
@@ -219,4 +223,40 @@ html:not(.dark) .hero-mesh {
 
 html:not(.dark) .scroll-warp-divider {
     opacity: 0.6;
+}
+
+@keyframes hex-drift {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-60px); }
+}
+
+@keyframes circuit-pulse {
+    0% { stroke-dashoffset: 15; }
+    100% { stroke-dashoffset: 0; }
+}
+
+@keyframes matrix-fall {
+    0% { transform: translateY(-50%); }
+    100% { transform: translateY(0); }
+}
+
+@keyframes node-pulse {
+    0% { transform: scale(0.8); opacity: 0.5; }
+    100% { transform: scale(1.2); opacity: 1; }
+}
+
+@keyframes sparkle-float {
+    0% { transform: translateY(0) rotate(45deg); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: translateY(-100px) rotate(45deg); opacity: 0; }
+}
+
+@keyframes radar-ping {
+    0% { transform: scale(0); opacity: 1; }
+    100% { transform: scale(1); opacity: 0; }
+}
+
+@keyframes led-blink {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 1; }
 }

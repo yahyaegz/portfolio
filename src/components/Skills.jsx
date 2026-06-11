@@ -4,6 +4,7 @@ import { skills, topSkills, languages } from '../data';
 import { useLanguage } from '../context/LanguageContext';
 import { slideLeft } from '../utils/animationVariants';
 import SplitTextReveal from './SplitTextReveal';
+import SectionBackground from './SectionBackground';
 
 const categoryKeys = ['programming', 'frontend', 'backend', 'databases', 'tools', 'ml', 'devops'];
 
@@ -42,6 +43,7 @@ export default function Skills() {
     const translatedLanguageCards = t('languageCards');
     return (
         <section id="skills" className="section-dark" aria-labelledby="skills-heading">
+            <SectionBackground variant="skills" />
             <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 md:py-20">
                 <motion.div
                     className="text-center mb-8 md:mb-16"
