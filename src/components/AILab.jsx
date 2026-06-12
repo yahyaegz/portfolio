@@ -1078,16 +1078,16 @@ export default function AILab() {
     const initSketchpad = () => {
         const canvas = sketchCanvasRef.current;
         if (!canvas) return;
-        // 280x280 = exact 10× of 28x28 — clean integer downscale, no rounding artifacts
-        canvas.width = 280;
-        canvas.height = 280;
+        // 420x420 = exact 15× of 28x28 — clean integer downscale, no rounding artifacts
+        canvas.width = 420;
+        canvas.height = 420;
 
         const ctx = canvas.getContext('2d');
         if (ctx) {
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
-            // 22px brush on 280px canvas ≈ 2.2 cells in 28×28 → matches MNIST stroke width
-            ctx.lineWidth = 22;
+            // 33px brush on 420px canvas ≈ 2.2 cells in 28×28 → matches MNIST stroke width
+            ctx.lineWidth = 33;
             ctx.strokeStyle = '#ffffff';
             contextRef.current = ctx;
         }
@@ -2109,10 +2109,10 @@ export default function AILab() {
                             initial={{ opacity: 0, y: 15 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -15 }}
-                            className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start justify-center max-w-4xl mx-auto"
+                            className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start justify-center max-w-5xl mx-auto"
                         >
                             {/* Sketch drawable frame */}
-                            <div className="md:col-span-5 flex flex-col items-center card-bg border rounded-2xl p-5">
+                            <div className="lg:col-span-6 flex flex-col items-center card-bg border rounded-2xl p-5 w-full">
                                 <div className="mb-4 text-center">
                                     <h3 className="text-base font-bold text-primary mb-1">{t('aiLab.sketchTitle')}</h3>
                                     <p className="text-xs text-muted leading-relaxed">{t('aiLab.sketchDesc')}</p>
@@ -2125,7 +2125,7 @@ export default function AILab() {
                                         onMouseMove={draw}
                                         onMouseUp={endDraw}
                                         onMouseLeave={endDraw}
-                                        className="cursor-crosshair bg-slate-950 block"
+                                        className="cursor-crosshair bg-slate-950 block w-full aspect-square max-w-[420px] mx-auto"
                                     />
                                     {predictions.reduce((s, v) => s + v, 0) === 0 && (
                                         <div className="absolute inset-0 pointer-events-none flex items-center justify-center text-xs text-slate-500/80 uppercase font-bold tracking-widest">
@@ -2145,7 +2145,7 @@ export default function AILab() {
                             </div>
 
                             {/* Network Inference confidences view */}
-                            <div className="md:col-span-7 card-bg border rounded-2xl p-5 h-full space-y-4">
+                            <div className="lg:col-span-6 card-bg border rounded-2xl p-5 h-full space-y-5 flex flex-col justify-center">
                                 <h4 className="text-xs font-bold text-secondary uppercase tracking-wider border-b pb-2" style={{ borderColor: 'var(--border-color)' }}>
                                     {t('aiLab.confidenceLabel')}
                                 </h4>
