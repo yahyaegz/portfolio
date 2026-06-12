@@ -7,6 +7,7 @@ export default function TiltCard({
     tiltMax = 8,
     glowColor = 'rgba(16, 185, 129, 0.10)',
     glowSize = 500,
+    as: Component = motion.div,
     ...rest
 }) {
     const ref = useRef(null);
@@ -45,7 +46,7 @@ export default function TiltCard({
     };
 
     return (
-        <motion.div
+        <Component
             ref={ref}
             className={`relative ${className}`}
             onMouseMove={handleMove}
@@ -74,6 +75,6 @@ export default function TiltCard({
                     transition={{ duration: 0.2 }}
                 />
             )}
-        </motion.div>
+        </Component>
     );
 }

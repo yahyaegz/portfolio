@@ -1,7 +1,8 @@
-import React, { Suspense, lazy, useState, useEffect } from 'react';
+import React, { Suspense, lazy } from 'react';
 import { motion } from 'framer-motion';
 import { profile } from '../data';
 import { useLanguage } from '../context/LanguageContext';
+import CurrentlyOpenTo from './CurrentlyOpenTo';
 
 const ParticleGlobe = lazy(() => import('./ParticleGlobe'));
 
@@ -26,29 +27,21 @@ const imageVariants = {
 
 export default function Hero() {
     const { t } = useLanguage();
-    const [isDesktop, setIsDesktop] = useState(true);
-
-    useEffect(() => {
-        setIsDesktop(window.innerWidth >= 768);
-    }, []);
-
     return (
         <section id="home" className="section-dark w-full min-h-screen relative overflow-hidden flex items-center justify-center px-4 pt-20 pb-12 md:py-0">
             <div className="absolute inset-0 z-0 hero-mesh" aria-hidden="true" />
 
-            {isDesktop && (
-                <Suspense fallback={null}>
-                    <ParticleGlobe />
-                </Suspense>
-            )}
+            <Suspense fallback={null}>
+                <ParticleGlobe />
+            </Suspense>
 
             <motion.div
-                className="absolute -left-40 -top-40 w-80 h-80 bg-accent/5 rounded-full blur-3xl pointer-events-none z-0"
+                className="absolute -left-10 -top-40 w-80 h-80 bg-accent/5 rounded-full blur-3xl pointer-events-none z-0"
                 animate={{ x: [0, 30, 0], y: [0, 30, 0] }}
                 transition={{ duration: 8, repeat: Infinity }}
             />
             <motion.div
-                className="absolute -right-40 -bottom-40 w-80 h-80 bg-cyan-400/5 rounded-full blur-3xl pointer-events-none z-0"
+                className="absolute -right-10 -bottom-40 w-80 h-80 bg-cyan-400/5 rounded-full blur-3xl pointer-events-none z-0"
                 animate={{ x: [0, -30, 0], y: [0, -30, 0] }}
                 transition={{ duration: 8, repeat: Infinity, delay: 1 }}
             />
@@ -96,6 +89,8 @@ export default function Hero() {
                         {t('hero.summary')}
                     </motion.p>
 
+                    <CurrentlyOpenTo variant="hero" />
+
                     <motion.div variants={itemVariants} className="flex gap-4 pt-4 flex-wrap">
                         {[
                             { icon: 'linkedin', url: profile.social.linkedin, label: 'LinkedIn' },
@@ -136,7 +131,7 @@ export default function Hero() {
                             />
                         </motion.a>
                         <motion.a
-                            href="/resume.pdf"
+                            href="/yahya_el_gzouli_cv_en.pdf"
                             download
                             className="inline-flex items-center gap-2 rounded-full border-2 border-accent/50 px-8 py-3 font-semibold text-accent hover:border-accent hover:bg-accent/10 transition duration-300"
                             data-magnetic
@@ -174,11 +169,10 @@ export default function Hero() {
                             transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
                         />
                         <motion.img
-                            className="relative z-10 w-56 sm:w-72 md:w-96 lg:w-[28rem] aspect-square rounded-full shadow-2xl border-4 border-accent/30 hover:border-accent/60 transition object-cover"
+                            className="relative z-10 w-56 sm:w-72 md:w-96 lg:w-[28rem] rounded-full shadow-2xl border-4 border-accent/30 hover:border-accent/60 transition object-cover"
                             src={profile.avatar}
-                            alt={`${profile.name} — Full-Stack Software Engineer`}
-                            loading="eager"
-                            fetchPriority="high"
+                            alt={`${profile.name} — Full-Stack Developer and DevOps Learner`}
+                            loading="lazy"
                             animate={{ y: [0, -10, 0] }}
                             transition={{ duration: 4, repeat: Infinity }}
                         />

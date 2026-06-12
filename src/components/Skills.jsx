@@ -4,8 +4,38 @@ import { skills, topSkills, languages } from '../data';
 import { useLanguage } from '../context/LanguageContext';
 import { slideLeft } from '../utils/animationVariants';
 import SplitTextReveal from './SplitTextReveal';
+import SectionBackground from './SectionBackground';
 
-const categoryKeys = ['programming', 'frontend', 'backend', 'databases', 'tools', 'ml'];
+const categoryKeys = ['programming', 'frontend', 'backend', 'databases', 'tools', 'ml', 'devops'];
+
+const SkillCard = ({ skill, index }) => (
+    <motion.div
+        key={skill.title}
+        initial={{ opacity: 0, y: 10 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ delay: index * 0.05 }}
+        viewport={{ once: true }}
+        whileHover={{ y: -5 }}
+        className="group rounded-lg card-bg border p-4 shadow-lg transition-all duration-300 hover:shadow-xl flex items-center gap-3"
+    >
+        <motion.div
+            className="text-2xl text-accent group-hover:scale-125 transition-transform duration-300"
+            animate={{ rotate: [0, 5, -5, 0] }}
+            transition={{ duration: 3, repeat: Infinity }}
+        >
+            <i className={skill.brand ? `fa-brands fa-${skill.icon}` : `fa fa-${skill.icon}`} />
+        </motion.div>
+        <h5 className="text-sm font-semibold group-hover:text-accent transition">{skill.title}</h5>
+    </motion.div>
+);
+
+const SkillGrid = ({ items }) => (
+    <div className="grid gap-2 sm:gap-3 md:grid-cols-2 lg:grid-cols-3">
+        {items.map((skill, index) => (
+            <SkillCard key={skill.title} skill={skill} index={index} />
+        ))}
+    </div>
+);
 
 export default function Skills() {
     const { t } = useLanguage();
@@ -13,6 +43,7 @@ export default function Skills() {
     const translatedLanguageCards = t('languageCards');
     return (
         <section id="skills" className="section-dark" aria-labelledby="skills-heading">
+            <SectionBackground variant="skills" />
             <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 md:py-20">
                 <motion.div
                     className="text-center mb-8 md:mb-16"
@@ -65,28 +96,18 @@ export default function Skills() {
                                     {t(`skills.${categoryKeys[catIndex]}`)}
                                     <span className="h-1 flex-grow bg-gradient-to-r from-cyan-400 to-transparent"></span>
                                 </h4>
-                                <div className="grid gap-2 sm:gap-3 md:grid-cols-2 lg:grid-cols-3">
-                                    {category.items.map((skill, index) => (
-                                        <motion.div
-                                            key={skill.title}
-                                            initial={{ opacity: 0, y: 10 }}
-                                            whileInView={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: index * 0.05 }}
-                                            viewport={{ once: true }}
-                                            whileHover={{ y: -5 }}
-                                            className="group rounded-lg card-bg border p-4 shadow-lg transition-all duration-300 hover:shadow-xl flex items-center gap-3"
-                                        >
-                                            <motion.div
-                                                className="text-2xl text-accent group-hover:scale-125 transition-transform duration-300"
-                                                animate={{ rotate: [0, 5, -5, 0] }}
-                                                transition={{ duration: 3, repeat: Infinity }}
-                                            >
-                                                <i className={skill.brand ? `fa-brands fa-${skill.icon}` : `fa fa-${skill.icon}`} />
-                                            </motion.div>
-                                            <h5 className="text-sm font-semibold group-hover:text-accent transition">{skill.title}</h5>
-                                        </motion.div>
-                                    ))}
-                                </div>
+                                {category.groups ? (
+                                    <div className="space-y-5">
+                                        {category.groups.map((group) => (
+                                            <div key={group.label} className="space-y-3">
+                                                <p className="text-xs font-bold uppercase tracking-wider text-muted">{group.label}</p>
+                                                <SkillGrid items={group.items} />
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <SkillGrid items={category.items} />
+                                )}
                             </motion.div>
                         ))}
                     </div>

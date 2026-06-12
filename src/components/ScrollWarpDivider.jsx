@@ -39,11 +39,10 @@ export default function ScrollWarpDivider({ flip = false }) {
                     fill={`url(#warp-grad-${flip ? 'f' : 'n'})`}
                     filter={`url(#warp-glow-${flip ? 'f' : 'n'})`}
                     style={{
-                        d: smoothWarp,
                     }}
                 />
                 <motion.path
-                    d={`M0,40 C360,${80} 720,${0} 1080,${40} C1260,${60} 1440,${40}`}
+                    d={`M0,40 C360,${80} 720,${0} 1080,${40} C1260,${60} 1440,${40} 1440,40`}
                     stroke="url(#warp-grad-${flip ? 'f' : 'n'})"
                     strokeWidth="1.5"
                     fill="none"

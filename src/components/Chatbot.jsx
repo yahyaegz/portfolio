@@ -1,7 +1,220 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { profile, skills, experience, projects, education, contactInfo, services, certifications, coreCompetencies, testimonials, languages as langData } from '../data';
+import {
+    profile,
+    topSkills,
+    skills,
+    experience,
+    projects,
+    education,
+    contactInfo,
+    services,
+    certifications,
+    coreCompetencies,
+    testimonials,
+    languages as langData,
+} from '../data';
 import { useLanguage } from '../context/LanguageContext';
+
+const PUTER_SDK_SRC = 'https://js.puter.com/v2/';
+const SPEECH_LANGS = {
+    en: 'en-US',
+    ar: 'ar-MA',
+    fr: 'fr-FR',
+    es: 'es-ES',
+};
+
+let puterLoadPromise;
+
+function setPuterQuietMode() {
+    window.PUTER_QUIET = true;
+    window.puter = window.puter || {};
+    window.puter.quiet = true;
+}
+
+function loadPuter() {
+    if (typeof window === 'undefined') {
+        return Promise.reject(new Error('Puter is only available in the browser.'));
+    }
+
+    setPuterQuietMode();
+
+    if (window.puter?.ai?.chat) {
+        return Promise.resolve(window.puter);
+    }
+
+    if (puterLoadPromise) {
+        return puterLoadPromise;
+    }
+
+    puterLoadPromise = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = PUTER_SDK_SRC;
+        script.async = true;
+        script.dataset.puterSdk = 'true';
+
+        script.onload = () => {
+            setPuterQuietMode();
+
+            if (window.puter?.ai?.chat) {
+                resolve(window.puter);
+                return;
+            }
+
+            puterLoadPromise = undefined;
+            reject(new Error('Puter AI did not initialize.'));
+        };
+
+        script.onerror = () => {
+            puterLoadPromise = undefined;
+            reject(new Error('Puter SDK failed to load.'));
+        };
+
+        document.head.appendChild(script);
+    });
+
+    return puterLoadPromise;
+}
+
+function getSpeechRecognition() {
+    if (typeof window === 'undefined') return null;
+    return window.SpeechRecognition || window.webkitSpeechRecognition || null;
+}
+
+function cleanForSpeech(text) {
+    return text
+        .replace(/https?:\/\/\S+/g, 'link')
+        .replace(/[*_`>#-]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, 900);
+}
+
+function formatSkillCategory(category) {
+    if (category.groups?.length) {
+        return `${category.category}: ${category.groups
+            .map(group => `${group.label}: ${group.items.map(item => item.title).join(', ')}`)
+            .join('; ')}`;
+    }
+
+    return `${category.category}: ${category.items.map(item => item.title).join(', ')}`;
+}
+
+function buildWebsiteKnowledge() {
+    const skillsSummary = skills
+        .map(formatSkillCategory)
+        .join('\n');
+    const projectsSummary = projects
+        .map(project => [
+            `${project.title}: ${project.description}`,
+            `Tech: ${project.tech.join(', ')}`,
+            project.link && project.link !== '#' ? `Link: ${project.link}` : null,
+            project.githubUrl ? `GitHub: ${project.githubUrl}` : null,
+            project.localNote || null,
+        ].filter(Boolean).join(' | '))
+        .join('\n');
+    const experienceSummary = experience
+        .map(item => [
+            `${item.company}: ${item.role}`,
+            `${item.period}, ${item.location}`,
+            item.summary,
+            item.highlights?.length ? `Highlights: ${item.highlights.join('; ')}` : null,
+            item.link && item.link !== '#' ? `Company link: ${item.link}` : null,
+        ].filter(Boolean).join(' | '))
+        .join('\n');
+    const educationSummary = education
+        .map(item => `${item.period}: ${item.text}`)
+        .join('\n');
+    const certsSummary = certifications
+        .map(category => `${category.category}\n${category.items.map(cert => [
+            cert.name,
+            cert.type,
+            `Issued: ${cert.issued}`,
+            cert.credentialId ? `Credential ID: ${cert.credentialId}` : null,
+            cert.skills?.length ? `Skills: ${cert.skills.join(', ')}` : null,
+            cert.credentialUrl && cert.credentialUrl !== '#' ? `URL: ${cert.credentialUrl}` : null,
+        ].filter(Boolean).join(' | ')).join('\n')}`)
+        .join('\n\n');
+    const servicesSummary = services
+        .map(service => `${service.title}: ${service.text}`)
+        .join('\n');
+    const testimonialsSummary = testimonials
+        .map(testimonial => `"${testimonial.quote}" - ${testimonial.author} (${testimonial.stars}/5)`)
+        .join('\n');
+    const languagesSummary = langData
+        .map(languageItem => `${languageItem.language}: ${languageItem.level}`)
+        .join(', ');
+
+    return `PROFILE
+Name: ${profile.name}
+Title: ${profile.title}
+Location and contact line: ${profile.subtitle}
+Email: ${contactInfo.email}
+Phone: ${contactInfo.phone}
+LinkedIn: ${contactInfo.linkedin}
+GitHub: ${contactInfo.github}
+Twitter/X: ${profile.social.twitter}
+Instagram: ${profile.social.instagram}
+Summary: ${profile.summary}
+
+POSITIONING
+Top skills: ${topSkills.join(', ')}
+Core competencies: ${coreCompetencies.join(', ')}
+Open to: opportunities, freelance projects, collaboration, full-stack work, backend/API work, AI/ML integrations, DevOps learning projects, and SaaS/product work.
+Favorite technologies: React for frontend, Node.js and ASP.NET Core for backend, Python for AI/ML, and Docker/Jenkins/SonarQube/Prometheus/Grafana for DevOps practice.
+
+WEBSITE SECTIONS
+Home: introduction, profile photo, contact CTA, CV download, social links.
+Services: full-stack development, database design and optimization, secure authentication, machine learning solutions, data analytics, neural networks and deep learning.
+Skills: grouped technical stack across programming, frontend, backend, databases, cloud/tools, AI/ML, and DevOps/CI/CD/monitoring.
+Projects: portfolio case studies and external project links when available.
+Education: EHEI Oujda, preparatory classes, baccalaureate.
+Experience: Codveda Technologies and AIR BABOUCHE.
+Certifications: Meta, HackerRank, Codedex, and Scrimba credentials.
+Contact: email, phone, LinkedIn, and contact form.
+
+SERVICES
+${servicesSummary}
+
+SKILLS
+${skillsSummary}
+
+PROJECTS
+${projectsSummary}
+
+EXPERIENCE
+${experienceSummary}
+
+EDUCATION
+${educationSummary}
+
+CERTIFICATIONS
+${certsSummary}
+
+LANGUAGES
+${languagesSummary}
+
+TESTIMONIALS
+${testimonialsSummary}`;
+}
+
+function buildSystemPrompt(language) {
+    const langNames = { en: 'English', ar: 'Arabic', fr: 'French', es: 'Spanish' };
+    const currentLang = langNames[language] || 'English';
+
+    return `You are Yahya El Gzouli's personal portfolio assistant and voice-capable website guide.
+
+Always respond in ${currentLang}. If the visitor writes or speaks in a different language, still respond in ${currentLang}.
+
+Use only the website knowledge below. Do not invent jobs, dates, metrics, links, credentials, or claims. If something is missing, say you do not see that detail on the website and offer a useful next step.
+
+Be powerful but concise: answer directly, organize complex answers, recommend the most relevant projects/skills/services for the visitor's goal, and guide people toward the CV, contact form, email, LinkedIn, or project links when helpful.
+
+When asked about Yahya, services, experience, projects, skills, certifications, education, contact, pricing, timeline, languages, or availability, use the exact facts below.
+
+WEBSITE KNOWLEDGE
+${buildWebsiteKnowledge()}`;
+}
 
 function YLogo({ size = 36 }) {
     return (
@@ -18,263 +231,6 @@ function YLogo({ size = 36 }) {
     );
 }
 
-function buildKnowledge() {
-    const kb = [];
-
-    kb.push({ keys: ['name', 'who', 'yahya', 'about', 'introduce', 'yourself', 'tell me about', 'gzouli', 'portfolio owner', 'developer', 'engineer', 'من', 'يحيى', 'acerca', 'qui'], category: 'about', data: profile });
-
-    kb.push({ keys: ['summary', 'bio', 'background', 'describe', 'overview', 'profile', 'ملخص', 'résumé', 'biografía'], category: 'summary', data: profile.summary });
-
-    skills.forEach(cat => {
-        const items = cat.items.map(i => i.title).join(', ');
-        kb.push({ keys: [cat.category.toLowerCase(), ...cat.items.map(i => i.title.toLowerCase())], category: 'skills', data: { category: cat.category, items } });
-    });
-    kb.push({ keys: ['skill', 'tech', 'stack', 'technology', 'tool', 'framework', 'programming', 'competenc', 'مهار', 'habilidad', 'compétence', 'what can', 'what do you know', 'capable'], category: 'allSkills', data: skills });
-
-    kb.push({ keys: ['competenc', 'core', 'strength', 'strong', 'best at', 'speciali', 'expert', 'كفاء', 'compétence clé', 'competencia'], category: 'competencies', data: coreCompetencies });
-
-    projects.forEach(p => {
-        kb.push({ keys: [p.title.toLowerCase(), ...p.tech.map(t => t.toLowerCase())], category: 'project', data: p });
-    });
-    kb.push({ keys: ['project', 'work', 'built', 'build', 'create', 'made', 'develop', 'مشر', 'proyecto', 'projet', 'portfolio', 'app', 'application', 'website', 'platform'], category: 'allProjects', data: projects });
-
-    experience.forEach(e => {
-        kb.push({ keys: [e.company.toLowerCase(), e.role.toLowerCase(), e.period.toLowerCase()], category: 'experience', data: e });
-    });
-    kb.push({ keys: ['experience', 'job', 'work', 'intern', 'stage', 'employ', 'company', 'career', 'خبر', 'experiencia', 'expérience', 'worked', 'where did', 'professional'], category: 'allExperience', data: experience });
-
-    kb.push({ keys: ['education', 'study', 'school', 'university', 'degree', 'college', 'learn', 'academic', 'ehei', 'bac', 'preparatory', 'تعليم', 'formación', 'formation', 'studied', 'graduated', 'diploma'], category: 'education', data: education });
-
-    kb.push({ keys: ['contact', 'email', 'phone', 'reach', 'message', 'call', 'connect', 'touch', 'تواصل', 'contacto', 'how to reach', 'get in touch', 'write', 'send'], category: 'contact', data: contactInfo });
-
-    kb.push({ keys: ['service', 'offer', 'provide', 'what do you do', 'can you', 'help', 'خدم', 'servicio', 'propose'], category: 'services', data: services });
-
-    kb.push({ keys: ['where', 'location', 'city', 'country', 'live', 'based', 'from', 'أين', 'dónde', 'où', 'morocco', 'oujda', 'maroc', 'marruecos', 'المغرب', 'وجدة'], category: 'location', data: null });
-
-    kb.push({ keys: ['hire', 'available', 'freelance', 'open to', 'job', 'opportunity', 'recruit', 'توظيف', 'disponible', 'contract', 'remote', 'looking for', 'need developer'], category: 'hire', data: null });
-
-    kb.push({ keys: ['language', 'speak', 'tongue', 'لغ', 'idioma', 'langue', 'arabic', 'french', 'english', 'spanish', 'عربي', 'فرنسي', 'انجليزي'], category: 'languages', data: langData });
-
-    kb.push({ keys: ['cv', 'resume', 'download', 'pdf', 'سيرة', 'currículum', 'télécharger', 'descargar'], category: 'cv', data: null });
-
-    kb.push({ keys: ['certif', 'badge', 'credential', 'hackerrank', 'scrimba', 'codédex', 'شهاد', 'certificación', 'achievement', 'award', 'earned'], category: 'certifications', data: certifications });
-
-    kb.push({ keys: ['testimonial', 'review', 'feedback', 'client', 'what people say', 'recommend', 'آراء', 'testimonio', 'témoignage', 'opinion', 'say about'], category: 'testimonials', data: testimonials });
-
-    kb.push({ keys: ['age', 'old', 'born', 'birthday', 'عمر', 'edad', 'âge', 'year born'], category: 'age', data: null });
-
-    kb.push({ keys: ['github', 'linkedin', 'twitter', 'instagram', 'social', 'link', 'مواقع', 'redes sociales', 'réseaux'], category: 'social', data: profile.social });
-
-    kb.push({ keys: ['hi', 'hello', 'hey', 'salam', 'bonjour', 'hola', 'مرحبا', 'السلام', 'good morning', 'good evening', 'sup', 'yo', 'wassup', 'what\'s up', 'howdy'], category: 'greeting', data: null });
-
-    kb.push({ keys: ['thank', 'thanks', 'merci', 'gracias', 'شكر', 'appreciate', 'helpful', 'great', 'awesome', 'cool', 'nice'], category: 'thanks', data: null });
-
-    kb.push({ keys: ['bye', 'goodbye', 'see you', 'later', 'وداع', 'adiós', 'au revoir', 'ciao', 'take care'], category: 'goodbye', data: null });
-
-    kb.push({ keys: ['joke', 'funny', 'fun', 'humor', 'laugh', 'نكت', 'chiste', 'blague'], category: 'fun', data: null });
-
-    kb.push({ keys: ['how are you', 'how\'s it going', 'how do you do', 'what\'s up', 'كيف حالك', 'comment ça va', 'cómo estás', 'ça va'], category: 'howareyou', data: null });
-
-    kb.push({ keys: ['what can you', 'what do you', 'help me', 'your purpose', 'your job', 'why are you here', 'capabilities', 'features', 'ماذا تفعل'], category: 'capabilities', data: null });
-
-    kb.push({ keys: ['price', 'cost', 'rate', 'charge', 'how much', 'budget', 'سعر', 'precio', 'tarif', 'combien', 'cuánto'], category: 'pricing', data: null });
-
-    kb.push({ keys: ['when', 'timeline', 'how long', 'deadline', 'start', 'متى', 'cuándo', 'quand', 'available when'], category: 'timeline', data: null });
-
-    kb.push({ keys: ['favorite', 'prefer', 'best', 'love', 'like most', 'مفضل', 'favorito', 'préféré', 'enjoy'], category: 'favorites', data: null });
-
-    kb.push({ keys: ['how did you learn', 'self-taught', 'course', 'bootcamp', 'training', 'كيف تعلمت', 'cómo aprendiste', 'comment as-tu appris'], category: 'learning', data: null });
-
-    kb.push({ keys: ['asp.net', '.net', 'c#', 'csharp'], category: 'skills', data: { category: 'Backend', items: 'C# / .NET / ASP.NET Core — Full-stack backend development with secure APIs' } });
-    kb.push({ keys: ['react', 'frontend', 'front-end', 'next.js', 'nextjs'], category: 'skills', data: { category: 'Frontend', items: 'React.js, Next.js, HTML5, CSS3, Tailwind CSS, Bootstrap' } });
-    kb.push({ keys: ['python', 'machine learning', 'ml', 'ai', 'artificial intelligence', 'tensorflow', 'deep learning', 'neural'], category: 'skills', data: { category: 'ML & AI', items: 'Python, TensorFlow, Keras, Deep Learning, Neural Networks, NLP, Data Analysis' } });
-    kb.push({ keys: ['database', 'sql', 'mysql', 'postgres', 'mongodb', 'nosql', 'قاعدة بيانات'], category: 'skills', data: { category: 'Databases', items: 'PostgreSQL, MySQL, MongoDB' } });
-    kb.push({ keys: ['docker', 'devops', 'deploy', 'cloud', 'aws', 'azure', 'vercel', 'netlify', 'ci/cd'], category: 'skills', data: { category: 'Tools & Cloud', items: 'Docker, Git & GitHub, Linux, AWS, Microsoft Azure, Vercel & Netlify' } });
-
-    return kb;
-}
-
-const knowledgeBase = buildKnowledge();
-
-function findBestMatch(input) {
-    const q = input.toLowerCase().trim();
-    const words = q.split(/\s+/);
-
-    let bestMatch = null;
-    let bestScore = 0;
-
-    for (const entry of knowledgeBase) {
-        let score = 0;
-        for (const key of entry.keys) {
-            if (q.includes(key)) {
-                score += key.length * 3;
-            }
-            for (const word of words) {
-                if (word.length < 2) continue;
-                if (key.includes(word)) {
-                    score += word.length * 2;
-                }
-                if (word.includes(key) && key.length >= 3) {
-                    score += key.length;
-                }
-            }
-        }
-        if (score > bestScore) {
-            bestScore = score;
-            bestMatch = entry;
-        }
-    }
-
-    return { match: bestMatch, score: bestScore };
-}
-
-function getResponse(input, t, _language) {
-    const q = input.toLowerCase().trim();
-    const { match, score } = findBestMatch(q);
-
-    if (!match || score < 3) {
-        return generateSmartFallback(q, t);
-    }
-
-    switch (match.category) {
-        case 'greeting':
-            return t('chatbot.greeting');
-
-        case 'thanks':
-            return t('chatbot.thanks');
-
-        case 'goodbye':
-            return t('chatbot.goodbye');
-
-        case 'howareyou':
-            return t('chatbot.howareyou');
-
-        case 'fun':
-            return t('chatbot.fun');
-
-        case 'capabilities':
-            return t('chatbot.capabilities');
-
-        case 'about':
-            return `${t('chatbot.aboutIntro')} ${profile.name} — ${profile.title}. ${profile.subtitle}`;
-
-        case 'summary':
-            return profile.summary;
-
-        case 'skills':
-            if (match.data?.category) {
-                return `**${match.data.category}:** ${match.data.items}`;
-            }
-            return t('chatbot.skillsIntro') + ' ' + skills.map(c => c.category).join(', ') + '.';
-
-        case 'allSkills': {
-            const cats = skills.map(c => `• ${c.category}: ${c.items.map(i => i.title).join(', ')}`).join('\n');
-            return `${t('chatbot.skillsIntro')}\n${cats}`;
-        }
-
-        case 'competencies':
-            return `${t('chatbot.competenciesIntro')} ${coreCompetencies.join(', ')}.`;
-
-        case 'project':
-            if (match.data?.title) {
-                return `📦 **${match.data.title}**: ${match.data.description}\n🛠️ Tech: ${match.data.tech.join(', ')}${match.data.link && match.data.link !== '#' ? `\n🔗 ${match.data.link}` : ''}`;
-            }
-            break;
-
-        case 'allProjects': {
-            const real = projects.filter(p => p.type === 'project');
-            return `${t('chatbot.projectsIntro')} ${real.map(p => `• ${p.title}`).join(', ')}.`;
-        }
-
-        case 'experience':
-            if (match.data?.company) {
-                return `💼 **${match.data.company}** — ${match.data.role} (${match.data.period})\n📍 ${match.data.location}\n${match.data.summary}`;
-            }
-            break;
-
-        case 'allExperience': {
-            const exp = experience.map(e => `• ${e.company} — ${e.role} (${e.period})`).join('\n');
-            return `${t('chatbot.experienceIntro')}\n${exp}`;
-        }
-
-        case 'education': {
-            const edu = education.map(e => `• ${e.text} (${e.period})`).join('\n');
-            return `${t('chatbot.educationIntro')}\n${edu}`;
-        }
-
-        case 'contact':
-            return `${t('chatbot.contactIntro')} ✉️ ${contactInfo.email} | 📞 ${contactInfo.phone} | 💼 LinkedIn: ${contactInfo.linkedin}`;
-
-        case 'services': {
-            const svc = services.map(s => `• ${s.title}: ${s.text}`).join('\n');
-            return `${t('chatbot.servicesIntro')}\n${svc}`;
-        }
-
-        case 'location':
-            return t('chatbot.location');
-
-        case 'hire':
-            return t('chatbot.hire');
-
-        case 'languages':
-            return t('chatbot.languages');
-
-        case 'cv':
-            return t('chatbot.cv');
-
-        case 'certifications': {
-            const certs = certifications.flatMap(cat =>
-                cat.items.map(c => `• ${c.name} (${cat.category}) — ${c.issued}`)
-            ).join('\n');
-            return `${t('chatbot.certificationsIntro')}\n${certs}`;
-        }
-
-        case 'testimonials': {
-            const test = testimonials.map(t => `⭐ "${t.quote}" — ${t.author}`).join('\n\n');
-            return `${t('chatbot.testimonialsIntro')}\n\n${test}`;
-        }
-
-        case 'age':
-            return t('chatbot.age');
-
-        case 'social':
-            return `${t('chatbot.socialIntro')}\n🔗 GitHub: ${profile.social.github}\n💼 LinkedIn: ${profile.social.linkedin}\n🐦 Twitter: ${profile.social.twitter}\n📸 Instagram: ${profile.social.instagram}`;
-
-        case 'pricing':
-            return t('chatbot.pricing');
-
-        case 'timeline':
-            return t('chatbot.timeline');
-
-        case 'favorites':
-            return t('chatbot.favorites');
-
-        case 'learning':
-            return t('chatbot.learning');
-
-        default:
-            return generateSmartFallback(q, t);
-    }
-
-    return generateSmartFallback(q, t);
-}
-
-function generateSmartFallback(q, t) {
-    const isQuestion = /\?|^(what|who|how|where|when|why|can|do|does|is|are|will|would|should|could|tell|show|list|explain|describe|ما|من|كيف|أين|هل|لماذا|qué|quién|cómo|dónde|est-ce|quel|pourquoi|comment)/.test(q);
-
-    const isConversational = /^(i |my |we |our |please|can you|could you|i'm|i am|i need|i want|looking for|help me|yo |أنا|أريد|je |j'|necesito|quiero)/.test(q);
-
-    if (isQuestion) {
-        return t('chatbot.smartQuestion');
-    }
-
-    if (isConversational) {
-        return t('chatbot.smartConversational');
-    }
-
-    return t('chatbot.smartDefault');
-}
-
 function getQuickQuestions(t) {
     return [
         t('chatbot.quickSkills'),
@@ -284,10 +240,6 @@ function getQuickQuestions(t) {
     ];
 }
 
-function getRandomDelay() {
-    return 400 + Math.floor(Math.random() * 600);
-}
-
 export default function Chatbot() {
     const { t, language } = useLanguage();
     const [open, setOpen] = useState(false);
@@ -295,17 +247,38 @@ export default function Chatbot() {
     const [input, setInput] = useState('');
     const [showQuick, setShowQuick] = useState(true);
     const [isTyping, setIsTyping] = useState(false);
+    const [isListening, setIsListening] = useState(false);
+    const [speechInputSupported, setSpeechInputSupported] = useState(false);
+    const [speechOutputSupported, setSpeechOutputSupported] = useState(false);
+    const [voiceReplyEnabled, setVoiceReplyEnabled] = useState(false);
     const messagesEnd = useRef(null);
     const inputRef = useRef(null);
     const welcomeSent = useRef(false);
+    const conversationRef = useRef([]);
+    const recognitionRef = useRef(null);
 
-    // Initialize welcome message when chat first opens
-    const ensureWelcome = () => {
+    const ensureWelcome = useCallback(() => {
         if (!welcomeSent.current) {
             welcomeSent.current = true;
-            setMessages([{ role: 'bot', text: t('chatbot.welcome') }]);
+            const welcomeText = t('chatbot.welcome');
+            setMessages([{ role: 'bot', text: welcomeText }]);
+            conversationRef.current = [
+                { role: 'assistant', content: welcomeText },
+            ];
         }
-    };
+    }, [t]);
+
+    useEffect(() => {
+        setSpeechInputSupported(Boolean(getSpeechRecognition()));
+        setSpeechOutputSupported(typeof window !== 'undefined' && 'speechSynthesis' in window);
+
+        return () => {
+            recognitionRef.current?.abort?.();
+            if (typeof window !== 'undefined' && window.speechSynthesis) {
+                window.speechSynthesis.cancel();
+            }
+        };
+    }, []);
 
     useEffect(() => {
         messagesEnd.current?.scrollIntoView({ behavior: 'smooth' });
@@ -315,9 +288,73 @@ export default function Chatbot() {
         if (open) inputRef.current?.focus();
     }, [open]);
 
-    const send = (text) => {
+    useEffect(() => {
+        if (!voiceReplyEnabled && typeof window !== 'undefined' && window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+        }
+    }, [voiceReplyEnabled]);
+
+    const speak = useCallback((text) => {
+        if (!voiceReplyEnabled || !speechOutputSupported || typeof window === 'undefined' || !window.speechSynthesis) {
+            return;
+        }
+
+        const spokenText = cleanForSpeech(text);
+        if (!spokenText) return;
+
+        window.speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance(spokenText);
+        const lang = SPEECH_LANGS[language] || SPEECH_LANGS.en;
+        const voices = window.speechSynthesis.getVoices?.() || [];
+        const matchingVoice = voices.find(voice => voice.lang?.toLowerCase().startsWith(lang.slice(0, 2).toLowerCase()));
+
+        utterance.lang = lang;
+        utterance.rate = 0.95;
+        utterance.pitch = 1;
+        if (matchingVoice) utterance.voice = matchingVoice;
+
+        window.speechSynthesis.speak(utterance);
+    }, [language, speechOutputSupported, voiceReplyEnabled]);
+
+    const sendToPuter = useCallback(async (userText) => {
+        const systemPrompt = buildSystemPrompt(language);
+
+        conversationRef.current = [
+            ...conversationRef.current,
+            { role: 'user', content: userText },
+        ];
+
+        if (conversationRef.current.length > 20) {
+            conversationRef.current = conversationRef.current.slice(-20);
+        }
+
+        try {
+            const puter = await loadPuter();
+            const response = await puter.ai.chat(
+                [
+                    { role: 'system', content: systemPrompt },
+                    ...conversationRef.current,
+                ],
+                { model: 'gpt-4o-mini' }
+            );
+
+            const botText = response?.message?.content || response?.toString?.() || t('chatbot.smartDefault');
+
+            conversationRef.current = [
+                ...conversationRef.current,
+                { role: 'assistant', content: botText },
+            ];
+
+            return botText;
+        } catch {
+            return t('chatbot.smartDefault');
+        }
+    }, [language, t]);
+
+    const send = useCallback(async (text) => {
         const trimmed = (text || input).trim();
-        if (!trimmed) return;
+        if (!trimmed || isTyping) return;
 
         const userMsg = { role: 'user', text: trimmed };
         setMessages(prev => [...prev, userMsg]);
@@ -325,14 +362,63 @@ export default function Chatbot() {
         setShowQuick(false);
         setIsTyping(true);
 
-        const delay = getRandomDelay();
-        setTimeout(() => {
-            const botResponse = getResponse(trimmed, t, language);
+        try {
+            const botResponse = await sendToPuter(trimmed);
             const botMsg = { role: 'bot', text: botResponse };
             setMessages(prev => [...prev, botMsg]);
+            speak(botResponse);
+        } finally {
             setIsTyping(false);
-        }, delay);
-    };
+        }
+    }, [input, isTyping, sendToPuter, speak]);
+
+    const startListening = useCallback(() => {
+        if (!speechInputSupported || isTyping || isListening) return;
+
+        const Recognition = getSpeechRecognition();
+        if (!Recognition) return;
+
+        recognitionRef.current?.abort?.();
+
+        const recognition = new Recognition();
+        recognition.lang = SPEECH_LANGS[language] || SPEECH_LANGS.en;
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        recognition.onstart = () => setIsListening(true);
+        recognition.onend = () => setIsListening(false);
+        recognition.onerror = () => setIsListening(false);
+        recognition.onresult = (event) => {
+            const transcript = Array.from(event.results)
+                .map(result => result[0]?.transcript)
+                .filter(Boolean)
+                .join(' ')
+                .trim();
+
+            if (transcript) {
+                send(transcript);
+            }
+        };
+
+        recognitionRef.current = recognition;
+        recognition.start();
+    }, [isListening, isTyping, language, send, speechInputSupported]);
+
+    const stopListening = useCallback(() => {
+        recognitionRef.current?.stop?.();
+        setIsListening(false);
+    }, []);
+
+    const toggleVoiceReplies = useCallback(() => {
+        if (!speechOutputSupported) return;
+        setVoiceReplyEnabled(current => {
+            if (current && typeof window !== 'undefined' && window.speechSynthesis) {
+                window.speechSynthesis.cancel();
+            }
+            return !current;
+        });
+    }, [speechOutputSupported]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -344,7 +430,7 @@ export default function Chatbot() {
     return (
         <>
             <motion.button
-                onClick={() => { setOpen(o => !o); ensureWelcome(); }}
+                onClick={() => { setOpen(current => !current); ensureWelcome(); }}
                 className="fixed bottom-[5.25rem] right-8 z-50 h-12 w-12 rounded-full bg-accent text-black shadow-lg shadow-accent/30 flex items-center justify-center hover:shadow-accent/50 transition-shadow"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
@@ -368,7 +454,7 @@ export default function Chatbot() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.9 }}
                         transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                        className="fixed bottom-[9.5rem] right-8 z-50 w-[340px] sm:w-[380px] max-h-[500px] rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+                        className="fixed bottom-[9.5rem] right-4 sm:right-8 z-50 w-[calc(100vw-2rem)] max-w-[390px] max-h-[500px] rounded-2xl shadow-2xl overflow-hidden flex flex-col"
                         style={{
                             backgroundColor: 'var(--bg-primary)',
                             borderColor: 'var(--border-color)',
@@ -385,18 +471,20 @@ export default function Chatbot() {
                                 <p className="text-black/60 text-xs">{t('chatbot.subtitle')}</p>
                             </div>
                             <button
+                                type="button"
                                 onClick={() => setOpen(false)}
                                 className="ml-auto text-black/60 hover:text-black transition"
                                 style={isRtl ? { marginLeft: 0, marginRight: 'auto' } : {}}
+                                aria-label="Close chatbot"
                             >
                                 <i className="fa fa-times" />
                             </button>
                         </div>
 
                         <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-[200px] max-h-[340px]" style={{ backgroundColor: 'var(--bg-secondary)' }}>
-                            {messages.map((msg, i) => (
+                            {messages.map((msg, index) => (
                                 <motion.div
-                                    key={i}
+                                    key={index}
                                     initial={{ opacity: 0, y: 8 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
@@ -438,16 +526,17 @@ export default function Chatbot() {
 
                             {showQuick && messages.length <= 1 && !isTyping && (
                                 <div className="flex flex-wrap gap-2 pt-2">
-                                    {getQuickQuestions(t).map((q, i) => (
+                                    {getQuickQuestions(t).map((question, index) => (
                                         <motion.button
-                                            key={i}
+                                            key={index}
+                                            type="button"
                                             initial={{ opacity: 0, scale: 0.8 }}
                                             animate={{ opacity: 1, scale: 1 }}
-                                            transition={{ delay: 0.3 + i * 0.1 }}
-                                            onClick={() => send(q)}
+                                            transition={{ delay: 0.3 + index * 0.1 }}
+                                            onClick={() => send(question)}
                                             className="text-xs rounded-full px-3 py-1.5 border border-accent/40 text-accent hover:bg-accent/10 transition"
                                         >
-                                            {q}
+                                            {question}
                                         </motion.button>
                                     ))}
                                 </div>
@@ -457,21 +546,56 @@ export default function Chatbot() {
                         </div>
 
                         <form onSubmit={handleSubmit} className="flex-shrink-0 p-3 flex gap-2" style={{ borderTop: '1px solid var(--border-color)', backgroundColor: 'var(--bg-primary)' }}>
+                            <motion.button
+                                type="button"
+                                whileHover={{ scale: speechInputSupported ? 1.05 : 1 }}
+                                whileTap={{ scale: speechInputSupported ? 0.95 : 1 }}
+                                className={`h-10 w-10 rounded-full border flex items-center justify-center flex-shrink-0 transition ${
+                                    isListening
+                                        ? 'bg-accent text-black border-accent shadow-lg shadow-accent/30'
+                                        : 'text-accent border-accent/40 hover:bg-accent/10 disabled:opacity-40 disabled:hover:bg-transparent'
+                                }`}
+                                onClick={isListening ? stopListening : startListening}
+                                disabled={!speechInputSupported || isTyping}
+                                aria-label={isListening ? 'Stop voice input' : 'Start voice input'}
+                                aria-pressed={isListening}
+                                title={speechInputSupported ? 'Voice input' : 'Voice input unavailable'}
+                            >
+                                <i className={`fa ${isListening ? 'fa-stop' : 'fa-microphone'} text-sm`} />
+                            </motion.button>
                             <input
                                 ref={inputRef}
                                 type="text"
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
                                 placeholder={t('chatbot.placeholder')}
-                                className="flex-1 text-sm px-4 py-2.5 rounded-full input-bg border outline-none focus:border-accent transition"
+                                className="min-w-0 flex-1 text-sm px-4 py-2.5 rounded-full input-bg border outline-none focus:border-accent transition"
                                 disabled={isTyping}
                             />
+                            <motion.button
+                                type="button"
+                                whileHover={{ scale: speechOutputSupported ? 1.05 : 1 }}
+                                whileTap={{ scale: speechOutputSupported ? 0.95 : 1 }}
+                                className={`h-10 w-10 rounded-full border flex items-center justify-center flex-shrink-0 transition ${
+                                    voiceReplyEnabled
+                                        ? 'bg-accent text-black border-accent'
+                                        : 'text-accent border-accent/40 hover:bg-accent/10 disabled:opacity-40 disabled:hover:bg-transparent'
+                                }`}
+                                onClick={toggleVoiceReplies}
+                                disabled={!speechOutputSupported}
+                                aria-label={voiceReplyEnabled ? 'Disable spoken replies' : 'Enable spoken replies'}
+                                aria-pressed={voiceReplyEnabled}
+                                title={speechOutputSupported ? 'Spoken replies' : 'Spoken replies unavailable'}
+                            >
+                                <i className={`fa ${voiceReplyEnabled ? 'fa-volume-high' : 'fa-volume-xmark'} text-sm`} />
+                            </motion.button>
                             <motion.button
                                 type="submit"
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
-                                className="h-10 w-10 rounded-full bg-accent text-black flex items-center justify-center flex-shrink-0"
+                                className="h-10 w-10 rounded-full bg-accent text-black flex items-center justify-center flex-shrink-0 disabled:opacity-50"
                                 disabled={!input.trim() || isTyping}
+                                aria-label="Send message"
                             >
                                 <i className={`fa fa-paper-plane text-sm ${isRtl ? 'fa-flip-horizontal' : ''}`} />
                             </motion.button>

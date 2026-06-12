@@ -1,22 +1,55 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { projects } from '../data';
 import { useLanguage } from '../context/LanguageContext';
 import { staggerContainer, scaleUp } from '../utils/animationVariants';
 import SplitTextReveal from './SplitTextReveal';
 import TiltCard from './TiltCard';
+import ProjectCaseStudy from './ProjectCaseStudy';
+import SectionBackground from './SectionBackground';
 
 const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
 };
 
-const ProjectCard = ({ p, translatedItem }) => {
+const ProjectVisual = ({ project }) => {
+    const [imageFailed, setImageFailed] = useState(false);
+
+    if (project.image && !imageFailed) {
+        return (
+            <img
+                src={project.image}
+                alt={`${project.title} preview`}
+                className="h-full w-full object-cover"
+                loading="lazy"
+                onError={() => setImageFailed(true)}
+            />
+        );
+    }
+
+    return (
+        <motion.i
+            className={`${project.brand ? `fa-brands fa-${project.icon}` : `fa fa-${project.icon}`} text-6xl text-accent opacity-80 group-hover:opacity-100`}
+            animate={{ rotate: [0, 10, -10, 0] }}
+            transition={{ duration: 4, repeat: Infinity }}
+        />
+    );
+};
+
+const ProjectCard = ({ p, translatedItem, onOpenCaseStudy }) => {
     const { t } = useLanguage();
     const title = translatedItem?.title || p.title;
     const description = translatedItem?.description || p.description;
+    const primaryAction = p.link && p.link !== '#'
+        ? { href: p.link, label: 'Live Demo', icon: 'fa-arrow-right' }
+        : p.githubUrl
+            ? { href: p.githubUrl, label: 'GitHub', icon: 'fa-brands fa-github' }
+            : null;
+
     return (
         <TiltCard
+            as={motion.article}
             className="group rounded-xl overflow-hidden card-bg border shadow-lg transition-all hover:shadow-2xl"
         >
             <motion.div variants={itemVariants} className="relative z-20">
@@ -24,11 +57,7 @@ const ProjectCard = ({ p, translatedItem }) => {
                 className="h-40 sm:h-44 md:h-48 bg-gradient-to-br from-accent/20 to-cyan-400/20 flex items-center justify-center relative overflow-hidden"
                 whileHover={{ scale: 1.05 }}
             >
-                <motion.i
-                    className={`${p.brand ? `fa-brands fa-${p.icon}` : `fa fa-${p.icon}`} text-6xl text-accent opacity-80 group-hover:opacity-100`}
-                    animate={{ rotate: [0, 10, -10, 0] }}
-                    transition={{ duration: 4, repeat: Infinity }}
-                />
+                <ProjectVisual project={p} />
                 <motion.div
                     className="absolute inset-0 bg-gradient-to-t from-black/40 dark:from-black/60 to-transparent"
                     initial={{ opacity: 0 }}
@@ -58,22 +87,45 @@ const ProjectCard = ({ p, translatedItem }) => {
                     </div>
                 </div>
 
-                {p.link !== '#' && (
-                    <motion.a
-                        href={p.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-accent hover:underline transition font-semibold group/link"
-                        whileHover={{ x: 5 }}
-                    >
-                        {t('projects.viewProject')}{' '}
-                        <motion.i
-                            className="fa fa-arrow-right"
-                            animate={{ x: [0, 3, 0] }}
-                            transition={{ duration: 1.5, repeat: Infinity }}
-                        />
-                    </motion.a>
+                {p.localNote && (
+                    <p className="mb-3 rounded-lg border border-accent/20 bg-accent/5 px-3 py-2 text-xs font-semibold text-secondary">
+                        <i className="fa fa-server text-accent mr-2" />
+                        {p.localNote}
+                    </p>
                 )}
+
+                <div className="flex items-center justify-between gap-4 mt-auto pt-2 border-t" style={{ borderColor: 'var(--border-color)' }}>
+                    <motion.button
+                        onClick={() => onOpenCaseStudy(p)}
+                        className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-accent border border-accent/30 hover:border-accent hover:bg-accent/10 px-3.5 py-2 rounded-full transition"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        <i className="fa-solid fa-file-invoice text-xs" />
+                        <span>{t('caseStudy.readCaseStudy')}</span>
+                    </motion.button>
+
+                    {primaryAction && (
+                        <motion.a
+                            href={primaryAction.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-secondary hover:text-accent transition"
+                            whileHover={{ x: 3 }}
+                        >
+                            <span>{primaryAction.label}</span>
+                            {primaryAction.icon.startsWith('fa-brands') ? (
+                                <i className={`${primaryAction.icon} text-sm`} />
+                            ) : (
+                                <motion.i
+                                    className={`fa ${primaryAction.icon} text-[10px]`}
+                                    animate={{ x: [0, 2, 0] }}
+                                    transition={{ duration: 1.5, repeat: Infinity }}
+                                />
+                            )}
+                        </motion.a>
+                    )}
+                </div>
             </div>
         </motion.div>
         </TiltCard>
@@ -82,6 +134,7 @@ const ProjectCard = ({ p, translatedItem }) => {
 
 export default function Projects() {
     const { t } = useLanguage();
+    const [activeCaseStudy, setActiveCaseStudy] = useState(null);
     const translatedItems = t('projects.items');
     const realProjects = projects.filter(p => p.type === 'project');
 
@@ -92,6 +145,7 @@ export default function Projects() {
 
     return (
         <section id="projects" className="section-alt" aria-labelledby="projects-heading">
+            <SectionBackground variant="projects" />
             <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 md:py-16">
                 <motion.div
                     className="text-center mb-8 md:mb-12"
@@ -112,10 +166,21 @@ export default function Projects() {
                     viewport={{ once: true }}
                 >
                     {realProjects.map((p) => (
-                        <ProjectCard key={p.title} p={p} translatedItem={getTranslation(p.title)} />
+                        <ProjectCard 
+                            key={p.title} 
+                            p={p} 
+                            translatedItem={getTranslation(p.title)} 
+                            onOpenCaseStudy={setActiveCaseStudy}
+                        />
                     ))}
                 </motion.div>
             </div>
+
+            <ProjectCaseStudy 
+                isOpen={activeCaseStudy !== null} 
+                onClose={() => setActiveCaseStudy(null)} 
+                project={activeCaseStudy}
+            />
         </section>
     );
 }

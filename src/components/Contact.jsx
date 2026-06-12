@@ -6,6 +6,8 @@ import { contactInfo } from '../data';
 import { useLanguage } from '../context/LanguageContext';
 import SplitTextReveal from './SplitTextReveal';
 import { slideRight } from '../utils/animationVariants';
+import CurrentlyOpenTo from './CurrentlyOpenTo';
+import SectionBackground from './SectionBackground';
 
 export default function Contact() {
     const [loading, setLoading] = useState(false);
@@ -19,10 +21,26 @@ export default function Contact() {
         setLoading(true);
         const toastId = toast.loading(t('contact.sending'));
 
+        // Add Web3Forms access key
+        const accessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY;
+        
+        if (!accessKey) {
+            toast.error('Configuration error: Contact form is missing API key.', { id: toastId });
+            setLoading(false);
+            return;
+        }
+
+        payload.access_key = accessKey;
+        payload.from_name = payload.name;
+        payload.subject = payload.subject || `New message from ${payload.name}`;
+
         try {
-            const response = await axios.post('/api/contact', payload, {
-                timeout: 8000,
-                headers: { 'Content-Type': 'application/json' }
+            const response = await axios.post('https://api.web3forms.com/submit', payload, {
+                timeout: 10000,
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
             });
 
             if (response?.data?.success) {
@@ -53,6 +71,7 @@ export default function Contact() {
 
     return (
         <section id="contact" className="section-alt" aria-labelledby="contact-heading">
+            <SectionBackground variant="contact" />
             <div className="mx-auto max-w-4xl px-4 sm:px-6 py-12 md:py-16">
                 <motion.div
                     className="text-center mb-8 md:mb-12"
@@ -96,6 +115,10 @@ export default function Contact() {
                         </motion.a>
                     ))}
                 </motion.div>
+
+                <div className="flex justify-center mb-8 md:mb-12">
+                    <CurrentlyOpenTo variant="contact" />
+                </div>
 
                 <motion.div
                     className="rounded-xl card-bg border backdrop-blur p-8 shadow-lg"

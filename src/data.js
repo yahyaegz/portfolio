@@ -1,23 +1,23 @@
-import heroImg from './assets/main.webp';
+import heroImg from './assets/main.jpg';
 
 export const profile = {
     name: 'Yahya El Gzouli',
-    title: 'Full-Stack Software Engineer | 4th Year Computer Engineering Student',
+    title: 'Full-Stack Developer | Computer Engineering Student | DevOps Learner',
     subtitle: 'Oujda, Morocco | Age: 23 | +212 654495827',
     avatar: heroImg,
     social: {
         linkedin: 'https://www.linkedin.com/in/yahya-el-gzouli-99536b331',
         github: 'https://github.com/yahyaegz',
         twitter: 'https://x.com/YahyaEgz?t=1w_Suv18laykjv_2GtumTQ&s=09',
-        instagram: 'https://www.instagram.com/arty7ya_?igshid=anB3cDR5am9tNjlx',
+        instagram: 'https://www.instagram.com/shadowy7ya',
     },
-    summary: `Results-driven Full-Stack Software Engineer with expertise in developing scalable and high-performance web applications using React, Node.js, ASP.NET Core, and SQL-based databases. Skilled in RESTful API design, cloud deployment, and database optimization. Committed to clean architecture, secure authentication systems, and agile team collaboration. Passionate about building innovative solutions and pushing boundaries in technology.`,
+    summary: `Full-Stack Developer and Computer Engineering student focused on building modern web applications and learning real-world DevOps workflows, including CI/CD automation, containerized deployment, code quality analysis, and monitoring.`,
 };
 
 export const topSkills = [
     'Full-Stack Development',
     'RESTful API Design',
-    'Database Optimization',
+    'DevOps / CI/CD Workflows',
 ];
 
 export const coreCompetencies = [
@@ -33,9 +33,105 @@ export const coreCompetencies = [
     'Deep Learning & Neural Networks',
     'Data Analysis & Visualization',
     'Natural Language Processing',
+    'Containerized Deployment',
+    'CI/CD Automation',
+    'Monitoring & Observability',
 ];
 
 export const certifications = [
+    {
+        category: 'Meta',
+        items: [
+            {
+                name: 'Meta Full-Stack Developer Professional Certificate',
+                issued: 'Mar 2026',
+                credentialId: 'NQDPG73WKDGP',
+                type: 'Professional Certificate',
+                skills: ['Full-Stack Development', 'React.js', 'Node.js', 'Python', 'Django', 'REST APIs', 'Databases', 'Git'],
+                credentialUrl: 'https://www.coursera.org/verify/professional-cert/NQDPG73WKDGP',
+                icon: 'certificate'
+            },
+            {
+                name: 'Meta APIs Certificate (Django REST Framework)',
+                issued: 'Mar 2026',
+                credentialId: 'EEUHU9MXOVV3',
+                type: 'Course',
+                skills: ['Django REST Framework', 'API REST', 'Web Development'],
+                credentialUrl: 'https://www.coursera.org/verify/EEUHU9MXOVV3',
+                icon: 'gears'
+            },
+            {
+                name: 'Version Control — Meta',
+                issued: 'Mar 2026',
+                credentialId: 'K10H9YWFQBBV',
+                type: 'Course',
+                skills: ['Git', 'Version Control', 'GitHub'],
+                credentialUrl: 'https://www.coursera.org/verify/K10H9YWFQBBV',
+                icon: 'github',
+                brand: true
+            },
+            {
+                name: 'Django Web Framework — Meta',
+                issued: 'Mar 2026',
+                credentialId: 'P0LB91TMSLGY',
+                type: 'Course',
+                skills: ['Django', 'Python', 'Back-End Development'],
+                credentialUrl: 'https://www.coursera.org/verify/P0LB91TMSLGY',
+                icon: 'python',
+                brand: true
+            },
+            {
+                name: 'Programming in Python — Meta',
+                issued: 'Mar 2026',
+                credentialId: 'N33V5W2ENBX8',
+                type: 'Course',
+                skills: ['Python', 'Object-Oriented Programming (OOP)'],
+                credentialUrl: 'https://www.coursera.org/verify/N33V5W2ENBX8',
+                icon: 'python',
+                brand: true
+            },
+            {
+                name: 'HTML and CSS in Depth — Meta',
+                issued: 'Mar 2026',
+                credentialId: 'JK76WH80F5SC',
+                type: 'Course',
+                skills: ['HTML', 'CSS', 'Responsive Design'],
+                credentialUrl: 'https://www.coursera.org/verify/JK76WH80F5SC',
+                icon: 'html5',
+                brand: true
+            },
+            {
+                name: 'Advanced React — Meta',
+                issued: 'Mar 2026',
+                credentialId: 'JS31GVB04B7D',
+                type: 'Course',
+                skills: ['React.js', 'Front-End Development', 'Performance Optimization'],
+                credentialUrl: 'https://www.coursera.org/verify/JS31GVB04B7D',
+                icon: 'react',
+                brand: true
+            },
+            {
+                name: 'React Basics — Meta',
+                issued: 'Mar 2026',
+                credentialId: 'EBA76J9BFNA5',
+                type: 'Course',
+                skills: ['React.js', 'Front-End Development', 'JSX'],
+                credentialUrl: 'https://www.coursera.org/verify/EBA76J9BFNA5',
+                icon: 'react',
+                brand: true
+            },
+            {
+                name: 'Programming with JavaScript — Meta',
+                issued: 'Mar 2026',
+                credentialId: 'IXA9RNJY9YV1',
+                type: 'Course',
+                skills: ['JavaScript', 'Web Development', 'ES6+'],
+                credentialUrl: 'https://www.coursera.org/verify/IXA9RNJY9YV1',
+                icon: 'js',
+                brand: true
+            }
+        ]
+    },
     {
         category: 'HackerRank',
         items: [
@@ -200,7 +296,8 @@ export const skills = [
             { icon: 'linux', title: 'Linux', brand: true },
             { icon: 'aws', title: 'AWS', brand: true },
             { icon: 'microsoft', title: 'Microsoft Azure', brand: true },
-            { icon: 'rocket', title: 'Vercel & Netlify' },
+            { icon: 'rocket', title: 'Vercel, Render & Netlify' },
+            { icon: 'code', title: 'Postman & Swagger' },
         ]
     },
     {
@@ -214,6 +311,46 @@ export const skills = [
             { icon: 'code', title: 'Natural Language Processing' },
         ]
     },
+    {
+        category: 'DevOps / CI/CD / Monitoring',
+        groups: [
+            {
+                label: 'DevOps & CI/CD',
+                items: [
+                    { icon: 'docker', title: 'Docker', brand: true },
+                    { icon: 'docker', title: 'Docker Compose', brand: true },
+                    { icon: 'jenkins', title: 'Jenkins', brand: true },
+                    { icon: 'code-branch', title: 'CI/CD Pipelines' },
+                    { icon: 'github', title: 'Git / GitHub', brand: true },
+                    { icon: 'server', title: 'Ansible' },
+                ],
+            },
+            {
+                label: 'Code Quality',
+                items: [
+                    { icon: 'magnifying-glass-chart', title: 'SonarQube' },
+                    { icon: 'code', title: 'Sonar Scanner' },
+                ],
+            },
+            {
+                label: 'Monitoring',
+                items: [
+                    { icon: 'chart-line', title: 'Prometheus' },
+                    { icon: 'gauge-high', title: 'Grafana' },
+                    { icon: 'microchip', title: 'Node Exporter' },
+                ],
+            },
+            {
+                label: 'Infrastructure',
+                items: [
+                    { icon: 'network-wired', title: 'NGINX Reverse Proxy' },
+                    { icon: 'linux', title: 'Linux / Ubuntu', brand: true },
+                    { icon: 'database', title: 'PostgreSQL' },
+                    { icon: 'desktop', title: 'VMware / Local DevOps Lab' },
+                ],
+            },
+        ],
+    },
 ];
 
 export const education = [
@@ -223,6 +360,36 @@ export const education = [
 ];
 
 export const experience = [
+    {
+        company: 'Cactus Leather London',
+        role: 'Software Engineer / Full-Stack Developer (Freelance)',
+        period: '2026',
+        location: 'Remote',
+        link: 'https://www.cactusleatherlondon.com/',
+        certificateUrl: '/cactus_leather_certificate.pdf',
+        summary: 'Designed and built a responsive e-commerce website on Wix with a high-end "dark luxury" visual identity for a Moroccan artisanal leather brand based in London. Managed full store architecture, SEO optimization, and brand content strategy.',
+        highlights: [
+            'Designed and structured a responsive e-commerce site on Wix with a high-end "dark luxury" visual identity',
+            'Configured store architecture: product categories, payment gateways, and shipping settings',
+            'Optimized SEO with proper heading hierarchy (H1, H2, H3), keyword optimization, meta descriptions, and alt texts',
+            'Crafted brand content showcasing Moroccan craftsmanship and London heritage, and configured the domain name',
+        ],
+    },
+    {
+        company: 'Codveda Technologies',
+        role: 'Full-Stack Development Intern',
+        period: 'Apr 2026 – May 2026',
+        location: 'Remote',
+        link: '#',
+        summary: 'Selected as a Full Stack Development Intern at Codveda Technologies, working on real-world full-stack web development tasks including building REST APIs, developing frontend interfaces, integrating databases, and implementing authentication systems.',
+        highlights: [
+            'Working on real-world full-stack web development tasks',
+            'Developing front-end and back-end components',
+            'Integrating APIs and optimizing application performance',
+            'Building scalable and user-friendly web applications',
+            'Collaborating remotely while delivering project tasks within deadlines',
+        ],
+    },
     {
         company: 'AIR BABOUCHE',
         role: 'Full-Stack Engineer',
@@ -242,6 +409,22 @@ export const experience = [
 
 export const projects = [
     {
+        title: 'Cliniko - AI Healthcare SaaS Platform',
+        description: 'SaaS platform for clinic management including patient records, appointment scheduling and AI-powered intelligent search. Built with Next.js, PostgreSQL, and AI integration.',
+        tech: ['Next.js', 'React', 'Node.js', 'PostgreSQL', 'Tailwind', 'REST API', 'JWT', 'AI'],
+        link: '#',
+        icon: 'hospital',
+        type: 'project',
+    },
+    {
+        title: 'Cactus Leather London — E-Commerce Website',
+        description: 'Responsive e-commerce website built on Wix with a high-end "dark luxury" visual identity for a Moroccan artisanal leather brand based in London. Includes full store architecture, SEO optimization, and brand content strategy.',
+        tech: ['Wix', 'E-Commerce', 'SEO', 'Branding', 'Responsive Design', 'UX/UI'],
+        link: 'https://www.cactusleatherlondon.com/',
+        icon: 'store',
+        type: 'project',
+    },
+    {
         title: 'AIR BABOUCHE E-Commerce Platform',
         description: 'Full-stack e-commerce platform with secure authentication, product management, and payment integration. Built with React, Node.js, and MySQL.',
         tech: ['React', 'Node.js', 'Express.js', 'MySQL', 'JWT Auth', 'REST APIs'],
@@ -255,6 +438,44 @@ export const projects = [
         tech: ['React', 'Vite', 'Tailwind CSS', 'Framer Motion'],
         link: '#',
         icon: 'briefcase',
+        type: 'project',
+    },
+    {
+        title: "Women's Day Tribute",
+        description: "An animated React celebration page honoring inspiring women around the world. Built to celebrate International Women's Day – March 8 💜 This project creates a beautiful interactive experience with animations, particles, inspirational quotes, and famous women showcases.",
+        tech: ['React', 'Framer Motion', 'Vite', 'Animations'],
+        link: 'https://international-womens-day-chi.vercel.app/',
+        icon: 'heart',
+        type: 'project',
+    },
+    {
+        title: 'Advanced DevOps CI/CD & Code Quality Platform',
+        description: 'A complete local DevOps lab project demonstrating CI/CD automation, containerized deployment, code quality analysis, reverse proxy configuration, monitoring, and deployment automation.',
+        longDescription: 'Built a full-stack task manager with React, Node.js, Express, and PostgreSQL, then containerized it with Docker and Docker Compose. Added NGINX as a reverse proxy, Jenkins for CI/CD, SonarQube for code quality analysis, Ansible for deployment automation, and Prometheus/Grafana with Node Exporter for monitoring.',
+        tech: ['React', 'Vite', 'Node.js', 'Express.js', 'PostgreSQL', 'Docker', 'Docker Compose', 'NGINX', 'Jenkins', 'SonarQube', 'Ansible', 'Prometheus', 'Grafana', 'Linux'],
+        link: '#',
+        githubUrl: 'https://github.com/yahyaegz/advanced-devops-sonarqube',
+        localNote: 'Local DevOps lab project running inside a VMware Ubuntu environment.',
+        image: '/projects/advanced-devops/jenkins-pipeline.png',
+        screenshots: [
+            { title: 'Jenkins successful pipeline', src: '/projects/advanced-devops/jenkins-pipeline.png' },
+            { title: 'SonarQube dashboard', src: '/projects/advanced-devops/sonarqube-dashboard.png' },
+            { title: 'Docker containers status', src: '/projects/advanced-devops/grafana-dashboard.png' },
+        ],
+        keyFeatures: [
+            'React frontend and Node.js backend API',
+            'PostgreSQL database with initialization script',
+            'NGINX reverse proxy',
+            'Docker Compose multi-container stack',
+            'Jenkins CI/CD pipeline',
+            'Backend test and frontend build stages',
+            'SonarQube code quality analysis',
+            'Docker image build and deployment',
+            'Prometheus and Grafana monitoring',
+            'Ansible deployment automation',
+            'Health check after deployment',
+        ],
+        icon: 'diagram-project',
         type: 'project',
     },
 ];

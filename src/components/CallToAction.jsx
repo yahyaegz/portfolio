@@ -5,6 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { fadeUp } from '../utils/animationVariants';
 import AnimatedCounter from './AnimatedCounter';
 import SplitTextReveal from './SplitTextReveal';
+import SectionBackground from './SectionBackground';
 
 export default function CallToAction() {
     const { t } = useLanguage();
@@ -20,6 +21,7 @@ export default function CallToAction() {
 
     return (
         <section className="section-alt relative overflow-hidden border-y py-16 md:py-20" style={{ borderColor: 'var(--border-color)' }}>
+            <SectionBackground variant="cta" />
             <div className="mx-auto max-w-5xl px-4 sm:px-6">
                 {/* CTA */}
                 <motion.div
@@ -63,7 +65,7 @@ export default function CallToAction() {
                 </motion.div>
 
                 <motion.div
-                    className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16 pt-12 border-t"
+                    className="grid grid-cols-3 gap-6 mt-16 pt-12 border-t"
                     style={{ borderColor: 'var(--border-color)' }}
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
@@ -73,10 +75,6 @@ export default function CallToAction() {
                     <div className="text-center">
                         <p className="text-3xl font-bold text-accent"><AnimatedCounter value={3} suffix="+" /></p>
                         <p className="text-muted text-sm">{t('cta.projectsDelivered')}</p>
-                    </div>
-                    <div className="text-center">
-                        <p className="text-3xl font-bold text-accent"><AnimatedCounter value={2} /></p>
-                        <p className="text-muted text-sm">{t('cta.internships')}</p>
                     </div>
                     <div className="text-center">
                         <p className="text-3xl font-bold text-accent"><AnimatedCounter value={30} suffix="+" /></p>

@@ -6,12 +6,16 @@ import { useLanguage } from '../context/LanguageContext';
 export default function Footer() {
     const currentYear = new Date().getFullYear();
     const { t } = useLanguage();
+    const phoneHref = contactInfo.phone.replace(/[^\d+]/g, '');
+    const locationHref = 'https://www.google.com/maps/search/?api=1&query=Oujda%2C%20Morocco';
 
     const navLinks = [
         { name: t('nav.home'), href: '#home' },
         { name: t('nav.skills'), href: '#skills' },
         { name: t('nav.projects'), href: '#projects' },
-        { name: t('nav.experience'), href: '#experience' },
+        { name: t('nav.aiLab') || 'AI Lab', href: '#ai-lab' },
+        { name: t('nav.resumeHub') || 'Resume', href: '#resume-hub' },
+        { name: t('nav.devArcade') || 'Dev Arcade', href: '#dev-arcade' },
         { name: t('certifications.title') + ' ' + t('certifications.titleSpan'), href: '#certifications' },
         { name: t('nav.contact'), href: '#contact' },
     ];
@@ -24,7 +28,7 @@ export default function Footer() {
     ];
 
     return (
-        <footer className="section-dark border-t" style={{ borderColor: 'var(--border-color)' }}>
+        <footer className="section-dark border-t relative z-20" style={{ borderColor: 'var(--border-color)' }}>
             <div className="mx-auto max-w-6xl px-4 sm:px-6 py-16">
                 <div className="grid gap-8 md:grid-cols-4 mb-12">
                     <motion.div
@@ -86,11 +90,11 @@ export default function Footer() {
                     >
                         <h4 className="font-semibold mb-4 uppercase text-sm tracking-wider">{t('footer.services')}</h4>
                         <ul className="space-y-2 text-sm text-secondary">
-                            <li className="hover:text-accent transition">{t('footer.webDev')}</li>
-                            <li className="hover:text-accent transition">{t('footer.fullstackSolutions')}</li>
-                            <li className="hover:text-accent transition">{t('footer.mlDataScience')}</li>
-                            <li className="hover:text-accent transition">{t('footer.apiDesign')}</li>
-                            <li className="hover:text-accent transition">{t('footer.cloudDeployment')}</li>
+                            <li><a href="#services" className="hover:text-accent transition">{t('footer.webDev')}</a></li>
+                            <li><a href="#services" className="hover:text-accent transition">{t('footer.fullstackSolutions')}</a></li>
+                            <li><a href="#ai-lab" className="hover:text-accent transition">{t('footer.mlDataScience')}</a></li>
+                            <li><a href="#skills" className="hover:text-accent transition">{t('footer.apiDesign')}</a></li>
+                            <li><a href="#skills" className="hover:text-accent transition">{t('footer.cloudDeployment')}</a></li>
                         </ul>
                     </motion.div>
 
@@ -110,13 +114,20 @@ export default function Footer() {
                             </div>
                             <div>
                                 <p className="text-muted text-xs">{t('footer.phone')}</p>
-                                <a href={`tel:${contactInfo.phone}`} className="text-secondary hover:text-accent transition">
+                                <a href={`tel:${phoneHref}`} className="text-secondary hover:text-accent transition">
                                     {contactInfo.phone}
                                 </a>
                             </div>
                             <div>
                                 <p className="text-muted text-xs">{t('footer.location')}</p>
-                                <p className="text-secondary">{t('footer.morocco')}</p>
+                                <a
+                                    href={locationHref}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-secondary hover:text-accent transition"
+                                >
+                                    {t('footer.morocco')}
+                                </a>
                             </div>
                         </div>
                     </motion.div>
@@ -130,7 +141,7 @@ export default function Footer() {
                             whileInView={{ opacity: 1 }}
                             viewport={{ once: true }}
                         >
-                            © {currentYear} Yahya El Gzouli. {t('footer.copyright')}
+                            &copy; {currentYear} Yahya El Gzouli. {t('footer.copyright')}
                         </motion.p>
                         <motion.div
                             className="flex gap-4"
@@ -138,24 +149,12 @@ export default function Footer() {
                             whileInView={{ opacity: 1 }}
                             viewport={{ once: true }}
                         >
-                            <a href="#" className="text-muted hover:text-accent transition text-xs">{t('footer.privacy')}</a>
-                            <a href="#" className="text-muted hover:text-accent transition text-xs">{t('footer.terms')}</a>
-                            <a href="#contact" className="text-muted hover:text-accent transition text-xs">{t('footer.sitemap')}</a>
+                            <a href="/privacy.html" className="text-muted hover:text-accent transition text-xs">{t('footer.privacy')}</a>
+                            <a href="/terms.html" className="text-muted hover:text-accent transition text-xs">{t('footer.terms')}</a>
+                            <a href="/sitemap.xml" className="text-muted hover:text-accent transition text-xs">{t('footer.sitemap')}</a>
                         </motion.div>
                     </div>
                 </div>
-
-                <motion.a
-                    href="#home"
-                    className="fixed bottom-8 right-8 grid h-12 w-12 place-items-center rounded-full bg-accent text-black shadow-lg hover:shadow-xl transition z-40"
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    whileHover={{ y: -5 }}
-                    whileTap={{ scale: 0.95 }}
-                >
-                    <i className="fa fa-arrow-up" />
-                </motion.a>
             </div>
         </footer>
     );

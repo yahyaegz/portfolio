@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { experience } from '../data';
 import { useLanguage } from '../context/LanguageContext';
 import SplitTextReveal from './SplitTextReveal';
@@ -25,6 +26,7 @@ export default function Experience() {
                 <div className="space-y-4 md:space-y-6">
                     {items.map((e) => (
                         <TiltCard
+                            as={motion.article}
                             key={e.company}
                             className="rounded-xl card-bg border p-6 md:p-8 shadow-lg transition-all duration-300 hover:shadow-xl"
                         >
@@ -49,15 +51,29 @@ export default function Experience() {
                                     ))}
                                 </ul>
                             )}
-                            {e.link && e.link !== '#' && (
-                                <a
-                                    className="inline-flex items-center gap-2 text-accent hover:underline transition font-semibold text-sm"
-                                    href={e.link}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                >
-                                    <i className="fa fa-link" /> {t('experience.visitCompany')}
-                                </a>
+                            {(e.link && e.link !== '#' || e.certificateUrl) && (
+                                <div className="flex flex-wrap gap-4">
+                                    {e.link && e.link !== '#' && (
+                                        <a
+                                            className="inline-flex items-center gap-2 text-accent hover:underline transition font-semibold text-sm"
+                                            href={e.link}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            <i className="fa fa-link" /> {t('experience.visitCompany')}
+                                        </a>
+                                    )}
+                                    {e.certificateUrl && (
+                                        <a
+                                            className="inline-flex items-center gap-2 text-accent hover:underline transition font-semibold text-sm"
+                                            href={e.certificateUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            <i className="fa fa-file-certificate" /> {t('experience.viewCertificate') || 'View Certificate'}
+                                        </a>
+                                    )}
+                                </div>
                             )}
                         </TiltCard>
                     ))}

@@ -42,7 +42,6 @@ export default function IntroSequence({ onComplete }) {
     const [show, setShow] = useState(() => {
         if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('intro-played')) return false;
         if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
-        if (typeof navigator !== 'undefined' && /Lighthouse|Googlebot|Chrome-Lighthouse|Speed Insights|PTST/i.test(navigator.userAgent)) return false;
         return true;
     });
     const name = useTextScramble('Yahya El Gzouli', show, 1200);
@@ -102,7 +101,7 @@ export default function IntroSequence({ onComplete }) {
                                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                                 transition={{ duration: 0.5 }}
                             >
-                                Full-Stack Software Engineer
+                                Full-Stack Developer / DevOps Learner
                             </motion.p>
                         )}
                     </AnimatePresence>

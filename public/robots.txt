@@ -1,5 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://yahya-elgzouli.dev/sitemap.xml
-
+Sitemap: https://yahyaelgzouli.engineer/sitemap.xml

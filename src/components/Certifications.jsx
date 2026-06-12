@@ -3,11 +3,14 @@ import { motion } from 'framer-motion';
 import { certifications } from '../data';
 import { useLanguage } from '../context/LanguageContext';
 import SplitTextReveal from './SplitTextReveal';
+import AnimatedCounter from './AnimatedCounter';
+import SectionBackground from './SectionBackground';
 
 export default function Certifications() {
     const { t } = useLanguage();
     return (
         <section id="certifications" className="section-dark">
+            <SectionBackground variant="certifications" />
             <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 md:py-20">
                 <motion.div
                     className="text-center mb-8 md:mb-16"
@@ -19,6 +22,35 @@ export default function Certifications() {
                     <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 md:mb-4"><SplitTextReveal>{t('certifications.title')}</SplitTextReveal> <span className="text-accent accent-glow-text"><SplitTextReveal stagger={0.06}>{t('certifications.titleSpan')}</SplitTextReveal></span></h2>
                     <p className="text-secondary max-w-2xl mx-auto text-sm sm:text-base px-2 md:px-0">{t('certifications.subtitle')}</p>
                 </motion.div>
+
+                {/* Visual Trust Stats Cards */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
+                    {[
+                        { label: "Meta Professional Credentials", value: 10, suffix: "+", icon: "fa-certificate", color: "text-accent" },
+                        { label: "Assessment Percentile Index", value: 98, suffix: "%", icon: "fa-arrow-trend-up", color: "text-cyan-400" },
+                        { label: "Core Technical Competencies", value: 12, suffix: "+", icon: "fa-cubes", color: "text-accent" },
+                        { label: "AI & Machine Learning Credentials", value: 5, suffix: "+", icon: "fa-brain", color: "text-cyan-400" }
+                    ].map((stat, sIdx) => (
+                        <motion.div
+                            key={sIdx}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.5, delay: sIdx * 0.1 }}
+                            className="card-bg border rounded-2xl p-5 text-center flex flex-col justify-center min-h-[130px]"
+                        >
+                            <div className={`text-2xl mb-2 flex justify-center ${stat.color}`}>
+                                <i className={`fa ${stat.icon}`} />
+                            </div>
+                            <span className={`text-2xl sm:text-3xl font-extrabold block mb-1 tabular-nums ${stat.color}`}>
+                                <AnimatedCounter value={stat.value} suffix={stat.suffix} />
+                            </span>
+                            <span className="text-[10px] sm:text-xs text-secondary font-bold uppercase tracking-wider leading-snug">
+                                {stat.label}
+                            </span>
+                        </motion.div>
+                    ))}
+                </div>
 
                 <div className="space-y-16">
                     {certifications.map((category, catIndex) => (
@@ -51,7 +83,7 @@ export default function Certifications() {
                                 viewport={{ once: true }}
                             >
                                 {category.items.map((cert) => (
-                                    <motion.div
+                                    <motion.article
                                         key={cert.name}
                                         variants={{
                                             hidden: { opacity: 0, y: 20 },
@@ -138,7 +170,7 @@ export default function Certifications() {
                                                 />
                                             </motion.a>
                                         )}
-                                    </motion.div>
+                                    </motion.article>
                                 ))}
                             </motion.div>
                         </motion.div>

@@ -1,24 +1,30 @@
 import React, { Suspense, lazy, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
-import Header from './components/Header';
-import ScrollProgress from './components/ScrollProgress';
-import Hero from './components/Hero';
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import SkeletonLoader from './components/SkeletonLoader';
-import BackToTop from './components/BackToTop';
-import IntroSequence from './components/IntroSequence';
-import ScrollWarpDivider from './components/ScrollWarpDivider';
 
+const Header = lazy(() => import('./components/Header'));
+const ScrollProgress = lazy(() => import('./components/ScrollProgress'));
+const Hero = lazy(() => import('./components/Hero'));
+const ParticleField = lazy(() => import('./components/ParticleField'));
+const BackToTop = lazy(() => import('./components/BackToTop'));
+const Chatbot = lazy(() => import('./components/Chatbot'));
+const IntroSequence = lazy(() => import('./components/IntroSequence'));
+const ScrollWarpDivider = lazy(() => import('./components/ScrollWarpDivider'));
 const Services = lazy(() => import('./components/Services'));
 const Skills = lazy(() => import('./components/Skills'));
-const ParticleField = lazy(() => import('./components/ParticleField'));
-const Chatbot = lazy(() => import('./components/Chatbot'));
+const CodeCanvas = lazy(() => import('./components/CodeCanvas'));
 const Projects = lazy(() => import('./components/Projects'));
-const Education = lazy(() => import('./components/Education'));
-const Experience = lazy(() => import('./components/Experience'));
+const AILab = lazy(() => import('./components/AILab'));
+const AlgorithmObservatory = lazy(() => import('./components/AlgorithmObservatory'));
+const InteractiveCV = lazy(() => import('./components/InteractiveCV'));
+const DevArcade = lazy(() => import('./components/DevArcade'));
+const DevOpsMissionControl = lazy(() => import('./components/DevOpsMissionControl'));
 const Certifications = lazy(() => import('./components/Certifications'));
 const CallToAction = lazy(() => import('./components/CallToAction'));
 const Contact = lazy(() => import('./components/Contact'));
 const Footer = lazy(() => import('./components/Footer'));
+const Telemetry = lazy(() => import('./components/Telemetry'));
 
 export default function App() {
     const [introDone, setIntroDone] = useState(
@@ -26,8 +32,11 @@ export default function App() {
     );
 
     return (
-        <div className="section-dark min-h-screen flex flex-col">
-            <IntroSequence onComplete={() => setIntroDone(true)} />
+        <>
+            <div className="section-dark min-h-screen flex flex-col overflow-x-hidden w-full relative">
+            <Suspense fallback={null}>
+                <IntroSequence onComplete={() => setIntroDone(true)} />
+            </Suspense>
 
             <Suspense fallback={null}>
                 <ParticleField />
@@ -54,26 +63,39 @@ export default function App() {
                 }}
             />
 
-            <ScrollProgress />
-            <BackToTop />
             <Suspense fallback={null}>
+                <ScrollProgress />
+                <BackToTop />
                 <Chatbot />
+                <Telemetry />
             </Suspense>
-            <Header />
+            <Suspense fallback={<SkeletonLoader />}>
+                <Header />
+            </Suspense>
             <main className="flex-grow relative z-10">
-                <Hero />
+                <Suspense fallback={<SkeletonLoader />}>
+                    <Hero />
+                </Suspense>
                 <Suspense fallback={<SkeletonLoader />}>
                     <ScrollWarpDivider />
                     <Services />
-                    <ScrollWarpDivider flip />
+                    <ScrollWarpDivider />
                     <Skills />
+                    <ScrollWarpDivider flip />
+                    <CodeCanvas />
                     <ScrollWarpDivider />
                     <Projects />
                     <ScrollWarpDivider flip />
-                    <Education />
+                    <AILab />
                     <ScrollWarpDivider />
-                    <Experience />
+                    <AlgorithmObservatory />
                     <ScrollWarpDivider flip />
+                    <InteractiveCV />
+                    <ScrollWarpDivider />
+                    <DevArcade />
+                    <ScrollWarpDivider flip />
+                    <DevOpsMissionControl />
+                    <ScrollWarpDivider />
                     <Certifications />
                     <ScrollWarpDivider />
                     <CallToAction />
@@ -85,5 +107,7 @@ export default function App() {
                 <Footer />
             </Suspense>
         </div>
+        <SpeedInsights />
+        </>
     );
 }
