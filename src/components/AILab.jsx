@@ -890,6 +890,7 @@ export default function AILab() {
     const isDrawingRef = useRef(false);
     const [predictions, setPredictions] = useState(Array(10).fill(0));
     const [activeNodes, setActiveNodes] = useState([]);
+    const [debugText, setDebugText] = useState("");
     const sketchCanvasRef = useRef(null);
     const contextRef = useRef(null);
     const processDrawingRef = useRef(null);
@@ -1111,6 +1112,7 @@ export default function AILab() {
         
         setPredictions(Array(10).fill(0));
         setActiveNodes([]);
+        setDebugText("");
     };
 
     // Robust coordinate mapping handling scaling and different browser events
@@ -1230,101 +1232,96 @@ export default function AILab() {
     }, [activeTab]);
 
     function processDrawing() {
-        const canvas = sketchCanvasRef.current;
-        if (!canvas) return;
-        
-        const W = canvas.width;  // 280
-        const H = canvas.height; // 280
-        const ctx = canvas.getContext('2d');
-        const imgData = ctx.getImageData(0, 0, W, H);
-        const raw = imgData.data; // RGBA flat array
+        try {
+            const canvas = sketchCanvasRef.current;
+            if (!canvas) return;
+            
+            const W = canvas.width;  // 420
+            const H = canvas.height; // 420
+            const ctx = canvas.getContext('2d');
+            const imgData = ctx.getImageData(0, 0, W, H);
+            const raw = imgData.data; // RGBA flat array
 
-        // ── Step 1: Extract grayscale float array (0–1) from the red channel ──
-        // The canvas background is #090d16, so the Red channel is 9.
-        // We subtract the background so pure background is exactly 0.0, and normalize by (255 - 9).
-        const gray = new Float32Array(W * H);
-        for (let i = 0; i < W * H; i++) {
-            const rVal = raw[i * 4];
-            gray[i] = Math.max(0, (rVal - 9) / 246.0);
-        }
-
-        // ── Step 2: Gaussian blur (σ≈1.5, 5×5 kernel) to mimic MNIST smoothness ──
-        // MNIST digits are written with pen on paper then photographed + anti-aliased.
-        // Hard browser canvas edges cause domain shift → blur fixes this.
-        const kernel = [
-            0.0030, 0.0133, 0.0219, 0.0133, 0.0030,
-            0.0133, 0.0596, 0.0983, 0.0596, 0.0133,
-            0.0219, 0.0983, 0.1621, 0.0983, 0.0219,
-            0.0133, 0.0596, 0.0983, 0.0596, 0.0133,
-            0.0030, 0.0133, 0.0219, 0.0133, 0.0030,
-        ];
-        const blurred = new Float32Array(W * H);
-        for (let ry = 0; ry < H; ry++) {
-            for (let rx = 0; rx < W; rx++) {
-                let v = 0;
-                for (let ky = -2; ky <= 2; ky++) {
-                    for (let kx = -2; kx <= 2; kx++) {
-                        const sy = Math.min(H - 1, Math.max(0, ry + ky));
-                        const sx = Math.min(W - 1, Math.max(0, rx + kx));
-                        v += gray[sy * W + sx] * kernel[(ky + 2) * 5 + (kx + 2)];
-                    }
-                }
-                blurred[ry * W + rx] = v;
+            const gray = new Float32Array(W * H);
+            for (let i = 0; i < W * H; i++) {
+                const rVal = raw[i * 4];
+                gray[i] = Math.max(0, (rVal - 9) / 246.0);
             }
-        }
 
-        // ── Step 3: Downsample to 28×28 by averaging all pixels in each 10×10 cell ──
-        // 280/28 = exactly 10 → no rounding errors, perfect coverage
-        const cellSize = W / 28; // = 10
-        const grid28x28 = Array(28).fill(0).map(() => Array(28).fill(0));
-        for (let r = 0; r < 28; r++) {
-            for (let c = 0; c < 28; c++) {
-                let sum = 0;
-                const startY = r * cellSize;
-                const startX = c * cellSize;
-                for (let py = startY; py < startY + cellSize; py++) {
-                    for (let px = startX; px < startX + cellSize; px++) {
-                        sum += blurred[py * W + px];
+            const kernel = [
+                0.0030, 0.0133, 0.0219, 0.0133, 0.0030,
+                0.0133, 0.0596, 0.0983, 0.0596, 0.0133,
+                0.0219, 0.0983, 0.1621, 0.0983, 0.0219,
+                0.0133, 0.0596, 0.0983, 0.0596, 0.0133,
+                0.0030, 0.0133, 0.0219, 0.0133, 0.0030,
+            ];
+            const blurred = new Float32Array(W * H);
+            for (let ry = 0; ry < H; ry++) {
+                for (let rx = 0; rx < W; rx++) {
+                    let v = 0;
+                    for (let ky = -2; ky <= 2; ky++) {
+                        for (let kx = -2; kx <= 2; kx++) {
+                            const sy = Math.min(H - 1, Math.max(0, ry + ky));
+                            const sx = Math.min(W - 1, Math.max(0, rx + kx));
+                            v += gray[sy * W + sx] * kernel[(ky + 2) * 5 + (kx + 2)];
+                        }
                     }
+                    blurred[ry * W + rx] = v;
                 }
-                grid28x28[r][c] = sum / (cellSize * cellSize);
             }
-        }
 
-        // ── Step 4: Center and scale bounding box to 20x20 inside 28x28 (MNIST standard) ──
-        const norm28x28 = normalizeMatrix28x28(grid28x28);
+            const cellSize = W / 28; // = 15
+            const grid28x28 = Array(28).fill(0).map(() => Array(28).fill(0));
+            for (let r = 0; r < 28; r++) {
+                for (let c = 0; c < 28; c++) {
+                    let sum = 0;
+                    const startY = r * cellSize;
+                    const startX = c * cellSize;
+                    for (let py = startY; py < startY + cellSize; py++) {
+                        for (let px = startX; px < startX + cellSize; px++) {
+                            sum += blurred[py * W + px];
+                        }
+                    }
+                    grid28x28[r][c] = sum / (cellSize * cellSize);
+                }
+            }
 
-        // ── Step 5: Flatten to 784-dim input vector and normalize intensity ──
-        const inputs = norm28x28.flat();
-        
-        let maxVal = 0;
-        for (let i = 0; i < inputs.length; i++) {
-            if (inputs[i] > maxVal) maxVal = inputs[i];
-        }
-        if (maxVal > 0) {
+            const norm28x28 = normalizeMatrix28x28(grid28x28);
+
+            const inputs = norm28x28.flat();
+            
+            let maxVal = 0;
             for (let i = 0; i < inputs.length; i++) {
-                inputs[i] /= maxVal;
+                if (inputs[i] > maxVal) maxVal = inputs[i];
             }
-        }
+            if (maxVal > 0) {
+                for (let i = 0; i < inputs.length; i++) {
+                    inputs[i] /= maxVal;
+                }
+            }
 
-        // Require a minimum ink mass
-        const totalMass = inputs.reduce((s, v) => s + v, 0);
-        if (totalMass < 0.5) {
+            const totalMass = inputs.reduce((s, v) => s + v, 0);
+            if (totalMass < 0.5) {
+                setDebugText("MASS < 0.5 | W:" + W + " H:" + H);
+                setPredictions(Array(10).fill(0));
+                setActiveNodes([]);
+                return;
+            }
+
+            const { out } = pretrainedMNISTModel.forward(inputs);
+            
+            setDebugText("MASS: " + totalMass.toFixed(2) + " | OUT[0]: " + out[0].toFixed(2));
+            setPredictions(out);
+
+            const winningIndex = out.indexOf(Math.max(...out));
+            if (Math.max(...out) > 0.15) {
+                setActiveNodes([winningIndex]);
+            } else {
+                setActiveNodes([]);
+            }
+        } catch (err) {
+            setDebugText("ERROR: " + err.message);
             setPredictions(Array(10).fill(0));
-            setActiveNodes([]);
-            return;
-        }
-
-        // ── Step 7: Forward pass through the pre-trained MNIST network ──
-        const { out } = pretrainedMNISTModel.forward(inputs);
-
-        setPredictions(out);
-
-        const winningIndex = out.indexOf(Math.max(...out));
-        if (Math.max(...out) > 0.15) {
-            setActiveNodes([winningIndex]);
-        } else {
-            setActiveNodes([]);
         }
     }
 
@@ -2130,6 +2127,11 @@ export default function AILab() {
                                     {predictions.reduce((s, v) => s + v, 0) === 0 && (
                                         <div className="absolute inset-0 pointer-events-none flex items-center justify-center text-xs text-slate-500/80 uppercase font-bold tracking-widest">
                                             {t('aiLab.placeholderDraw')}
+                                        </div>
+                                    )}
+                                    {debugText && (
+                                        <div className="absolute top-2 left-2 pointer-events-none bg-black/80 text-red-500 font-mono text-[10px] p-1 rounded z-50">
+                                            {debugText}
                                         </div>
                                     )}
                                 </div>
