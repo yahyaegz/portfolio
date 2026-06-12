@@ -79,7 +79,7 @@ def train():
 
     layers = [model.fc1, model.fc2, model.fc3]
     for idx, layer in enumerate(layers):
-        w = layer.weight.detach().cpu().numpy().T
+        w = layer.weight.detach().cpu().numpy()
         b = layer.bias.detach().cpu().numpy()
         
         model_data["layers"].append({
