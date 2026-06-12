@@ -2118,6 +2118,8 @@ export default function AILab() {
                                 <div className="border border-slate-700/80 rounded-xl overflow-hidden relative shadow-inner">
                                     <canvas
                                         ref={sketchCanvasRef}
+                                        width={420}
+                                        height={420}
                                         onMouseDown={startDraw}
                                         onMouseMove={draw}
                                         onMouseUp={endDraw}
