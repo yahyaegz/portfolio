@@ -1,93 +1,101 @@
-import numpy as np
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torchvision import datasets, transforms
 import json
-from sklearn.datasets import fetch_openml
-from sklearn.model_selection import train_test_split
-from sklearn.neural_network import MLPClassifier
-from sklearn.preprocessing import StandardScaler
 import os
 
-print("Fetching MNIST dataset (70,000 samples)...")
-mnist = fetch_openml('mnist_784', version=1, parser='auto')
-X, y = mnist.data.to_numpy(), mnist.target.to_numpy().astype(int)
+print("Fetching MNIST dataset...")
+transform = transforms.Compose([
+    transforms.ToTensor(),
+])
 
-print(f"Total original samples: {len(X)}")
+train_dataset = datasets.MNIST('./data', train=True, download=True, transform=transform)
+test_dataset = datasets.MNIST('./data', train=False, transform=transform)
 
-# Normalise pixels to [0, 1]
-X = X / 255.0
+train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=128, shuffle=True)
+test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=1000, shuffle=False)
 
-print("Augmenting data (random shifts to improve robustness)...")
-import scipy.ndimage
-np.random.seed(42)
+class MLP(nn.Module):
+    def __init__(self):
+        super(MLP, self).__init__()
+        self.fc1 = nn.Linear(784, 256)
+        self.fc2 = nn.Linear(256, 128)
+        self.fc3 = nn.Linear(128, 10)
+        
+    def forward(self, x):
+        x = x.view(-1, 784)
+        x = torch.relu(self.fc1(x))
+        x = torch.relu(self.fc2(x))
+        x = self.fc3(x)
+        return x
 
-X_aug = []
-y_aug = []
+def train():
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Using device: {device}")
 
-for img, label in zip(X, y):
-    # Keep original
-    X_aug.append(img)
-    y_aug.append(label)
-    
-    # Add one shifted version (up to +/- 2 pixels in x and y)
-    dy, dx = np.random.randint(-2, 3, size=2)
-    if dy != 0 or dx != 0:
-        shifted = scipy.ndimage.shift(img.reshape(28, 28), [dy, dx], cval=0, mode="constant").flatten()
-        X_aug.append(shifted)
-        y_aug.append(label)
+    model = MLP().to(device)
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    criterion = nn.CrossEntropyLoss()
 
-X_aug = np.array(X_aug)
-y_aug = np.array(y_aug)
+    epochs = 15
+    print(f"Training deep MLP (784 -> 256 -> 128 -> 10) on {device} for {epochs} epochs...")
 
-print(f"Total samples after augmentation: {len(X_aug)}")
+    for epoch in range(epochs):
+        model.train()
+        total_loss = 0
+        correct = 0
+        for batch_idx, (data, target) in enumerate(train_loader):
+            data, target = data.to(device), target.to(device)
+            optimizer.zero_grad()
+            output = model(data)
+            loss = criterion(output, target)
+            loss.backward()
+            optimizer.step()
+            total_loss += loss.item()
+            pred = output.argmax(dim=1, keepdim=True)
+            correct += pred.eq(target.view_as(pred)).sum().item()
+        
+        acc = 100. * correct / len(train_loader.dataset)
+        print(f"Epoch {epoch+1}/{epochs} - Loss: {total_loss/len(train_loader):.4f} - Train Acc: {acc:.2f}%")
 
-print(f"Training deep MLP (784 -> 256 -> 128 -> 10) on {len(X_aug)} samples with ReLU + Adam...")
-X_train, X_test, y_train, y_test = train_test_split(X_aug, y_aug, test_size=0.1, random_state=42)
+    model.eval()
+    correct = 0
+    with torch.no_grad():
+        for data, target in test_loader:
+            data, target = data.to(device), target.to(device)
+            output = model(data)
+            pred = output.argmax(dim=1, keepdim=True)
+            correct += pred.eq(target.view_as(pred)).sum().item()
 
-# Train a highly accurate deep MLP classifier using ReLU activations
-# ReLU converges much faster and achieves higher accuracy than sigmoid
-mlp = MLPClassifier(
-    hidden_layer_sizes=(256, 128),
-    activation='relu',
-    solver='adam',
-    learning_rate_init=0.001,
-    max_iter=50,
-    batch_size=128,
-    random_state=42,
-    verbose=True,
-    early_stopping=True,
-    validation_fraction=0.1,
-    n_iter_no_change=10,
-    tol=1e-5,
-)
-mlp.fit(X_train, y_train)
+    test_acc = 100. * correct / len(test_loader.dataset)
+    print(f"\nTesting Accuracy: {test_acc:.2f}%\n")
 
-# Check accuracy
-train_acc = mlp.score(X_train, y_train)
-test_acc = mlp.score(X_test, y_test)
-print(f"\nTraining Accuracy: {train_acc * 100:.2f}%")
-print(f"Testing Accuracy:  {test_acc * 100:.2f}%")
+    # Extract weights and biases
+    model_data = {
+        "architecture": "relu",
+        "layers": [],
+    }
 
-# Extract weights and biases (3 layers: input->h1, h1->h2, h2->output)
-# coefs_[i] shape: (n_features_in, n_features_out)
-# We transpose to (n_features_out, n_features_in) for easy JS row-major looping
-model_data = {
-    "architecture": "relu",
-    "layers": [],
-}
+    layers = [model.fc1, model.fc2, model.fc3]
+    for idx, layer in enumerate(layers):
+        w = layer.weight.detach().cpu().numpy().T
+        b = layer.bias.detach().cpu().numpy()
+        
+        model_data["layers"].append({
+            "w": w.round(5).tolist(),
+            "b": b.round(5).tolist(),
+        })
+        print(f"  Layer {idx+1}: w={w.shape}, b={b.shape}")
 
-for idx, (coef, intercept) in enumerate(zip(mlp.coefs_, mlp.intercepts_)):
-    model_data["layers"].append({
-        "w": np.round(coef.T, 5).tolist(),
-        "b": np.round(intercept, 5).tolist(),
-    })
-    print(f"  Layer {idx+1}: w={coef.T.shape}, b={intercept.shape}")
+    output_path = os.path.join(os.getcwd(), "src", "data", "mnist_weights.json")
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    with open(output_path, "w") as f:
+        json.dump(model_data, f, separators=(',', ':'))
 
-# Write weights as JSON to be loaded in React
-output_path = os.path.join(os.getcwd(), "src", "data", "mnist_weights.json")
-os.makedirs(os.path.dirname(output_path), exist_ok=True)
-with open(output_path, "w") as f:
-    json.dump(model_data, f, separators=(',', ':'))
+    size_kb = os.path.getsize(output_path) / 1024
+    print(f"\nWeights successfully saved to {output_path}")
+    print(f"Weights file size: {size_kb:.2f} KB")
 
-size_kb = os.path.getsize(output_path) / 1024
-print(f"\nWeights successfully saved to {output_path}")
-print(f"Weights file size: {size_kb:.2f} KB")
-print(f"Model architecture: 784 -> 256 -> 128 -> 10 (ReLU hidden, softmax output)")
+if __name__ == "__main__":
+    train()
