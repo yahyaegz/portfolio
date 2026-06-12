@@ -891,6 +891,7 @@ export default function AILab() {
     const [predictions, setPredictions] = useState(Array(10).fill(0));
     const [activeNodes, setActiveNodes] = useState([]);
     const sketchCanvasRef = useRef(null);
+    const visionCanvasRef = useRef(null);
     const contextRef = useRef(null);
     const processDrawingRef = useRef(null);
 
@@ -1089,6 +1090,8 @@ export default function AILab() {
             // 33px brush on 420px canvas ≈ 2.2 cells in 28×28 → matches MNIST stroke width
             ctx.lineWidth = 33;
             ctx.strokeStyle = '#ffffff';
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#38bdf8';
             contextRef.current = ctx;
         }
 
@@ -1101,13 +1104,17 @@ export default function AILab() {
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
+        
+        ctx.shadowBlur = 0; // Turn off glow for background
         ctx.fillStyle = '#090d16';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
-        ctx.lineWidth = 22;
+        ctx.lineWidth = 33;
         ctx.strokeStyle = '#ffffff';
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = '#38bdf8';
         
         setPredictions(Array(10).fill(0));
         setActiveNodes([]);
@@ -1153,8 +1160,10 @@ export default function AILab() {
         if (ctx) {
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
-            ctx.lineWidth = 22;
+            ctx.lineWidth = 33;
             ctx.strokeStyle = '#ffffff';
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#38bdf8';
             ctx.beginPath();
             ctx.moveTo(x, y);
             contextRef.current = ctx;
@@ -1177,8 +1186,10 @@ export default function AILab() {
         if (ctx) {
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
-            ctx.lineWidth = 22;
+            ctx.lineWidth = 33;
             ctx.strokeStyle = '#ffffff';
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#38bdf8';
             ctx.lineTo(x, y);
             ctx.stroke();
         }
@@ -1301,11 +1312,33 @@ export default function AILab() {
         if (totalMass < 0.5) {
             setPredictions(Array(10).fill(0));
             setActiveNodes([]);
+            
+            // Clear vision canvas
+            const visionCanvas = visionCanvasRef.current;
+            if (visionCanvas) {
+                const vctx = visionCanvas.getContext('2d');
+                vctx.clearRect(0, 0, 28, 28);
+            }
             return;
         }
 
         const { out } = pretrainedMNISTModel.forward(inputs);
         
+        // Update Neural Vision Viewport
+        const visionCanvas = visionCanvasRef.current;
+        if (visionCanvas) {
+            const vctx = visionCanvas.getContext('2d');
+            const img = vctx.createImageData(28, 28);
+            for (let i = 0; i < 784; i++) {
+                const val = inputs[i] * 255;
+                img.data[i * 4] = val;     // R
+                img.data[i * 4 + 1] = val; // G
+                img.data[i * 4 + 2] = val; // B
+                img.data[i * 4 + 3] = 255; // A
+            }
+            vctx.putImageData(img, 0, 0);
+        }
+
         setPredictions(out);
 
         const winningIndex = out.indexOf(Math.max(...out));
@@ -2106,7 +2139,8 @@ export default function AILab() {
                                     <p className="text-xs text-muted leading-relaxed">{t('aiLab.sketchDesc')}</p>
                                 </div>
 
-                                <div className="border border-slate-700/80 rounded-xl overflow-hidden relative shadow-inner">
+                                <div className="border border-slate-700/80 rounded-xl overflow-hidden relative shadow-inner w-full max-w-[420px] mx-auto group">
+                                    <div className="absolute inset-0 pointer-events-none opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,1) 1px, transparent 0)', backgroundSize: '20px 20px' }}></div>
                                     <canvas
                                         ref={sketchCanvasRef}
                                         width={420}
@@ -2115,13 +2149,28 @@ export default function AILab() {
                                         onMouseMove={draw}
                                         onMouseUp={endDraw}
                                         onMouseLeave={endDraw}
-                                        className="cursor-crosshair bg-slate-950 block w-full aspect-square max-w-[420px] mx-auto"
+                                        className="cursor-crosshair bg-slate-950 block w-full aspect-square relative z-10"
                                     />
                                     {predictions.reduce((s, v) => s + v, 0) === 0 && (
-                                        <div className="absolute inset-0 pointer-events-none flex items-center justify-center text-xs text-slate-500/80 uppercase font-bold tracking-widest">
+                                        <div className="absolute inset-0 pointer-events-none flex items-center justify-center text-xs text-slate-500/80 uppercase font-bold tracking-widest z-20">
                                             {t('aiLab.placeholderDraw')}
                                         </div>
                                     )}
+                                    
+                                    {/* Network Vision HUD */}
+                                    <div className="absolute top-4 left-4 bg-slate-900/90 border border-slate-700/80 p-2 rounded-lg backdrop-blur-md shadow-2xl flex flex-col items-center gap-1.5 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        <span className="text-[8px] font-mono text-slate-400 tracking-[0.2em] uppercase flex items-center gap-1.5">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
+                                            Live Feed
+                                        </span>
+                                        <canvas 
+                                            ref={visionCanvasRef} 
+                                            width={28} 
+                                            height={28} 
+                                            className="w-[60px] h-[60px] bg-[#090d16] rounded border border-slate-800 shadow-inner" 
+                                            style={{ imageRendering: 'pixelated' }} 
+                                        />
+                                    </div>
                                 </div>
 
                                 <motion.button
@@ -2142,19 +2191,24 @@ export default function AILab() {
 
                                 <div className="space-y-2.5">
                                     {predictions.map((score, digit) => {
-                                        const isWinner = score === Math.max(...predictions) && Math.max(...predictions) > 0.2;
+                                        const winningIndex = predictions.indexOf(Math.max(...predictions));
+                                        const isWinner = winningIndex === digit && score > 0.05;
+                                        
+                                        const getConfidenceColor = (score, isWinner) => {
+                                            if (score > 0.85) return 'bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.5)]';
+                                            if (score > 0.5) return 'bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.4)]';
+                                            if (isWinner && score > 0.15) return 'bg-sky-400 shadow-[0_0_10px_rgba(56,189,248,0.4)]';
+                                            return 'bg-slate-600';
+                                        };
+
                                         return (
                                             <div key={digit} className="flex items-center gap-3">
                                                 <span className={`w-4 text-sm font-extrabold text-right ${isWinner ? 'text-accent text-base' : 'text-secondary'}`}>
                                                     {digit}
                                                 </span>
-                                                <div className="flex-1 h-3.5 rounded-full bg-slate-900 border border-slate-800 overflow-hidden relative">
+                                                <div className="bg-slate-800/80 rounded-full h-3.5 flex-1 relative overflow-hidden border border-slate-700/50">
                                                     <motion.div
-                                                        className={`h-full rounded-full ${
-                                                            isWinner
-                                                                ? 'bg-gradient-to-r from-accent to-cyan-400'
-                                                                : 'bg-slate-700/60'
-                                                        }`}
+                                                        className={`absolute left-0 top-0 bottom-0 rounded-full ${getConfidenceColor(score, isWinner)}`}
                                                         initial={{ width: 0 }}
                                                         animate={{ width: `${score * 100}%` }}
                                                         transition={{ duration: 0.2, ease: 'easeOut' }}
